@@ -8,6 +8,10 @@ async function main() {
 
   // Clear existing data
   console.log("Clearing existing data...");
+  await prisma.purchase.deleteMany();
+  await prisma.message.deleteMany();
+  await prisma.conversation.deleteMany();
+  await prisma.digitalProduct.deleteMany();
   await prisma.comment.deleteMany();
   await prisma.payment.deleteMany();
   await prisma.subscription.deleteMany();
@@ -384,6 +388,159 @@ async function main() {
   });
 
   console.log("✅ Created posts for all creators");
+
+  // Create Digital Products
+  console.log("\nCreating digital products...");
+
+  // Priya's digital products
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: priyaProfile.id,
+      title: "Complete Procreate Brush Pack",
+      description: "50+ custom brushes I use in all my digital art. Includes texture, line, and shading brushes.",
+      price: 49900, // ₹499
+      fileUrl: "https://example.com/files/priya-brushes.zip",
+      fileType: "zip",
+      isActive: true,
+    },
+  });
+
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: priyaProfile.id,
+      title: "Digital Portrait Drawing eBook",
+      description: "Learn my step-by-step process for creating realistic digital portraits. 80+ pages with tutorials.",
+      price: 29900, // ₹299
+      fileUrl: "https://example.com/files/priya-ebook.pdf",
+      fileType: "pdf",
+      isActive: true,
+    },
+  });
+
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: priyaProfile.id,
+      title: "Custom Wallpaper Pack (12 designs)",
+      description: "My best artwork as high-resolution wallpapers for desktop and mobile.",
+      price: 9900, // ₹99
+      fileUrl: "https://example.com/files/priya-wallpapers.zip",
+      fileType: "zip",
+      isActive: true,
+    },
+  });
+
+  // Amit's digital products
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: amitProfile.id,
+      title: "React Component Library Starter",
+      description: "Production-ready component library setup with TypeScript, Storybook, and automated testing.",
+      price: 99900, // ₹999
+      fileUrl: "https://example.com/files/amit-component-lib.zip",
+      fileType: "zip",
+      isActive: true,
+    },
+  });
+
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: amitProfile.id,
+      title: "Next.js SaaS Boilerplate",
+      description: "Complete SaaS starter with auth, payments, admin dashboard, and more. Save weeks of development!",
+      price: 199900, // ₹1999
+      fileUrl: "https://example.com/files/amit-saas-boilerplate.zip",
+      fileType: "zip",
+      isActive: true,
+    },
+  });
+
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: amitProfile.id,
+      title: "Web Developer Interview Guide",
+      description: "100+ common interview questions with detailed answers for frontend and fullstack roles.",
+      price: 29900, // ₹299
+      fileUrl: "https://example.com/files/amit-interview-guide.pdf",
+      fileType: "pdf",
+      isActive: true,
+    },
+  });
+
+  // Riya's digital products
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: riyaProfile.id,
+      title: "12-Week Transformation Program",
+      description: "Complete workout and nutrition plan to transform your body. Includes video guides.",
+      price: 149900, // ₹1499
+      fileUrl: "https://example.com/files/riya-12week.zip",
+      fileType: "zip",
+      isActive: true,
+    },
+  });
+
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: riyaProfile.id,
+      title: "Home Workout Video Pack",
+      description: "30 follow-along workout videos, no equipment needed. From beginner to advanced.",
+      price: 79900, // ₹799
+      fileUrl: "https://example.com/files/riya-home-videos.zip",
+      fileType: "zip",
+      isActive: true,
+    },
+  });
+
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: riyaProfile.id,
+      title: "Healthy Indian Recipe eBook",
+      description: "50+ healthy Indian recipes with macros. Perfect for fitness enthusiasts.",
+      price: 19900, // ₹199
+      fileUrl: "https://example.com/files/riya-recipes.pdf",
+      fileType: "pdf",
+      isActive: true,
+    },
+  });
+
+  // Sameer's digital products
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: sameerProfile.id,
+      title: "Original Song Stems Pack",
+      description: "Complete stems and instrumentals for 5 of my original songs. Use for remixes or covers!",
+      price: 49900, // ₹499
+      fileUrl: "https://example.com/files/sameer-stems.zip",
+      fileType: "zip",
+      isActive: true,
+    },
+  });
+
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: sameerProfile.id,
+      title: "Music Production Sample Pack",
+      description: "200+ royalty-free samples: drums, synths, vocals. Created for Nepali music production.",
+      price: 39900, // ₹399
+      fileUrl: "https://example.com/files/sameer-samples.zip",
+      fileType: "zip",
+      isActive: true,
+    },
+  });
+
+  await prisma.digitalProduct.create({
+    data: {
+      creatorId: sameerProfile.id,
+      title: "Guitar Chord Book (Nepali Songs)",
+      description: "Chord charts and strumming patterns for 100+ popular Nepali songs.",
+      price: 14900, // ₹149
+      fileUrl: "https://example.com/files/sameer-chords.pdf",
+      fileType: "pdf",
+      isActive: true,
+    },
+  });
+
+  console.log("✅ Created digital products for all creators");
 
   // Create some subscriptions
   console.log("\nCreating subscriptions...");

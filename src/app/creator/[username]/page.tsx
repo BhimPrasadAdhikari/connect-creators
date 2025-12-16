@@ -47,12 +47,18 @@ async function getCreator(username: string) {
           requiredTier: true,
         },
       },
+      digitalProducts: {
+        where: { isActive: true },
+        orderBy: { createdAt: "desc" },
+        take: 6,
+      },
       _count: {
         select: {
           subscriptions: {
             where: { status: "ACTIVE" },
           },
           posts: true,
+          digitalProducts: true,
         },
       },
     },
@@ -312,6 +318,53 @@ export default async function CreatorProfilePage({ params }: PageProps) {
                 </div>
               )}
             </div>
+
+            {/* Digital Products */}
+            {creator.digitalProducts && creator.digitalProducts.length > 0 && (
+              <div className="mt-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                  <Package className="w-5 h-5 text-purple-500" />
+                  Digital Products
+                </h2>
+                <div className="space-y-3">
+                  {creator.digitalProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-purple-200 transition-all"
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-gray-900 truncate">
+                            {product.title}
+                          </h3>
+                          {product.description && (
+                            <p className="text-sm text-gray-500 line-clamp-2 mt-1">
+                              {product.description}
+                            </p>
+                          )}
+                          {product.fileType && (
+                            <span className="inline-block mt-2 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
+                              {product.fileType.toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                        <div className="text-right flex-shrink-0">
+                          <p className="font-bold text-lg text-purple-600">
+                            {formatPrice(product.price)}
+                          </p>
+                          <Link
+                            href={`/products/${product.id}`}
+                            className="text-sm text-purple-600 hover:underline font-medium"
+                          >
+                            Buy Now →
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Send a Message (for non-owners) */}
             {!isOwner && (
