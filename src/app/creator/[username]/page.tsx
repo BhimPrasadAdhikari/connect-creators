@@ -239,7 +239,7 @@ export default async function CreatorProfilePage({ params }: PageProps) {
           <div className="lg:col-span-1 space-y-8">
             {/* Subscription Tiers */}
             <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                 <Heart className="w-5 h-5 text-pink-500" />
                 Support {displayName.split(" ")[0]}
               </h2>
@@ -251,55 +251,80 @@ export default async function CreatorProfilePage({ params }: PageProps) {
                   </CardContent>
                 </Card>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   {creator.tiers.map((tier, index) => (
                     <div
                       key={tier.id}
-                      className={`relative bg-white rounded-xl border-2 p-5 transition-all hover:shadow-lg ${
-                        index === 0 ? "border-blue-500 shadow-md" : "border-gray-200"
+                      className={`relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ${
+                        index === 0 
+                          ? "ring-2 ring-blue-500 shadow-blue-100" 
+                          : "border border-gray-200 hover:border-gray-300"
                       }`}
                     >
+                      {/* Popular badge - inside card */}
                       {index === 0 && (
-                        <Badge
-                          variant="accent"
-                          className="absolute -top-2 left-4 text-xs"
+                        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center py-2 text-sm font-semibold">
+                          ⭐ Most Popular
+                        </div>
+                      )}
+                      
+                      <div className="p-6">
+                        <h3 className="font-bold text-xl text-gray-900 mb-2">
+                          {tier.name}
+                        </h3>
+                        <div className="flex items-baseline gap-1 mb-4">
+                          <span className="text-3xl font-bold text-gray-900">
+                            {formatPrice(tier.price)}
+                          </span>
+                          <span className="text-gray-500">/month</span>
+                        </div>
+                        
+                        {tier.description && (
+                          <p className="text-gray-600 mb-5 pb-5 border-b border-gray-100">
+                            {tier.description}
+                          </p>
+                        )}
+                        
+                        <ul className="space-y-3 mb-6">
+                          {tier.benefits.map((benefit, i) => (
+                            <li key={i} className="flex items-start gap-3 text-gray-700">
+                              <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
+                                <CheckCircle className="w-3.5 h-3.5 text-green-600" />
+                              </div>
+                              <span>{benefit}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        
+                        <Link
+                          href={`/checkout/${tier.id}`}
+                          className={`block w-full text-center py-3.5 rounded-xl font-semibold transition-all duration-200 ${
+                            index === 0
+                              ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                              : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                          }`}
                         >
-                          Most Popular
-                        </Badge>
-                      )}
-                      <h3 className="font-bold text-lg text-gray-900 mb-1">
-                        {tier.name}
-                      </h3>
-                      <p className="text-2xl font-bold text-blue-600 mb-3">
-                        {formatPrice(tier.price)}
-                        <span className="text-sm font-normal text-gray-500">/month</span>
-                      </p>
-                      {tier.description && (
-                        <p className="text-sm text-gray-600 mb-4">{tier.description}</p>
-                      )}
-                      <ul className="space-y-2 mb-5">
-                        {tier.benefits.map((benefit, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
-                            <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
-                            {benefit}
-                          </li>
-                        ))}
-                      </ul>
-                      <Link
-                        href={`/checkout/${tier.id}`}
-                        className={`block w-full text-center py-3 rounded-lg font-semibold transition-colors ${
-                          index === 0
-                            ? "bg-blue-600 text-white hover:bg-blue-700"
-                            : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                        }`}
-                      >
-                        Subscribe
-                      </Link>
+                          Subscribe Now
+                        </Link>
+                      </div>
                     </div>
                   ))}
                 </div>
               )}
             </div>
+
+            {/* Send a Message (for non-owners) */}
+            {!isOwner && (
+              <div className="mt-6">
+                <Link
+                  href={`/messages?creator=${creator.id}`}
+                  className="flex items-center justify-center gap-3 w-full py-4 rounded-xl bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold hover:from-gray-800 hover:to-gray-700 transition-all shadow-lg"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Send a Message
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Right Column - Posts */}
