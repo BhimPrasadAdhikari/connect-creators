@@ -1,12 +1,13 @@
 import Link from "next/link";
-import { Check, ArrowRight } from "lucide-react";
+import { Check, ArrowRight, Calculator } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { Button, Card, CardContent } from "@/components/ui";
+import { EarningsCalculator } from "@/components/ui/EarningsCalculator";
 
 export const metadata = {
   title: "Pricing | CreatorConnect",
-  description: "Simple, transparent pricing for creators.CreatorConnect takes only 10%.",
+  description: "Simple, transparent pricing for creators. CreatorConnect takes only 5%.",
 };
 
 const creatorPlans = [
@@ -28,7 +29,7 @@ const creatorPlans = [
   },
   {
     name: "Pro",
-    price: "10%",
+    price: "5%",
     period: "of earnings",
     description: "Everything you need to monetize",
     features: [
@@ -38,6 +39,7 @@ const creatorPlans = [
       "Advanced analytics",
       "Custom branding",
       "Early access to new features",
+      "Keep ~93% after all fees",
     ],
     cta: "Start Earning",
     href: "/signup?role=creator",
@@ -55,11 +57,11 @@ const fanFeatures = [
 ];
 
 const paymentMethods = [
-  { name: "UPI", region: "India" },
-  { name: "Cards", region: "International" },
-  { name: "eSewa", region: "Nepal" },
-  { name: "Khalti", region: "Nepal" },
-  { name: "Bank Transfer", region: "All" },
+  { name: "UPI", region: "India", fee: "~2%" },
+  { name: "Cards", region: "International", fee: "~2.5%" },
+  { name: "eSewa", region: "Nepal", fee: "~2%" },
+  { name: "Khalti", region: "Nepal", fee: "~2%" },
+  { name: "Bank Transfer", region: "All", fee: "~1%" },
 ];
 
 export default function PricingPage() {
@@ -72,7 +74,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Simple, Transparent Pricing</h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            We only make money when you do. Creators keep 90% of their earnings.
+            We only make money when you do. Creators keep up to 93% of their earnings.
           </p>
         </div>
       </section>
@@ -172,27 +174,53 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* Payment Methods */}
-      <section className="py-20">
+      {/* Earnings Calculator */}
+      <section className="py-20 bg-gray-100">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Accepted Payment Methods</h2>
-            <p className="text-gray-600 mt-4">
-              We support multiple payment options for your convenience.
+            <span className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
+              <Calculator className="w-4 h-4 inline mr-1" />
+              Calculate Your Earnings
+            </span>
+            <h2 className="text-3xl font-bold text-gray-900">See What You&apos;ll Earn</h2>
+            <p className="text-gray-600 mt-4 max-w-xl mx-auto">
+              Use our calculator to see exactly how much you&apos;ll earn after platform and payment fees.
             </p>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-4 max-w-2xl mx-auto">
+          <div className="max-w-md mx-auto">
+            <EarningsCalculator />
+          </div>
+        </div>
+      </section>
+
+      {/* Payment Methods */}
+      <section className="py-20 bg-white">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-gray-900">Payment Methods & Fees</h2>
+            <p className="text-gray-600 mt-4">
+              We support multiple payment options. Lower fees = more earnings for you!
+            </p>
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 max-w-3xl mx-auto">
             {paymentMethods.map((method) => (
               <div
                 key={method.name}
-                className="bg-white rounded-lg border border-gray-200 px-6 py-4 text-center"
+                className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4 text-center min-w-[140px]"
               >
                 <p className="font-semibold text-gray-900">{method.name}</p>
                 <p className="text-sm text-gray-500">{method.region}</p>
+                <p className="text-sm font-medium text-green-600 mt-1">{method.fee} fee</p>
               </div>
             ))}
           </div>
+
+          <p className="text-center text-sm text-gray-500 mt-8 max-w-xl mx-auto">
+            💡 <strong>Pro tip:</strong> Encourage your Indian fans to pay via UPI for the lowest fees. 
+            You&apos;ll keep more of what they pay!
+          </p>
         </div>
       </section>
 
