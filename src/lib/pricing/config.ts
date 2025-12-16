@@ -9,12 +9,12 @@
 
 // Platform commission rates
 export const PLATFORM_COMMISSION = {
-  // Standard commission rate (5% of transaction)
-  STANDARD: 0.05,
+  // Standard commission rate (10% of transaction)
+  STANDARD: 0.10,
   // Premium creators (high volume) - reduced rate
-  PREMIUM: 0.03,
+  PREMIUM: 0.05,
   // Promotional rate for new creators (first 3 months)
-  PROMOTIONAL: 0.02,
+  PROMOTIONAL: 0.03,
 } as const;
 
 // Payment processing fees by provider

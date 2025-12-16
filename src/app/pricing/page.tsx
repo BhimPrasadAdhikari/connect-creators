@@ -7,7 +7,7 @@ import { EarningsCalculator } from "@/components/ui/EarningsCalculator";
 
 export const metadata = {
   title: "Pricing | CreatorConnect",
-  description: "Simple, transparent pricing for creators. CreatorConnect takes only 5%.",
+  description: "Simple, transparent pricing for creators. CreatorConnect takes only 10%.",
 };
 
 const creatorPlans = [
@@ -29,7 +29,7 @@ const creatorPlans = [
   },
   {
     name: "Pro",
-    price: "5%",
+    price: "10%",
     period: "of earnings",
     description: "Everything you need to monetize",
     features: [
@@ -39,7 +39,7 @@ const creatorPlans = [
       "Advanced analytics",
       "Custom branding",
       "Early access to new features",
-      "Keep ~93% after all fees",
+      "Keep ~88% after all fees",
     ],
     cta: "Start Earning",
     href: "/signup?role=creator",
@@ -74,7 +74,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Simple, Transparent Pricing</h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            We only make money when you do. Creators keep up to 93% of their earnings.
+            We only make money when you do. Creators keep up to 88% of their earnings.
           </p>
         </div>
       </section>

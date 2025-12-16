@@ -147,7 +147,7 @@ export function EarningsCalculator({ className = "" }: EarningsCalculatorProps) 
         <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
           <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <p>
-            Platform fee is only 5%. Payment fees vary by method. 
+            Platform fee is only 10%. Payment fees vary by method. 
             UPI has the lowest fees (~2%), so encourage Indian fans to use it!
           </p>
         </div>
