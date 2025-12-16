@@ -7,6 +7,7 @@ import Link from "next/link";
 import { ArrowLeft, Send, MessageCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Button, Card, CardContent, Avatar } from "@/components/ui";
+import { Skeleton, MessageSkeleton } from "@/components/ui/Skeleton";
 
 interface Conversation {
   id: string;
@@ -114,8 +115,25 @@ export default function MessagesPage() {
     return (
       <main className="min-h-screen bg-gray-50">
         <Header />
-        <div className="container mx-auto px-4 py-8">
-          <p>Loading...</p>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-4xl mx-auto">
+            <Skeleton className="h-6 w-40 mb-6" />
+            <Skeleton className="h-8 w-32 mb-8" />
+            <div className="grid md:grid-cols-3 gap-4 h-[600px]">
+              <Card className="md:col-span-1">
+                <CardContent className="p-0">
+                  <MessageSkeleton />
+                  <MessageSkeleton />
+                  <MessageSkeleton />
+                </CardContent>
+              </Card>
+              <Card className="md:col-span-2">
+                <CardContent className="p-4">
+                  <Skeleton className="h-full w-full min-h-[500px]" />
+                </CardContent>
+              </Card>
+            </div>
+          </div>
         </div>
       </main>
     );

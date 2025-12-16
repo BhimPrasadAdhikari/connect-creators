@@ -11,6 +11,8 @@ import {
   DollarSign,
   TrendingUp,
   Plus,
+  Package,
+  MessageCircle,
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { Avatar, Card, CardContent, Button, Badge } from "@/components/ui";
@@ -156,6 +158,20 @@ export default async function CreatorDashboardPage() {
             >
               <FileText className="w-5 h-5" />
               Posts
+            </Link>
+            <Link
+              href="/dashboard/creator/products"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
+            >
+              <Package className="w-5 h-5" />
+              Products
+            </Link>
+            <Link
+              href="/messages"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
+            >
+              <MessageCircle className="w-5 h-5" />
+              Messages
             </Link>
             <Link
               href="/dashboard/creator/subscribers"

@@ -4,9 +4,10 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Plus, Edit, Trash2, ArrowLeft, Download, Eye, Package } from "lucide-react";
+import { Plus, Trash2, ArrowLeft, Package } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Button, Card, CardContent, Badge, Input } from "@/components/ui";
+import { Skeleton, ProductCardSkeleton } from "@/components/ui/Skeleton";
 
 interface Product {
   id: string;
@@ -56,8 +57,21 @@ export default function ProductsManagementPage() {
     return (
       <main className="min-h-screen bg-gray-50">
         <Header />
-        <div className="container mx-auto px-4 py-8">
-          <p>Loading...</p>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-3xl mx-auto">
+            <Skeleton className="h-6 w-40 mb-6" />
+            <div className="flex justify-between mb-8">
+              <div>
+                <Skeleton className="h-8 w-48 mb-2" />
+                <Skeleton className="h-4 w-64" />
+              </div>
+              <Skeleton className="h-10 w-32" />
+            </div>
+            <div className="space-y-4">
+              <ProductCardSkeleton />
+              <ProductCardSkeleton />
+            </div>
+          </div>
         </div>
       </main>
     );
