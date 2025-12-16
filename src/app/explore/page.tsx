@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Search, Filter } from "lucide-react";
 import { Avatar, Badge, Card, CardContent, Button } from "@/components/ui";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import prisma from "@/lib/prisma";
 
 // Helper function to format price
@@ -203,6 +204,9 @@ export default async function ExplorePage() {
           </div>
         )}
       </div>
+
+      {/* Footer */}
+      <Footer />
     </main>
   );
 }

@@ -9,6 +9,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 export default function HomePage() {
   return (
@@ -362,72 +363,5 @@ function CTASection() {
         </div>
       </div>
     </section>
-  );
-}
-
-function Footer() {
-  return (
-    <footer className="py-12 bg-gray-900 text-white/80">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                <Heart className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-lg font-semibold text-white">
-                CreatorConnect
-              </span>
-            </div>
-            <p className="text-sm text-white/60">
-              Connecting fans with creators across Nepal &amp; India.
-            </p>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-white mb-4">For Fans</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/explore" className="hover:text-white transition-colors">Explore Creators</Link></li>
-              <li><Link href="/how-it-works" className="hover:text-white transition-colors">How It Works</Link></li>
-              <li><Link href="/pricing" className="hover:text-white transition-colors">Pricing</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-white mb-4">For Creators</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/signup?role=creator" className="hover:text-white transition-colors">Start Creating</Link></li>
-              <li><Link href="/creator-resources" className="hover:text-white transition-colors">Resources</Link></li>
-              <li><Link href="/pricing/creators" className="hover:text-white transition-colors">Creator Pricing</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="font-semibold text-white mb-4">Company</h4>
-            <ul className="space-y-2 text-sm">
-              <li><Link href="/about" className="hover:text-white transition-colors">About Us</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
-              <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="mt-12 pt-8 border-t border-white/10 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-sm text-white/60">
-            © {new Date().getFullYear()} CreatorConnect. All rights reserved.
-          </p>
-          <div className="flex items-center gap-4 text-sm">
-            <span className="flex items-center gap-2">
-              <Shield className="w-4 h-4 text-green-500" />
-              Secure Payments
-            </span>
-            <span className="flex items-center gap-2">
-              <CreditCard className="w-4 h-4" />
-              UPI Supported
-            </span>
-          </div>
-        </div>
-      </div>
-    </footer>
   );
 }

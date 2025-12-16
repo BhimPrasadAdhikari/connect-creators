@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { Avatar, Card, CardContent, TierCard, PostCard } from "@/components/ui";
 import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import prisma from "@/lib/prisma";
 
 interface PageProps {
@@ -214,8 +215,8 @@ export default async function CreatorProfilePage({ params }: PageProps) {
         </div>
       </div>
 
-      {/* Footer Spacing */}
-      <div className="h-20" />
+      {/* Footer */}
+      <Footer />
     </main>
   );
 }
