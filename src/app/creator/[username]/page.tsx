@@ -47,18 +47,12 @@ async function getCreator(username: string) {
           requiredTier: true,
         },
       },
-      digitalProducts: {
-        where: { isActive: true },
-        orderBy: { createdAt: "desc" },
-        take: 4,
-      },
       _count: {
         select: {
           subscriptions: {
             where: { status: "ACTIVE" },
           },
           posts: true,
-          digitalProducts: true,
         },
       },
     },
@@ -306,53 +300,6 @@ export default async function CreatorProfilePage({ params }: PageProps) {
                 </div>
               )}
             </div>
-
-            {/* Digital Products */}
-            {creator.digitalProducts && creator.digitalProducts.length > 0 && (
-              <div>
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Package className="w-5 h-5 text-purple-500" />
-                  Digital Products
-                </h2>
-                <div className="space-y-3">
-                  {creator.digitalProducts.map((product) => (
-                    <div
-                      key={product.id}
-                      className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-shadow"
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="font-semibold text-gray-900 mb-1">
-                            {product.title}
-                          </h3>
-                          {product.description && (
-                            <p className="text-sm text-gray-500 line-clamp-2">
-                              {product.description}
-                            </p>
-                          )}
-                          {product.fileType && (
-                            <Badge variant="default" className="mt-2 text-xs">
-                              {product.fileType.toUpperCase()}
-                            </Badge>
-                          )}
-                        </div>
-                        <div className="text-right ml-4">
-                          <p className="font-bold text-blue-600">
-                            {formatPrice(product.price)}
-                          </p>
-                          <Link
-                            href={`/products/${product.id}`}
-                            className="text-sm text-blue-600 hover:underline"
-                          >
-                            View →
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
 
           {/* Right Column - Posts */}
