@@ -7,15 +7,23 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import type { PaymentConfig, PaymentResult, PaymentVerification, PaymentProviderInterface } from "./types";
 
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID || "",
-  key_secret: process.env.RAZORPAY_KEY_SECRET || "",
-});
+// Lazy initialization to avoid build-time errors when API keys are not set
+let razorpayInstance: Razorpay | null = null;
+
+function getRazorpay(): Razorpay {
+  if (!razorpayInstance) {
+    razorpayInstance = new Razorpay({
+      key_id: process.env.RAZORPAY_KEY_ID || "",
+      key_secret: process.env.RAZORPAY_KEY_SECRET || "",
+    });
+  }
+  return razorpayInstance;
+}
 
 export const razorpayProvider: PaymentProviderInterface = {
   async createOrder(config: PaymentConfig): Promise<PaymentResult> {
     try {
-      const order = await razorpay.orders.create({
+      const order = await getRazorpay().orders.create({
         amount: config.amount,
         currency: config.currency,
         receipt: config.subscriptionId,
@@ -66,7 +74,7 @@ export const razorpayProvider: PaymentProviderInterface = {
       }
 
       // Fetch payment details
-      const payment = await razorpay.payments.fetch(paymentId);
+      const payment = await getRazorpay().payments.fetch(paymentId);
 
       return {
         success: payment.status === "captured",

@@ -7,6 +7,7 @@ import type { PaymentConfig, PaymentResult, PaymentVerification, PaymentProvider
 import prisma from "@/lib/prisma";
 
 interface BankDetails {
+  [key: string]: string | undefined;
   bankName: string;
   accountName: string;
   accountNumber: string;

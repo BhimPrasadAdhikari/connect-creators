@@ -3,33 +3,35 @@
  * Entry point for all payment operations
  */
 
-import type { PaymentConfig, PaymentResult, PaymentVerification, PaymentProvider } from "./types";
-import { stripeProvider } from "./stripe";
-import { razorpayProvider } from "./razorpay";
-import { esewaProvider } from "./esewa";
-import { khaltiProvider } from "./khalti";
-import { bankTransferProvider } from "./bank-transfer";
+import type { PaymentConfig, PaymentResult, PaymentVerification, PaymentProvider, PaymentProviderInterface } from "./types";
 
 export * from "./types";
-export { getRazorpayKeyId } from "./razorpay";
-export { getKhaltiPublicKey } from "./khalti";
-export { getBankDetails, verifyBankTransfer } from "./bank-transfer";
 
 /**
- * Get the appropriate payment provider
+ * Get the appropriate payment provider (lazy loaded)
  */
-function getProvider(provider: PaymentProvider) {
+async function getProvider(provider: PaymentProvider): Promise<PaymentProviderInterface> {
   switch (provider) {
-    case "stripe":
+    case "stripe": {
+      const { stripeProvider } = await import("./stripe");
       return stripeProvider;
-    case "razorpay":
+    }
+    case "razorpay": {
+      const { razorpayProvider } = await import("./razorpay");
       return razorpayProvider;
-    case "esewa":
+    }
+    case "esewa": {
+      const { esewaProvider } = await import("./esewa");
       return esewaProvider;
-    case "khalti":
+    }
+    case "khalti": {
+      const { khaltiProvider } = await import("./khalti");
       return khaltiProvider;
-    case "bank_transfer":
+    }
+    case "bank_transfer": {
+      const { bankTransferProvider } = await import("./bank-transfer");
       return bankTransferProvider;
+    }
     default:
       throw new Error(`Unknown payment provider: ${provider}`);
   }
@@ -42,7 +44,7 @@ export async function createPaymentOrder(
   provider: PaymentProvider,
   config: PaymentConfig
 ): Promise<PaymentResult> {
-  const paymentProvider = getProvider(provider);
+  const paymentProvider = await getProvider(provider);
   return paymentProvider.createOrder(config);
 }
 
@@ -55,7 +57,7 @@ export async function verifyPayment(
   paymentId?: string,
   signature?: string
 ): Promise<PaymentVerification> {
-  const paymentProvider = getProvider(provider);
+  const paymentProvider = await getProvider(provider);
   return paymentProvider.verifyPayment(orderId, paymentId || "", signature);
 }
 
@@ -85,4 +87,31 @@ export function getAvailableProviders(countryCode: string): PaymentProvider[] {
     default:
       return ["stripe", "bank_transfer"];
   }
+}
+
+/**
+ * Lazy exports for specific provider utilities
+ */
+export async function getRazorpayKeyId(): Promise<string> {
+  const { getRazorpayKeyId: getKey } = await import("./razorpay");
+  return getKey();
+}
+
+export async function getKhaltiPublicKey(): Promise<string> {
+  const { getKhaltiPublicKey: getKey } = await import("./khalti");
+  return getKey();
+}
+
+export async function getBankDetails() {
+  const { getBankDetails: getDetails } = await import("./bank-transfer");
+  return getDetails();
+}
+
+export async function verifyBankTransfer(
+  orderId: string,
+  transactionId: string,
+  adminNote?: string
+): Promise<boolean> {
+  const { verifyBankTransfer: verify } = await import("./bank-transfer");
+  return verify(orderId, transactionId, adminNote);
 }

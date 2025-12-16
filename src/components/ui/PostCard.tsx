@@ -7,13 +7,13 @@ import Link from "next/link";
 import Image from "next/image";
 
 export interface PostCardProps {
-  id: string;
+  id?: string;
   title: string;
   content: string;
   mediaUrl?: string | null;
   mediaType?: string | null;
   tierName?: string;
-  isPaid: boolean;
+  isPaid?: boolean;
   isLocked: boolean;
   createdAt: Date | string;
   creator: {
@@ -38,6 +38,10 @@ export function PostCard({
   commentsCount = 0,
   className,
 }: PostCardProps) {
+  // Default isPaid to isLocked if not provided
+  const isPaidContent = isPaid ?? isLocked;
+  const postId = id || "post";
+  
   const truncatedContent = content.length > 200 
     ? content.slice(0, 200) + "..." 
     : content;
@@ -88,7 +92,7 @@ export function PostCard({
               {formatDate(createdAt)}
             </span>
           </div>
-          {isPaid && (
+          {isPaidContent && (
             <Badge variant="accent">
               {isLocked ? "Premium" : "Exclusive"}
             </Badge>
@@ -97,7 +101,7 @@ export function PostCard({
 
         {/* Title */}
         <h3 className="text-lg font-semibold text-text-primary mb-2">
-          <Link href={`/post/${id}`} className="hover:text-primary transition-colors">
+          <Link href={`/post/${postId}`} className="hover:text-primary transition-colors">
             {title}
           </Link>
         </h3>
@@ -125,7 +129,7 @@ export function PostCard({
         {!isLocked && (
           <div className="mt-4 pt-4 border-t border-border flex items-center justify-between">
             <Link
-              href={`/post/${id}`}
+              href={`/post/${postId}`}
               className="text-sm text-primary font-medium hover:underline"
             >
               Read more →
