@@ -120,7 +120,7 @@ export default function PricingPage() {
                   <Link href={plan.href}>
                     <Button
                       className="w-full"
-                      variant={plan.popular ? "default" : "outline"}
+                      variant={plan.popular ? "primary" : "outline"}
                     >
                       {plan.cta}
                       <ArrowRight className="w-4 h-4 ml-2" />
