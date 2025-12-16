@@ -165,6 +165,7 @@ export default async function CreatorProfilePage({ params }: PageProps) {
               {creator.tiers.map((tier, index) => (
                 <TierCard
                   key={tier.id}
+                  id={tier.id}
                   name={tier.name}
                   price={tier.price}
                   currency={tier.currency}
@@ -191,9 +192,11 @@ export default async function CreatorProfilePage({ params }: PageProps) {
                 {creator.posts.map((post) => (
                   <PostCard
                     key={post.id}
+                    id={post.id}
                     title={post.title}
                     content={post.content}
                     createdAt={post.createdAt}
+                    isPaid={post.isPaid}
                     isLocked={post.isPaid}
                     mediaUrl={post.mediaUrl || undefined}
                     mediaType={post.mediaType as "image" | "video" | "audio" | undefined}

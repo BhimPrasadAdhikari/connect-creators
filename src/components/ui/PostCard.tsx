@@ -12,13 +12,14 @@ export interface PostCardProps {
   content: string;
   mediaUrl?: string | null;
   mediaType?: string | null;
+  tierName?: string;
   isPaid: boolean;
   isLocked: boolean;
   createdAt: Date | string;
   creator: {
     username: string;
     name: string;
-    image?: string | null;
+    avatar?: string | null;
   };
   commentsCount?: number;
   className?: string;
@@ -74,7 +75,7 @@ export function PostCard({
         {/* Creator Info */}
         <div className="flex items-center gap-3 mb-4">
           <Link href={`/creator/${creator.username}`}>
-            <Avatar src={creator.image} name={creator.name} size="md" />
+            <Avatar src={creator.avatar} name={creator.name} size="md" />
           </Link>
           <div className="flex-1 min-w-0">
             <Link 

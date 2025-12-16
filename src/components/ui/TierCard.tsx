@@ -8,10 +8,13 @@ export interface TierCardProps {
   id: string;
   name: string;
   price: number; // in paise
+  currency: string;
+  description: string;
   benefits: string[];
   isPopular?: boolean;
   creatorUsername?: string;
   className?: string;
+  ctaHref?: string;
 }
 
 export function TierCard({
