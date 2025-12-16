@@ -56,6 +56,7 @@ model User {
   payments       Payment[]
   accounts       Account[]
   sessions       Session[]
+  tipsGiven      Tip[]             @relation("TipsGiven")
 }
 
 // NextAuth required models
@@ -111,6 +112,7 @@ model CreatorProfile {
   tiers         SubscriptionTier[]
   posts         Post[]
   subscriptions Subscription[]
+  tipsReceived  Tip[]              @relation("TipsReceived")
 }
 
 model SubscriptionTier {
@@ -168,6 +170,7 @@ model Post {
   creator      CreatorProfile    @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   requiredTier SubscriptionTier? @relation("TierRequiredPosts", fields: [requiredTierId], references: [id])
   comments     Comment[]
+  tips         Tip[]
 }
 
 model Comment {
@@ -202,4 +205,20 @@ model Payment {
   // Relations
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+}
+
+model Tip {
+  id        String   @id @default(cuid())
+  fromUserId String
+  toCreatorId String
+  postId     String?
+  amount     Int      // Amount in paise/cents
+  currency   String   @default("INR")
+  message    String?
+  createdAt  DateTime @default(now())
+
+  // Relations
+  fromUser  User           @relation("TipsGiven", fields: [fromUserId], references: [id], onDelete: Cascade)
+  toCreator CreatorProfile @relation("TipsReceived", fields: [toCreatorId], references: [id], onDelete: Cascade)
+  post      Post?          @relation(fields: [postId], references: [id])
 }
