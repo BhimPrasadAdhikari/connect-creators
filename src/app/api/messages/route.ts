@@ -2,14 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { createMessageSchema, validateBody, idSchema } from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeMessage } from "@/lib/api/sanitize";
 
-// GET /api/messages - Get user's conversations
+// Get user's conversations
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     // Get creator profile if exists
@@ -57,26 +60,29 @@ export async function GET() {
 
     return NextResponse.json({ conversations: formatted });
   } catch (error) {
-    console.error("Error fetching conversations:", error);
-    return NextResponse.json({ error: "Failed to fetch conversations" }, { status: 500 });
+    logError("messages.GET", error);
+    return ApiErrors.internal();
   }
 }
 
-// POST /api/messages - Start a new conversation or send a message
+// Start a new conversation or send a message
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     const body = await request.json();
-    const { creatorId, content } = body;
-
-    if (!creatorId || !content) {
-      return NextResponse.json({ error: "Creator ID and content are required" }, { status: 400 });
+    
+    // Validate input
+    const validation = validateBody(createMessageSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
     }
+    
+    const { creatorId, content } = validation.data;
 
     // Get creator
     const creator = await prisma.creatorProfile.findUnique({
@@ -84,13 +90,16 @@ export async function POST(request: NextRequest) {
     });
 
     if (!creator) {
-      return NextResponse.json({ error: "Creator not found" }, { status: 404 });
+      return ApiErrors.notFound("Creator");
     }
 
     // Can't message yourself
     if (creator.userId === session.user.id) {
-      return NextResponse.json({ error: "You can't message yourself" }, { status: 400 });
+      return ApiErrors.badRequest("You can't message yourself");
     }
+
+    // Sanitize message content
+    const sanitizedContent = sanitizeMessage(content);
 
     // Find or create conversation
     let conversation = await prisma.conversation.findUnique({
@@ -119,7 +128,7 @@ export async function POST(request: NextRequest) {
       data: {
         conversationId: conversation.id,
         senderId: session.user.id,
-        content,
+        content: sanitizedContent,
         isPaid,
         price: isPaid ? creator.dmPrice : null,
       },
@@ -129,7 +138,7 @@ export async function POST(request: NextRequest) {
     await prisma.conversation.update({
       where: { id: conversation.id },
       data: {
-        lastMessage: content.substring(0, 100),
+        lastMessage: sanitizedContent.substring(0, 100),
         lastMessageAt: new Date(),
       },
     });
@@ -141,7 +150,7 @@ export async function POST(request: NextRequest) {
       price: creator.dmPrice,
     }, { status: 201 });
   } catch (error) {
-    console.error("Error sending message:", error);
-    return NextResponse.json({ error: "Failed to send message" }, { status: 500 });
+    logError("messages.POST", error);
+    return ApiErrors.internal();
   }
 }

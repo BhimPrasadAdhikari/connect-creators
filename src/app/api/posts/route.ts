@@ -2,15 +2,37 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { 
+  createPostSchema, 
+  paginationSchema, 
+  validateBody, 
+  validateQuery,
+  idSchema 
+} from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeContent, sanitizeUrl } from "@/lib/api/sanitize";
 
-// GET /api/posts - Get posts (for feed or by creator)
+// Get posts (for feed or by creator)
 export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     const { searchParams } = new URL(request.url);
+    
+    // Validate pagination
+    const paginationResult = validateQuery(paginationSchema, searchParams);
+    if (!paginationResult.success) {
+      return ApiErrors.validationError(paginationResult.errors);
+    }
+    const { limit, offset } = paginationResult.data;
+    
+    // Validate creatorId if provided
     const creatorId = searchParams.get("creatorId");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    if (creatorId) {
+      const idResult = idSchema.safeParse(creatorId);
+      if (!idResult.success) {
+        return ApiErrors.badRequest("Invalid creator ID format");
+      }
+    }
 
     const where: Record<string, unknown> = {
       isPublished: true,
@@ -73,18 +95,18 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ posts: postsWithAccess });
   } catch (error) {
-    console.error("Error fetching posts:", error);
-    return NextResponse.json({ error: "Failed to fetch posts" }, { status: 500 });
+    logError("posts.GET", error);
+    return ApiErrors.internal();
   }
 }
 
-// POST /api/posts - Create a new post (creators only)
+// Create a new post (creators only)
 export async function POST(request: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
     
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     // Check if user is a creator
@@ -93,15 +115,23 @@ export async function POST(request: NextRequest) {
     });
 
     if (!creator) {
-      return NextResponse.json({ error: "Must be a creator to post" }, { status: 403 });
+      return ApiErrors.forbidden("Must be a creator to post");
     }
 
     const body = await request.json();
-    const { title, content, mediaUrl, mediaType, isPaid, requiredTierId } = body;
-
-    if (!title || !content) {
-      return NextResponse.json({ error: "Title and content are required" }, { status: 400 });
+    
+    // Validate input
+    const validation = validateBody(createPostSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
     }
+    
+    const { title, content, mediaUrl, mediaType, isPaid, requiredTierId } = validation.data;
+
+    // Sanitize content to prevent XSS
+    const sanitizedTitle = sanitizeContent(title);
+    const sanitizedContent = sanitizeContent(content);
+    const sanitizedMediaUrl = sanitizeUrl(mediaUrl);
 
     // Validate tier if provided
     if (requiredTierId) {
@@ -109,16 +139,16 @@ export async function POST(request: NextRequest) {
         where: { id: requiredTierId, creatorId: creator.id },
       });
       if (!tier) {
-        return NextResponse.json({ error: "Invalid tier" }, { status: 400 });
+        return ApiErrors.badRequest("Invalid tier - it must belong to you");
       }
     }
 
     const post = await prisma.post.create({
       data: {
         creatorId: creator.id,
-        title,
-        content,
-        mediaUrl: mediaUrl || null,
+        title: sanitizedTitle,
+        content: sanitizedContent,
+        mediaUrl: sanitizedMediaUrl,
         mediaType: mediaType || null,
         isPaid: isPaid || false,
         requiredTierId: isPaid ? requiredTierId : null,
@@ -135,7 +165,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ post }, { status: 201 });
   } catch (error) {
-    console.error("Error creating post:", error);
-    return NextResponse.json({ error: "Failed to create post" }, { status: 500 });
+    logError("posts.POST", error);
+    return ApiErrors.internal();
   }
 }

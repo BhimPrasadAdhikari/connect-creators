@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { updatePostSchema, validateBody, idSchema } from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeContent, sanitizeUrl } from "@/lib/api/sanitize";
 
 interface RouteParams {
   params: Promise<{ postId: string }>;
@@ -11,6 +14,13 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { postId } = await params;
+    
+    // Validate postId format
+    const idResult = idSchema.safeParse(postId);
+    if (!idResult.success) {
+      return ApiErrors.badRequest("Invalid post ID format");
+    }
+    
     const session = await getServerSession(authOptions);
 
     const post = await prisma.post.findUnique({
@@ -33,7 +43,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return ApiErrors.notFound("Post");
     }
 
     // Check access
@@ -65,8 +75,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error("Error fetching post:", error);
-    return NextResponse.json({ error: "Failed to fetch post" }, { status: 500 });
+    logError("posts.[postId].GET", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -74,10 +84,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const { postId } = await params;
+    
+    // Validate postId format
+    const idResult = idSchema.safeParse(postId);
+    if (!idResult.success) {
+      return ApiErrors.badRequest("Invalid post ID format");
+    }
+    
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     const post = await prisma.post.findUnique({
@@ -86,27 +103,37 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return ApiErrors.notFound("Post");
     }
 
+    // IDOR protection: verify ownership
     if (post.creator.userId !== session.user.id) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return ApiErrors.forbidden("You can only edit your own posts");
     }
 
     const body = await request.json();
-    const { title, content, mediaUrl, mediaType, isPaid, requiredTierId, isPublished } = body;
+    
+    // Validate input
+    const validation = validateBody(updatePostSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
+    }
+    
+    const { title, content, mediaUrl, mediaType, isPaid, requiredTierId, isPublished } = validation.data;
+
+    // Sanitize content if provided
+    const updateData: Record<string, unknown> = {};
+    if (title) updateData.title = sanitizeContent(title);
+    if (content) updateData.content = sanitizeContent(content);
+    if (mediaUrl !== undefined) updateData.mediaUrl = sanitizeUrl(mediaUrl);
+    if (mediaType !== undefined) updateData.mediaType = mediaType;
+    if (isPaid !== undefined) updateData.isPaid = isPaid;
+    if (requiredTierId !== undefined) updateData.requiredTierId = isPaid ? requiredTierId : null;
+    if (isPublished !== undefined) updateData.isPublished = isPublished;
 
     const updatedPost = await prisma.post.update({
       where: { id: postId },
-      data: {
-        ...(title && { title }),
-        ...(content && { content }),
-        ...(mediaUrl !== undefined && { mediaUrl }),
-        ...(mediaType !== undefined && { mediaType }),
-        ...(isPaid !== undefined && { isPaid }),
-        ...(requiredTierId !== undefined && { requiredTierId: isPaid ? requiredTierId : null }),
-        ...(isPublished !== undefined && { isPublished }),
-      },
+      data: updateData,
       include: {
         creator: { include: { user: { select: { name: true, image: true } } } },
         requiredTier: true,
@@ -115,8 +142,8 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ post: updatedPost });
   } catch (error) {
-    console.error("Error updating post:", error);
-    return NextResponse.json({ error: "Failed to update post" }, { status: 500 });
+    logError("posts.[postId].PUT", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -124,10 +151,17 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const { postId } = await params;
+    
+    // Validate postId format
+    const idResult = idSchema.safeParse(postId);
+    if (!idResult.success) {
+      return ApiErrors.badRequest("Invalid post ID format");
+    }
+    
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     const post = await prisma.post.findUnique({
@@ -136,18 +170,19 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return ApiErrors.notFound("Post");
     }
 
+    // IDOR protection: verify ownership
     if (post.creator.userId !== session.user.id) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return ApiErrors.forbidden("You can only delete your own posts");
     }
 
     await prisma.post.delete({ where: { id: postId } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting post:", error);
-    return NextResponse.json({ error: "Failed to delete post" }, { status: 500 });
+    logError("posts.[postId].DELETE", error);
+    return ApiErrors.internal();
   }
 }

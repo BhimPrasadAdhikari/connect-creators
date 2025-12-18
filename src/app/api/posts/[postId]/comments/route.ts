@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { createCommentSchema, validateBody, idSchema } from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeContent } from "@/lib/api/sanitize";
 
 interface RouteParams {
   params: Promise<{ postId: string }>;
@@ -11,21 +14,25 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { postId } = await params;
+    
+    // Validate postId format
+    const idResult = idSchema.safeParse(postId);
+    if (!idResult.success) {
+      return ApiErrors.badRequest("Invalid post ID format");
+    }
 
     const comments = await prisma.comment.findMany({
       where: { postId },
       include: {
-        user: {
-          select: { id: true, name: true, image: true },
-        },
+        user: { select: { id: true, name: true, image: true } },
       },
       orderBy: { createdAt: "desc" },
     });
 
     return NextResponse.json({ comments });
   } catch (error) {
-    console.error("Error fetching comments:", error);
-    return NextResponse.json({ error: "Failed to fetch comments" }, { status: 500 });
+    logError("posts.[postId].comments.GET", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -33,42 +40,56 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function POST(request: NextRequest, { params }: RouteParams) {
   try {
     const { postId } = await params;
+    
+    // Validate postId format
+    const idResult = idSchema.safeParse(postId);
+    if (!idResult.success) {
+      return ApiErrors.badRequest("Invalid post ID format");
+    }
+    
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Must be logged in to comment" }, { status: 401 });
+      return ApiErrors.unauthorized("Must be logged in to comment");
     }
 
-    const body = await request.json();
-    const { content } = body;
-
-    if (!content || content.trim().length === 0) {
-      return NextResponse.json({ error: "Comment cannot be empty" }, { status: 400 });
-    }
-
-    // Check if post exists and user has access
+    // Check post exists
     const post = await prisma.post.findUnique({
       where: { id: postId },
       include: { creator: true },
     });
 
     if (!post) {
-      return NextResponse.json({ error: "Post not found" }, { status: 404 });
+      return ApiErrors.notFound("Post");
     }
 
-    // Check access for paid posts
-    if (post.isPaid && post.creator.userId !== session.user.id) {
-      if (post.requiredTierId) {
-        const subscription = await prisma.subscription.findFirst({
+    const body = await request.json();
+    
+    // Validate input
+    const validation = validateBody(createCommentSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
+    }
+    
+    const { content } = validation.data;
+
+    // Sanitize comment content to prevent XSS
+    const sanitizedContent = sanitizeContent(content);
+
+    // If post is paid, check if user has access
+    if (post.isPaid) {
+      const hasAccess = 
+        post.creator.userId === session.user.id ||
+        (post.requiredTierId && await prisma.subscription.findFirst({
           where: {
             fanId: session.user.id,
             tierId: post.requiredTierId,
             status: "ACTIVE",
           },
-        });
-        if (!subscription) {
-          return NextResponse.json({ error: "Subscribe to comment on this post" }, { status: 403 });
-        }
+        }));
+      
+      if (!hasAccess) {
+        return ApiErrors.forbidden("You must be subscribed to comment on this post");
       }
     }
 
@@ -76,18 +97,16 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
       data: {
         postId,
         userId: session.user.id,
-        content: content.trim(),
+        content: sanitizedContent,
       },
       include: {
-        user: {
-          select: { id: true, name: true, image: true },
-        },
+        user: { select: { id: true, name: true, image: true } },
       },
     });
 
     return NextResponse.json({ comment }, { status: 201 });
   } catch (error) {
-    console.error("Error creating comment:", error);
-    return NextResponse.json({ error: "Failed to create comment" }, { status: 500 });
+    logError("posts.[postId].comments.POST", error);
+    return ApiErrors.internal();
   }
 }

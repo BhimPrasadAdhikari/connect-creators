@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { createTipSchema, validateBody } from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeMessage } from "@/lib/api/sanitize";
 
 // Pre-defined tip amounts
 const TIP_AMOUNTS = {
@@ -16,23 +19,26 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Must be logged in to send tips" }, { status: 401 });
+      return ApiErrors.unauthorized("Must be logged in to send tips");
     }
 
     const body = await request.json();
-    const { creatorId, postId, amount, message } = body;
-
-    if (!creatorId) {
-      return NextResponse.json({ error: "Creator ID is required" }, { status: 400 });
+    
+    // Validate input
+    const validation = validateBody(createTipSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
     }
+    
+    const { creatorId, postId, amount, message } = validation.data;
 
-    // Validate amount
+    // Calculate tip amount
     const tipAmount = typeof amount === "string" 
       ? TIP_AMOUNTS[amount as keyof typeof TIP_AMOUNTS] 
       : amount;
     
     if (!tipAmount || tipAmount < 5000) {
-      return NextResponse.json({ error: "Invalid tip amount" }, { status: 400 });
+      return ApiErrors.badRequest("Invalid tip amount (minimum ₹50)");
     }
 
     // Verify creator exists
@@ -42,12 +48,12 @@ export async function POST(request: NextRequest) {
     });
 
     if (!creator) {
-      return NextResponse.json({ error: "Creator not found" }, { status: 404 });
+      return ApiErrors.notFound("Creator");
     }
 
     // Cannot tip yourself
     if (creator.userId === session.user.id) {
-      return NextResponse.json({ error: "Cannot tip yourself" }, { status: 400 });
+      return ApiErrors.badRequest("Cannot tip yourself");
     }
 
     // Verify post if provided
@@ -56,9 +62,12 @@ export async function POST(request: NextRequest) {
         where: { id: postId, creatorId },
       });
       if (!post) {
-        return NextResponse.json({ error: "Post not found" }, { status: 404 });
+        return ApiErrors.notFound("Post");
       }
     }
+
+    // Sanitize message
+    const sanitizedMessage = message ? sanitizeMessage(message, 500) : null;
 
     // Create tip record (in real app, this would integrate with payment)
     const tip = await prisma.tip.create({
@@ -67,7 +76,7 @@ export async function POST(request: NextRequest) {
         toCreatorId: creatorId,
         postId: postId || null,
         amount: tipAmount,
-        message: message || null,
+        message: sanitizedMessage,
       },
       include: {
         fromUser: { select: { name: true, image: true } },
@@ -83,8 +92,8 @@ export async function POST(request: NextRequest) {
       message: `Sent ₹${tipAmount / 100} tip to ${creator.user.name || creator.displayName}!`,
     }, { status: 201 });
   } catch (error) {
-    console.error("Error sending tip:", error);
-    return NextResponse.json({ error: "Failed to send tip" }, { status: 500 });
+    logError("tips.POST", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -94,7 +103,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     const { searchParams } = new URL(request.url);
@@ -144,7 +153,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ tips });
     }
   } catch (error) {
-    console.error("Error fetching tips:", error);
-    return NextResponse.json({ error: "Failed to fetch tips" }, { status: 500 });
+    logError("tips.GET", error);
+    return ApiErrors.internal();
   }
 }

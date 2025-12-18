@@ -1,36 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import prisma from "@/lib/prisma";
+import { signupSchema, validateBody } from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { name, email, password, role = "FAN", username } = body;
-
-    // Validate required fields
-    if (!email || !password || !name) {
-      return NextResponse.json(
-        { error: "Name, email, and password are required" },
-        { status: 400 }
-      );
+    
+    // Validate input with Zod
+    const validation = validateBody(signupSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
     }
-
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      return NextResponse.json(
-        { error: "Invalid email format" },
-        { status: 400 }
-      );
-    }
-
-    // Validate password strength
-    if (password.length < 8) {
-      return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
-        { status: 400 }
-      );
-    }
+    
+    const { name, email, password, role, username } = validation.data;
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({
@@ -38,51 +22,33 @@ export async function POST(request: NextRequest) {
     });
 
     if (existingUser) {
-      return NextResponse.json(
-        { error: "An account with this email already exists" },
-        { status: 409 }
-      );
+      return ApiErrors.conflict("An account with this email already exists");
     }
 
     // If creator, validate and check username
     if (role === "CREATOR") {
       if (!username) {
-        return NextResponse.json(
-          { error: "Username is required for creators" },
-          { status: 400 }
-        );
-      }
-
-      // Validate username format (alphanumeric and underscores only)
-      const usernameRegex = /^[a-zA-Z0-9_]+$/;
-      if (!usernameRegex.test(username) || username.length < 3) {
-        return NextResponse.json(
-          { error: "Username must be at least 3 characters and contain only letters, numbers, and underscores" },
-          { status: 400 }
-        );
+        return ApiErrors.validationError(["Username is required for creators"]);
       }
 
       // Check if username is taken
       const existingCreator = await prisma.creatorProfile.findUnique({
-        where: { username: username.toLowerCase() },
+        where: { username },
       });
 
       if (existingCreator) {
-        return NextResponse.json(
-          { error: "This username is already taken" },
-          { status: 409 }
-        );
+        return ApiErrors.conflict("This username is already taken");
       }
     }
 
-    // Hash password
+    // Hash password with strong cost factor
     const hashedPassword = await bcrypt.hash(password, 12);
 
     // Create user
     const user = await prisma.user.create({
       data: {
         name,
-        email: email.toLowerCase(),
+        email,
         password: hashedPassword,
         role: role === "CREATOR" ? "CREATOR" : "FAN",
       },
@@ -93,7 +59,7 @@ export async function POST(request: NextRequest) {
       await prisma.creatorProfile.create({
         data: {
           userId: user.id,
-          username: username.toLowerCase(),
+          username,
           displayName: name,
         },
       });
@@ -110,10 +76,7 @@ export async function POST(request: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Signup error:", error);
-    return NextResponse.json(
-      { error: "An error occurred during signup" },
-      { status: 500 }
-    );
+    logError("signup", error);
+    return ApiErrors.internal();
   }
 }
