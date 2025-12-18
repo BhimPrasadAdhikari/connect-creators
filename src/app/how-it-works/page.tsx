@@ -100,7 +100,7 @@ export default function HowItWorksPage() {
             How CreatorConnect Works
           </h1>
           <p className="text-xl text-blue-100 max-w-2xl mx-auto">
-            Whether you're a creator looking to monetize your content or a fan wanting to support your favorites, we make it simple.
+            Whether you&apos;re a creator looking to monetize your content or a fan wanting to support your favorites, we make it simple.
           </p>
         </div>
       </section>

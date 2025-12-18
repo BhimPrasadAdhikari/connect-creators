@@ -89,7 +89,7 @@ export default function TermsPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">8. Limitation of Liability</h2>
               <p className="text-gray-600">
-                CreatorConnect is provided "as is" without warranties. We are not liable for 
+                CreatorConnect is provided &quot;as is&quot; without warranties. We are not liable for 
                 indirect, incidental, or consequential damages arising from your use of the platform.
               </p>
             </section>

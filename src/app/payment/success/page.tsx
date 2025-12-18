@@ -1,8 +1,22 @@
+"use client";
+
 import Link from "next/link";
 import { Heart, CheckCircle, ArrowRight } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
+import { useMemo } from "react";
 
 export default function PaymentSuccessPage() {
+  // Calculate next billing date outside of render to avoid impure function warning
+  const nextBillingDate = useMemo(() => {
+    const date = new Date();
+    date.setDate(date.getDate() + 30);
+    return date.toLocaleDateString("en-IN", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }, []);
+
   return (
     <main className="min-h-screen bg-background flex flex-col">
       {/* Header */}
@@ -50,11 +64,7 @@ export default function PaymentSuccessPage() {
               <div className="flex justify-between">
                 <span className="text-text-secondary">Next billing</span>
                 <span className="font-medium text-text-primary">
-                  {new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toLocaleDateString("en-IN", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                  {nextBillingDate}
                 </span>
               </div>
             </div>
