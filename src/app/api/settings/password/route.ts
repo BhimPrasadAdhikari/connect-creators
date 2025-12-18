@@ -3,8 +3,9 @@ import { getServerSession } from "next-auth";
 import bcrypt from "bcryptjs";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { validatePassword } from "@/lib/auth/validation";
+import { invalidateUserSessions } from "@/lib/auth/session";
 
-// PUT /api/settings/password - Change user password
 export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
@@ -13,7 +14,7 @@ export async function PUT(req: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const userId = (session.user as { id?: string }).id;
+    const userId = session.user.id;
     if (!userId) {
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
@@ -28,9 +29,15 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    if (newPassword.length < 8) {
+    // Validate new password against security policy
+    const validation = validatePassword(newPassword);
+    if (!validation.valid) {
       return NextResponse.json(
-        { error: "Password must be at least 8 characters" },
+        { 
+          error: "Password does not meet security requirements",
+          details: validation.errors,
+          strength: validation.strength
+        },
         { status: 400 }
       );
     }
@@ -62,7 +69,16 @@ export async function PUT(req: NextRequest) {
       );
     }
 
-    // Hash new password
+    // Prevent reuse of current password
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return NextResponse.json(
+        { error: "New password must be different from current password" },
+        { status: 400 }
+      );
+    }
+
+    // Hash new password with strong cost factor
     const hashedPassword = await bcrypt.hash(newPassword, 12);
 
     // Update password
@@ -71,7 +87,14 @@ export async function PUT(req: NextRequest) {
       data: { password: hashedPassword },
     });
 
-    return NextResponse.json({ success: true });
+    // SECURITY: Invalidate all existing sessions after password change
+    // This forces all other devices to re-authenticate
+    await invalidateUserSessions(userId);
+
+    return NextResponse.json({ 
+      success: true,
+      message: "Password changed successfully. You may need to log in again on other devices."
+    });
   } catch (error) {
     console.error("Failed to change password:", error);
     return NextResponse.json(
