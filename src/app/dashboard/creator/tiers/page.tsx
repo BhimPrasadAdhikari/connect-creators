@@ -7,6 +7,7 @@ import Link from "next/link";
 import { Plus, Edit, Trash2, ArrowLeft, Check, Info } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Button, Card, CardContent, Input, Badge } from "@/components/ui";
+import { TiersPageSkeleton } from "@/components/ui/Skeleton";
 
 interface Tier {
   id: string;
@@ -63,8 +64,8 @@ export default function TiersManagementPage() {
     return (
       <main className="min-h-screen bg-gray-50">
         <Header />
-        <div className="container mx-auto px-4 py-8">
-          <p>Loading...</p>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <TiersPageSkeleton />
         </div>
       </main>
     );

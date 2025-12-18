@@ -153,3 +153,77 @@ export function ProfileSkeleton() {
     </div>
   );
 }
+
+export function TierCardSkeleton() {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+      <div className="flex items-start justify-between">
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center gap-2">
+            <Skeleton className="h-5 w-24" />
+            <Skeleton className="h-5 w-16 rounded-full" />
+          </div>
+          <Skeleton className="h-7 w-28" />
+          <Skeleton className="h-4 w-full" />
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="w-8 h-8 rounded-lg" />
+          <Skeleton className="w-8 h-8 rounded-lg" />
+        </div>
+      </div>
+      <div className="space-y-1.5 pt-2">
+        <div className="flex items-center gap-2">
+          <Skeleton className="w-3 h-3 rounded-full" />
+          <Skeleton className="h-3 w-40" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="w-3 h-3 rounded-full" />
+          <Skeleton className="h-3 w-32" />
+        </div>
+        <div className="flex items-center gap-2">
+          <Skeleton className="w-3 h-3 rounded-full" />
+          <Skeleton className="h-3 w-36" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TiersPageSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto space-y-6">
+      {/* Back link */}
+      <Skeleton className="h-4 w-32" />
+      
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </div>
+        <Skeleton className="h-10 w-24 rounded-lg" />
+      </div>
+      
+      {/* Info card */}
+      <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
+        <div className="flex items-start gap-3">
+          <Skeleton className="w-5 h-5 rounded-full bg-blue-200" />
+          <div className="flex-1 space-y-2">
+            <Skeleton className="h-4 w-24 bg-blue-200" />
+            <Skeleton className="h-3 w-full bg-blue-200" />
+            <Skeleton className="h-3 w-5/6 bg-blue-200" />
+            <Skeleton className="h-3 w-4/6 bg-blue-200" />
+          </div>
+        </div>
+      </div>
+      
+      {/* Tier cards */}
+      <div className="space-y-4">
+        <Skeleton className="h-6 w-24" />
+        <TierCardSkeleton />
+        <TierCardSkeleton />
+        <TierCardSkeleton />
+      </div>
+    </div>
+  );
+}
