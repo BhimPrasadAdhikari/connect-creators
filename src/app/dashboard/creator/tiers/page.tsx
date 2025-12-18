@@ -137,7 +137,7 @@ export default function TiersManagementPage() {
     setFormData({ ...formData, benefits: formData.benefits.filter((_, i) => i !== index) });
   };
 
-  const useSuggestedTier = (tier: typeof SUGGESTED_TIERS[0]) => {
+  const applySuggestedTier = (tier: typeof SUGGESTED_TIERS[0]) => {
     setFormData({
       name: tier.name,
       description: "",
@@ -315,7 +315,7 @@ export default function TiersManagementPage() {
                             ))}
                           </ul>
                         </div>
-                        <Button variant="outline" onClick={() => useSuggestedTier(tier)}>
+                        <Button variant="outline" onClick={() => applySuggestedTier(tier)}>
                           Use This
                         </Button>
                       </div>

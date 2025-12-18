@@ -182,7 +182,7 @@ async function main() {
     },
   });
 
-  const priyaTier3 = await prisma.subscriptionTier.create({
+  const _priyaTier3 = await prisma.subscriptionTier.create({
     data: {
       creatorId: priyaProfile.id,
       name: "Premium Artist",

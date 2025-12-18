@@ -292,7 +292,7 @@ export default async function CreatorProfilePage({ params }: PageProps) {
                         )}
                         
                         <ul className="space-y-3 mb-6">
-                          {tier.benefits.map((benefit, i) => (
+                          {tier.benefits.map((benefit: string, i: number) => (
                             <li key={i} className="flex items-start gap-3 text-gray-700">
                               <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
                                 <CheckCircle className="w-3.5 h-3.5 text-green-600" />

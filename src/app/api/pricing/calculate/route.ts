@@ -3,7 +3,6 @@ import {
   calculateEarnings,
   getSuggestedTiers,
   getPricingGuidance,
-  validateTierPrice,
   PAYMENT_FEES,
   type Currency,
   type PaymentProvider,
