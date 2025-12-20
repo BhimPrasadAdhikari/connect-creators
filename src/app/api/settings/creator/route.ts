@@ -2,23 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { updateCreatorProfileSchema, validateBody } from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeContent, sanitizeUrl } from "@/lib/api/sanitize";
 
 // GET /api/settings/creator - Get creator profile settings
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = (session.user as { id?: string }).id;
-    if (!userId) {
-      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
+    if (!session?.user?.id) {
+      return ApiErrors.unauthorized();
     }
 
     const creatorProfile = await prisma.creatorProfile.findUnique({
-      where: { userId },
+      where: { userId: session.user.id },
       select: {
         id: true,
         username: true,
@@ -32,19 +30,13 @@ export async function GET() {
     });
 
     if (!creatorProfile) {
-      return NextResponse.json(
-        { error: "Creator profile not found" },
-        { status: 404 }
-      );
+      return ApiErrors.notFound("Creator profile");
     }
 
     return NextResponse.json(creatorProfile);
   } catch (error) {
-    console.error("Failed to fetch creator profile:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch creator profile" },
-      { status: 500 }
-    );
+    logError("settings.creator.GET", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -53,28 +45,30 @@ export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = (session.user as { id?: string }).id;
-    if (!userId) {
-      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
+    if (!session?.user?.id) {
+      return ApiErrors.unauthorized();
     }
 
     const body = await req.json();
-    const { displayName, bio, coverImage, socialLinks, dmPrice } = body;
+    
+    // Validate input
+    const validation = validateBody(updateCreatorProfileSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
+    }
+    
+    const { displayName, bio, coverImage, socialLinks, dmPrice } = validation.data;
 
-    // Build update data
+    // Build update data with sanitization
     const updateData: Record<string, unknown> = {};
-    if (displayName !== undefined) updateData.displayName = displayName;
-    if (bio !== undefined) updateData.bio = bio;
-    if (coverImage !== undefined) updateData.coverImage = coverImage;
+    if (displayName !== undefined) updateData.displayName = displayName ? sanitizeContent(displayName) : null;
+    if (bio !== undefined) updateData.bio = bio ? sanitizeContent(bio) : null;
+    if (coverImage !== undefined) updateData.coverImage = sanitizeUrl(coverImage);
     if (socialLinks !== undefined) updateData.socialLinks = socialLinks;
     if (dmPrice !== undefined) updateData.dmPrice = dmPrice;
 
     const updatedProfile = await prisma.creatorProfile.update({
-      where: { userId },
+      where: { userId: session.user.id },
       data: updateData,
       select: {
         id: true,
@@ -89,10 +83,7 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(updatedProfile);
   } catch (error) {
-    console.error("Failed to update creator profile:", error);
-    return NextResponse.json(
-      { error: "Failed to update creator profile" },
-      { status: 500 }
-    );
+    logError("settings.creator.PUT", error);
+    return ApiErrors.internal();
   }
 }

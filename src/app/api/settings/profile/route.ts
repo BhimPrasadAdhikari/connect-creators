@@ -2,23 +2,21 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { updateProfileSchema, validateBody } from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeUrl } from "@/lib/api/sanitize";
 
 // GET /api/settings/profile - Get user profile settings
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = (session.user as { id?: string }).id;
-    if (!userId) {
-      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
+    if (!session?.user?.id) {
+      return ApiErrors.unauthorized();
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: userId },
+      where: { id: session.user.id },
       select: {
         id: true,
         name: true,
@@ -29,16 +27,13 @@ export async function GET() {
     });
 
     if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return ApiErrors.notFound("User");
     }
 
     return NextResponse.json(user);
   } catch (error) {
-    console.error("Failed to fetch profile:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch profile" },
-      { status: 500 }
-    );
+    logError("settings.profile.GET", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -47,41 +42,27 @@ export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = (session.user as { id?: string }).id;
-    if (!userId) {
-      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
+    if (!session?.user?.id) {
+      return ApiErrors.unauthorized();
     }
 
     const body = await req.json();
-    const { name, email, profilePublic } = body;
-
-    // Validate email if provided
-    if (email) {
-      const existingUser = await prisma.user.findFirst({
-        where: {
-          email,
-          NOT: { id: userId },
-        },
-      });
-
-      if (existingUser) {
-        return NextResponse.json(
-          { error: "Email already in use" },
-          { status: 400 }
-        );
-      }
+    
+    // Validate input
+    const validation = validateBody(updateProfileSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
     }
+    
+    const { name, image } = validation.data;
 
+    // Build update data
     const updateData: Record<string, unknown> = {};
     if (name !== undefined) updateData.name = name;
-    if (email !== undefined) updateData.email = email;
+    if (image !== undefined) updateData.image = sanitizeUrl(image);
 
     const updatedUser = await prisma.user.update({
-      where: { id: userId },
+      where: { id: session.user.id },
       data: updateData,
       select: {
         id: true,
@@ -93,11 +74,8 @@ export async function PUT(req: NextRequest) {
 
     return NextResponse.json(updatedUser);
   } catch (error) {
-    console.error("Failed to update profile:", error);
-    return NextResponse.json(
-      { error: "Failed to update profile" },
-      { status: 500 }
-    );
+    logError("settings.profile.PUT", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -106,26 +84,18 @@ export async function DELETE() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = (session.user as { id?: string }).id;
-    if (!userId) {
-      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
+    if (!session?.user?.id) {
+      return ApiErrors.unauthorized();
     }
 
     // Delete user (cascades to related records due to onDelete: Cascade)
     await prisma.user.delete({
-      where: { id: userId },
+      where: { id: session.user.id },
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Failed to delete account:", error);
-    return NextResponse.json(
-      { error: "Failed to delete account" },
-      { status: 500 }
-    );
+    logError("settings.profile.DELETE", error);
+    return ApiErrors.internal();
   }
 }

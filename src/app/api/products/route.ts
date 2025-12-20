@@ -2,14 +2,36 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { 
+  createProductSchema, 
+  paginationSchema, 
+  validateBody, 
+  validateQuery,
+  idSchema 
+} from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeContent, sanitizeUrl } from "@/lib/api/sanitize";
 
 // GET /api/products - List digital products
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
+    
+    // Validate pagination
+    const paginationResult = validateQuery(paginationSchema, searchParams);
+    if (!paginationResult.success) {
+      return ApiErrors.validationError(paginationResult.errors);
+    }
+    const { limit, offset } = paginationResult.data;
+    
+    // Validate creatorId if provided
     const creatorId = searchParams.get("creatorId");
-    const limit = parseInt(searchParams.get("limit") || "20");
-    const offset = parseInt(searchParams.get("offset") || "0");
+    if (creatorId) {
+      const idResult = idSchema.safeParse(creatorId);
+      if (!idResult.success) {
+        return ApiErrors.badRequest("Invalid creator ID format");
+      }
+    }
 
     const where: { creatorId?: string; isActive: boolean } = {
       isActive: true,
@@ -36,8 +58,8 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({ products });
   } catch (error) {
-    console.error("Error fetching products:", error);
-    return NextResponse.json({ error: "Failed to fetch products" }, { status: 500 });
+    logError("products.GET", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -47,11 +69,11 @@ export async function POST(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     if (session.user.role !== "CREATOR") {
-      return NextResponse.json({ error: "Only creators can create products" }, { status: 403 });
+      return ApiErrors.forbidden("Only creators can create products");
     }
 
     const creator = await prisma.creatorProfile.findUnique({
@@ -59,38 +81,44 @@ export async function POST(request: NextRequest) {
     });
 
     if (!creator) {
-      return NextResponse.json({ error: "Creator profile not found" }, { status: 404 });
+      return ApiErrors.notFound("Creator profile");
     }
 
     const body = await request.json();
-    const { title, description, price, fileUrl, fileType, thumbnailUrl } = body;
-
-    if (!title || !price || !fileUrl) {
-      return NextResponse.json(
-        { error: "Title, price, and file URL are required" },
-        { status: 400 }
-      );
+    
+    // Validate input
+    const validation = validateBody(createProductSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
     }
+    
+    const { title, description, price, fileUrl, fileType, thumbnailUrl } = validation.data;
 
-    if (price < 4900) {
-      return NextResponse.json({ error: "Minimum price is ₹49" }, { status: 400 });
+    // Sanitize content
+    const sanitizedTitle = sanitizeContent(title);
+    const sanitizedDescription = description ? sanitizeContent(description) : null;
+    const sanitizedFileUrl = sanitizeUrl(fileUrl);
+    const sanitizedThumbnailUrl = sanitizeUrl(thumbnailUrl);
+
+    if (!sanitizedFileUrl) {
+      return ApiErrors.badRequest("Invalid file URL");
     }
 
     const product = await prisma.digitalProduct.create({
       data: {
         creatorId: creator.id,
-        title,
-        description,
+        title: sanitizedTitle,
+        description: sanitizedDescription,
         price,
-        fileUrl,
+        fileUrl: sanitizedFileUrl,
         fileType,
-        thumbnailUrl,
+        thumbnailUrl: sanitizedThumbnailUrl,
       },
     });
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {
-    console.error("Error creating product:", error);
-    return NextResponse.json({ error: "Failed to create product" }, { status: 500 });
+    logError("products.POST", error);
+    return ApiErrors.internal();
   }
 }

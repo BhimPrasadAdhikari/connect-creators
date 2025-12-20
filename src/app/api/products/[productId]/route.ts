@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { updateProductSchema, validateBody, idSchema } from "@/lib/api/validation";
+import { ApiErrors, logError } from "@/lib/api/errors";
+import { sanitizeContent, sanitizeUrl } from "@/lib/api/sanitize";
 
 interface RouteParams {
   params: Promise<{ productId: string }>;
@@ -11,6 +14,13 @@ interface RouteParams {
 export async function GET(request: NextRequest, { params }: RouteParams) {
   try {
     const { productId } = await params;
+    
+    // Validate ID format
+    const idResult = idSchema.safeParse(productId);
+    if (!idResult.success) {
+      return ApiErrors.badRequest("Invalid product ID format");
+    }
+    
     const session = await getServerSession(authOptions);
 
     const product = await prisma.digitalProduct.findUnique({
@@ -26,7 +36,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      return ApiErrors.notFound("Product");
     }
 
     // Check if user has purchased this product
@@ -53,8 +63,8 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
     return NextResponse.json({ product: responseProduct });
   } catch (error) {
-    console.error("Error fetching product:", error);
-    return NextResponse.json({ error: "Failed to fetch product" }, { status: 500 });
+    logError("products.[productId].GET", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -62,10 +72,17 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 export async function PUT(request: NextRequest, { params }: RouteParams) {
   try {
     const { productId } = await params;
+    
+    // Validate ID format
+    const idResult = idSchema.safeParse(productId);
+    if (!idResult.success) {
+      return ApiErrors.badRequest("Invalid product ID format");
+    }
+    
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     const product = await prisma.digitalProduct.findUnique({
@@ -74,33 +91,43 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      return ApiErrors.notFound("Product");
     }
 
+    // IDOR protection
     if (product.creator.userId !== session.user.id) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return ApiErrors.forbidden("You can only edit your own products");
     }
 
     const body = await request.json();
-    const { title, description, price, fileUrl, fileType, thumbnailUrl, isActive } = body;
+    
+    // Validate input
+    const validation = validateBody(updateProductSchema, body);
+    if (!validation.success) {
+      return ApiErrors.validationError(validation.errors);
+    }
+    
+    const { title, description, price, fileUrl, fileType, thumbnailUrl, isActive } = validation.data;
+
+    // Build update data with sanitization
+    const updateData: Record<string, unknown> = {};
+    if (title) updateData.title = sanitizeContent(title);
+    if (description !== undefined) updateData.description = description ? sanitizeContent(description) : null;
+    if (price) updateData.price = price;
+    if (fileUrl) updateData.fileUrl = sanitizeUrl(fileUrl);
+    if (fileType) updateData.fileType = fileType;
+    if (thumbnailUrl) updateData.thumbnailUrl = sanitizeUrl(thumbnailUrl);
+    if (isActive !== undefined) updateData.isActive = isActive;
 
     const updated = await prisma.digitalProduct.update({
       where: { id: productId },
-      data: {
-        ...(title && { title }),
-        ...(description !== undefined && { description }),
-        ...(price && { price }),
-        ...(fileUrl && { fileUrl }),
-        ...(fileType && { fileType }),
-        ...(thumbnailUrl && { thumbnailUrl }),
-        ...(isActive !== undefined && { isActive }),
-      },
+      data: updateData,
     });
 
     return NextResponse.json({ product: updated });
   } catch (error) {
-    console.error("Error updating product:", error);
-    return NextResponse.json({ error: "Failed to update product" }, { status: 500 });
+    logError("products.[productId].PUT", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -108,10 +135,17 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
 export async function DELETE(request: NextRequest, { params }: RouteParams) {
   try {
     const { productId } = await params;
+    
+    // Validate ID format
+    const idResult = idSchema.safeParse(productId);
+    if (!idResult.success) {
+      return ApiErrors.badRequest("Invalid product ID format");
+    }
+    
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return ApiErrors.unauthorized();
     }
 
     const product = await prisma.digitalProduct.findUnique({
@@ -120,11 +154,12 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!product) {
-      return NextResponse.json({ error: "Product not found" }, { status: 404 });
+      return ApiErrors.notFound("Product");
     }
 
+    // IDOR protection
     if (product.creator.userId !== session.user.id) {
-      return NextResponse.json({ error: "Not authorized" }, { status: 403 });
+      return ApiErrors.forbidden("You can only delete your own products");
     }
 
     // If has purchases, just deactivate
@@ -133,14 +168,14 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         where: { id: productId },
         data: { isActive: false },
       });
-      return NextResponse.json({ message: "Product deactivated" });
+      return NextResponse.json({ message: "Product deactivated (has purchases)" });
     }
 
     await prisma.digitalProduct.delete({ where: { id: productId } });
 
     return NextResponse.json({ success: true });
   } catch (error) {
-    console.error("Error deleting product:", error);
-    return NextResponse.json({ error: "Failed to delete product" }, { status: 500 });
+    logError("products.[productId].DELETE", error);
+    return ApiErrors.internal();
   }
 }

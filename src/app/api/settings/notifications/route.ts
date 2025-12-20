@@ -1,15 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
+import { ApiErrors, logError } from "@/lib/api/errors";
 
 // GET /api/settings/notifications - Get notification preferences
 export async function GET() {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session?.user?.id) {
+      return ApiErrors.unauthorized();
     }
 
     // Return default values since notification fields aren't in schema yet
@@ -19,11 +19,8 @@ export async function GET() {
       marketingEmails: false,
     });
   } catch (error) {
-    console.error("Failed to fetch notification settings:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch notification settings" },
-      { status: 500 }
-    );
+    logError("settings.notifications.GET", error);
+    return ApiErrors.internal();
   }
 }
 
@@ -32,36 +29,28 @@ export async function PUT(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions);
 
-    if (!session?.user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const userId = (session.user as { id?: string }).id;
-    if (!userId) {
-      return NextResponse.json({ error: "User ID not found" }, { status: 401 });
+    if (!session?.user?.id) {
+      return ApiErrors.unauthorized();
     }
 
     const body = await req.json();
     const { emailNotifications, marketingEmails } = body;
 
     // Placeholder - in a real implementation, you would update the User model
-    // For now, we just acknowledge the settings
-    console.log("Notification settings updated:", {
-      userId,
-      emailNotifications,
-      marketingEmails,
+    // Log without sensitive data
+    logError("settings.notifications.PUT", new Error("Notification preferences update placeholder"), {
+      userId: session.user.id,
+      emailNotifications: !!emailNotifications,
+      marketingEmails: !!marketingEmails,
     });
 
     return NextResponse.json({
       success: true,
-      emailNotifications,
-      marketingEmails,
+      emailNotifications: !!emailNotifications,
+      marketingEmails: !!marketingEmails,
     });
   } catch (error) {
-    console.error("Failed to update notification settings:", error);
-    return NextResponse.json(
-      { error: "Failed to update notification settings" },
-      { status: 500 }
-    );
+    logError("settings.notifications.PUT", error);
+    return ApiErrors.internal();
   }
 }
