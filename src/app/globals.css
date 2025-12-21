@@ -59,3 +59,61 @@ a {
   background-color: #2563EB;
   color: white;
 }
+
+/* Safe Area for Mobile Notches */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+/* Add bottom padding to main content when mobile nav is shown */
+@media (max-width: 1023px) {
+  .pb-mobile-nav {
+    padding-bottom: 80px; /* 64px nav + 16px extra */
+  }
+  
+  main {
+    padding-bottom: 80px;
+  }
+}
+
+/* Smooth animations */
+@keyframes slide-in-from-right {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-in {
+  animation-duration: 300ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-in-from-right-full {
+  animation-name: slide-in-from-right;
+}
+
+/* Glass morphism utility */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

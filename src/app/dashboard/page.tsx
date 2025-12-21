@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { Avatar, Card, CardContent, PostCard } from "@/components/ui";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import prisma from "@/lib/prisma";
 
 // Fetch user's subscriptions and feed
@@ -390,6 +391,9 @@ export default async function FanDashboardPage() {
           </div>
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 }

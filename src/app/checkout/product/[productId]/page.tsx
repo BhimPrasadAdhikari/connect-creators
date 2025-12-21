@@ -376,22 +376,15 @@ export default function ProductCheckoutPage() {
                       type="submit"
                       className="w-full bg-purple-600 hover:bg-purple-700"
                       size="lg"
-                      disabled={isProcessing}
+                      loading={isProcessing}
                     >
-                      {isProcessing ? (
-                        <span className="flex items-center gap-2">
-                          <Loader2 className="w-5 h-5 animate-spin" />
-                          Processing...
-                        </span>
-                      ) : (
-                        `Pay ${formatPrice(product.price)}`
-                      )}
+                      {isProcessing ? "Processing..." : `Pay ${formatPrice(product.price)}`}
                     </Button>
 
                     {/* Security Note */}
                     <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
-                      <Shield className="w-4 h-4" />
-                      <span>Secure payment via eSewa</span>
+                      <Shield className="w-4 h-4 text-green-600" />
+                      <span>Secure encrypted payment</span>
                     </div>
                   </form>
                 </CardContent>

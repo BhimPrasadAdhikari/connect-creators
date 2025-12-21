@@ -1,229 +1,255 @@
-"use client";
-
-import React from "react";
+import { cn } from "@/lib/utils";
 
 interface SkeletonProps {
   className?: string;
+  variant?: "text" | "circular" | "rectangular";
+  width?: string | number;
+  height?: string | number;
+  animate?: boolean;
 }
 
-export function Skeleton({ className = "" }: SkeletonProps) {
+export function Skeleton({
+  className,
+  variant = "rectangular",
+  width,
+  height,
+  animate = true,
+}: SkeletonProps) {
+  const variantStyles = {
+    text: "rounded",
+    circular: "rounded-full",
+    rectangular: "rounded-lg",
+  };
+
   return (
     <div
-      className={`animate-pulse bg-gray-200 rounded ${className}`}
+      className={cn(
+        "bg-gray-200",
+        animate && "animate-pulse",
+        variantStyles[variant],
+        className
+      )}
+      style={{
+        width: typeof width === "number" ? `${width}px` : width,
+        height: typeof height === "number" ? `${height}px` : height,
+      }}
     />
   );
 }
 
-export function CardSkeleton() {
+// Preset skeleton components for common use cases
+
+export function SkeletonText({ lines = 3, className }: { lines?: number; className?: string }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <div className="flex items-center gap-4">
-        <Skeleton className="w-12 h-12 rounded-full" />
+    <div className={cn("space-y-2", className)}>
+      {Array.from({ length: lines }).map((_, i) => (
+        <Skeleton
+          key={i}
+          variant="text"
+          height={16}
+          width={i === lines - 1 ? "80%" : "100%"}
+        />
+      ))}
+    </div>
+  );
+}
+
+export function SkeletonAvatar({ size = "md" }: { size?: "sm" | "md" | "lg" | "xl" }) {
+  const sizes = {
+    sm: 32,
+    md: 40,
+    lg: 48,
+    xl: 64,
+  };
+
+  return <Skeleton variant="circular" width={sizes[size]} height={sizes[size]} />;
+}
+
+export function SkeletonButton({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
+  const heights = {
+    sm: 36,
+    md: 44,
+    lg: 52,
+  };
+
+  const widths = {
+    sm: 80,
+    md: 120,
+    lg: 160,
+  };
+
+  return <Skeleton width={widths[size]} height={heights[size]} />;
+}
+
+export function SkeletonCard({ className }: { className?: string }) {
+  return (
+    <div className={cn("p-6 bg-white rounded-xl border border-gray-200", className)}>
+      <div className="flex items-start gap-4 mb-4">
+        <SkeletonAvatar size="lg" />
         <div className="flex-1 space-y-2">
-          <Skeleton className="h-4 w-3/4" />
-          <Skeleton className="h-3 w-1/2" />
+          <Skeleton height={20} width="60%" />
+          <Skeleton height={16} width="40%" />
         </div>
       </div>
-    </div>
-  );
-}
-
-export function PostCardSkeleton() {
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-      <div className="flex items-center gap-3">
-        <Skeleton className="w-10 h-10 rounded-full" />
-        <div className="space-y-2">
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-20" />
-        </div>
-      </div>
-      <Skeleton className="h-4 w-full" />
-      <Skeleton className="h-4 w-5/6" />
-      <Skeleton className="h-48 w-full rounded-lg" />
-      <div className="flex gap-4">
-        <Skeleton className="h-8 w-20" />
-        <Skeleton className="h-8 w-20" />
+      <SkeletonText lines={3} />
+      <div className="flex items-center gap-2 mt-4">
+        <SkeletonButton size="sm" />
+        <SkeletonButton size="sm" />
       </div>
     </div>
   );
 }
 
-export function ProductCardSkeleton() {
+export function SkeletonCreatorCard() {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-      <Skeleton className="h-32 w-full rounded-lg" />
-      <Skeleton className="h-5 w-3/4" />
-      <Skeleton className="h-4 w-1/2" />
-      <div className="flex justify-between">
-        <Skeleton className="h-6 w-16" />
-        <Skeleton className="h-8 w-24" />
-      </div>
-    </div>
-  );
-}
-
-export function MessageSkeleton() {
-  return (
-    <div className="flex gap-3 p-4">
-      <Skeleton className="w-10 h-10 rounded-full flex-shrink-0" />
-      <div className="flex-1 space-y-2">
-        <Skeleton className="h-4 w-32" />
-        <Skeleton className="h-3 w-48" />
-      </div>
-    </div>
-  );
-}
-
-export function StatCardSkeleton() {
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4">
-      <div className="flex items-center gap-3">
-        <Skeleton className="w-10 h-10 rounded-lg" />
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-20" />
-          <Skeleton className="h-6 w-16" />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function TableRowSkeleton() {
-  return (
-    <div className="flex items-center gap-4 p-4 border-b">
-      <Skeleton className="w-8 h-8 rounded-full" />
-      <Skeleton className="h-4 w-32" />
-      <Skeleton className="h-4 w-24 ml-auto" />
-      <Skeleton className="h-4 w-16" />
-    </div>
-  );
-}
-
-export function DashboardSkeleton() {
-  return (
-    <div className="space-y-6">
-      {/* Stats Grid */}
-      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCardSkeleton />
-        <StatCardSkeleton />
-        <StatCardSkeleton />
-        <StatCardSkeleton />
-      </div>
-      
-      {/* Content Grid */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          <Skeleton className="h-6 w-32" />
-          <TableRowSkeleton />
-          <TableRowSkeleton />
-          <TableRowSkeleton />
-        </div>
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-4">
-          <Skeleton className="h-6 w-32" />
-          <PostCardSkeleton />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export function ProfileSkeleton() {
-  return (
-    <div className="space-y-6">
-      {/* Cover */}
-      <Skeleton className="h-48 w-full" />
-      
-      {/* Profile Info */}
-      <div className="px-6 -mt-16 relative">
-        <Skeleton className="w-32 h-32 rounded-full border-4 border-white" />
-        <div className="mt-4 space-y-2">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-4 w-64" />
-        </div>
-      </div>
-      
-      {/* Tiers */}
-      <div className="px-6 grid md:grid-cols-3 gap-4">
-        <ProductCardSkeleton />
-        <ProductCardSkeleton />
-        <ProductCardSkeleton />
-      </div>
-    </div>
-  );
-}
-
-export function TierCardSkeleton() {
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
-      <div className="flex items-start justify-between">
+    <div className="p-6 bg-white rounded-xl border border-gray-200">
+      <div className="flex items-start gap-4 mb-4">
+        <SkeletonAvatar size="lg" />
         <div className="flex-1 space-y-2">
-          <div className="flex items-center gap-2">
-            <Skeleton className="h-5 w-24" />
-            <Skeleton className="h-5 w-16 rounded-full" />
-          </div>
-          <Skeleton className="h-7 w-28" />
-          <Skeleton className="h-4 w-full" />
-        </div>
-        <div className="flex gap-2">
-          <Skeleton className="w-8 h-8 rounded-lg" />
-          <Skeleton className="w-8 h-8 rounded-lg" />
+          <Skeleton height={20} width="70%" />
+          <Skeleton height={14} width="40%" />
         </div>
       </div>
-      <div className="space-y-1.5 pt-2">
-        <div className="flex items-center gap-2">
-          <Skeleton className="w-3 h-3 rounded-full" />
-          <Skeleton className="h-3 w-40" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Skeleton className="w-3 h-3 rounded-full" />
-          <Skeleton className="h-3 w-32" />
-        </div>
-        <div className="flex items-center gap-2">
-          <Skeleton className="w-3 h-3 rounded-full" />
-          <Skeleton className="h-3 w-36" />
-        </div>
+      <SkeletonText lines={2} className="mb-4" />
+      <div className="flex items-center justify-between mb-4">
+        <Skeleton height={24} width={60} />
+        <Skeleton height={20} width={80} />
+      </div>
+      <div className="pt-4 border-t border-gray-100">
+        <Skeleton height={16} width="50%" />
       </div>
     </div>
   );
 }
 
-export function TiersPageSkeleton() {
+export function SkeletonPost() {
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
-      {/* Back link */}
-      <Skeleton className="h-4 w-32" />
-      
+    <div className="p-6 bg-white rounded-xl border border-gray-200">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div className="space-y-2">
-          <Skeleton className="h-8 w-48" />
-          <Skeleton className="h-4 w-64" />
+      <div className="flex items-center gap-3 mb-4">
+        <SkeletonAvatar />
+        <div className="flex-1 space-y-2">
+          <Skeleton height={16} width="30%" />
+          <Skeleton height={14} width="20%" />
         </div>
-        <Skeleton className="h-10 w-24 rounded-lg" />
+        <Skeleton height={24} width={60} />
       </div>
-      
-      {/* Info card */}
-      <div className="bg-blue-50 rounded-xl border border-blue-200 p-4">
-        <div className="flex items-start gap-3">
-          <Skeleton className="w-5 h-5 rounded-full bg-blue-200" />
-          <div className="flex-1 space-y-2">
-            <Skeleton className="h-4 w-24 bg-blue-200" />
-            <Skeleton className="h-3 w-full bg-blue-200" />
-            <Skeleton className="h-3 w-5/6 bg-blue-200" />
-            <Skeleton className="h-3 w-4/6 bg-blue-200" />
+
+      {/* Title */}
+      <Skeleton height={24} width="80%" className="mb-4" />
+
+      {/* Content */}
+      <SkeletonText lines={4} className="mb-4" />
+
+      {/* Image placeholder */}
+      <Skeleton height={200} className="mb-4" />
+
+      {/* Footer */}
+      <div className="flex items-center gap-4">
+        <Skeleton height={32} width={32} variant="circular" />
+        <Skeleton height={32} width={32} variant="circular" />
+        <Skeleton height={32} width={32} variant="circular" />
+      </div>
+    </div>
+  );
+}
+
+export function SkeletonHeader() {
+  return (
+    <div className="h-16 px-4 sm:px-6 lg:px-8 border-b border-gray-200 bg-white">
+      <div className="flex items-center justify-between h-full container mx-auto">
+        <div className="flex items-center gap-2">
+          <Skeleton variant="rectangular" width={32} height={32} />
+          <Skeleton height={24} width={150} />
+        </div>
+        <div className="hidden md:flex items-center gap-6">
+          <Skeleton height={20} width={100} />
+          <Skeleton height={20} width={100} />
+        </div>
+        <div className="flex items-center gap-3">
+          <Skeleton height={40} width={100} />
+          <SkeletonAvatar size="sm" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function SkeletonDashboard() {
+  return (
+    <div className="p-8 space-y-8">
+      {/* Welcome section */}
+      <div>
+        <Skeleton height={32} width="40%" className="mb-2" />
+        <Skeleton height={20} width="60%" />
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="p-6 bg-white rounded-xl border border-gray-200">
+            <Skeleton height={16} width="50%" className="mb-4" />
+            <Skeleton height={36} width="40%" />
+          </div>
+        ))}
+      </div>
+
+      {/* Feed */}
+      <div className="space-y-6">
+        <Skeleton height={24} width={120} />
+        <SkeletonPost />
+        <SkeletonPost />
+        <SkeletonPost />
+      </div>
+    </div>
+  );
+}
+
+export function SkeletonTable({ rows = 5 }: { rows?: number }) {
+  return (
+    <div className="border border-gray-200 rounded-lg overflow-hidden">
+      {/* Header */}
+      <div className="bg-gray-50 p-4 border-b border-gray-200">
+        <div className="flex items-center gap-4">
+          <Skeleton height={16} width="20%" />
+          <Skeleton height={16} width="30%" />
+          <Skeleton height={16} width="15%" />
+          <Skeleton height={16} width="20%" />
+        </div>
+      </div>
+
+      {/* Rows */}
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} className="p-4 border-b border-gray-100 last:border-b-0">
+          <div className="flex items-center gap-4">
+            <SkeletonAvatar size="sm" />
+            <Skeleton height={16} width="25%" />
+            <Skeleton height={16} width="15%" />
+            <Skeleton height={16} width="20%" />
           </div>
         </div>
-      </div>
-      
-      {/* Tier cards */}
-      <div className="space-y-4">
-        <Skeleton className="h-6 w-24" />
-        <TierCardSkeleton />
-        <TierCardSkeleton />
-        <TierCardSkeleton />
-      </div>
+      ))}
+    </div>
+  );
+}
+
+// Grid of skeleton cards
+export function SkeletonGrid({
+  count = 6,
+  component = SkeletonCard,
+  className,
+}: {
+  count?: number;
+  component?: React.ComponentType<{ className?: string }>;
+  className?: string;
+}) {
+  const Component = component;
+  
+  return (
+    <div className={cn("grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6", className)}>
+      {Array.from({ length: count }).map((_, i) => (
+        <Component key={i} />
+      ))}
     </div>
   );
 }

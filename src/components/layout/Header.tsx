@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Heart, Menu, X } from "lucide-react";
+import { Heart, Menu, X, Search } from "lucide-react";
 import { useState } from "react";
 import { Avatar } from "@/components/ui";
+import { useRouter } from "next/navigation";
 
 interface HeaderProps {
   transparent?: boolean;
@@ -13,43 +14,72 @@ interface HeaderProps {
 export function Header({ transparent = false }: HeaderProps) {
   const { data: session, status } = useSession();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   const isLoggedIn = status === "authenticated" && session?.user;
   const userRole = (session?.user as { role?: string })?.role;
 
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
+    }
+  };
+
   return (
     <header
-      className={`sticky top-0 z-50 border-b border-gray-200 ${
+      className={`sticky top-0 z-sticky border-b border-gray-200 ${
         transparent
           ? "bg-white/80 backdrop-blur-md"
           : "bg-white"
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-semibold text-gray-900 hidden sm:inline">
               CreatorConnect
             </span>
           </Link>
 
+          {/* Search Bar - Desktop */}
+          <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-md mx-4">
+            <div className="relative w-full">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search creators..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-colors"
+              />
+            </div>
+          </form>
+
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6">
             <Link
               href="/explore"
-              className="text-gray-600 hover:text-blue-600 transition-colors"
+              className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
             >
-              Explore Creators
+              Explore
             </Link>
             <Link
               href="/how-it-works"
-              className="text-gray-600 hover:text-blue-600 transition-colors"
+              className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
             >
               How It Works
+            </Link>
+            <Link
+              href="/pricing"
+              className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
+            >
+              Pricing
             </Link>
           </nav>
 

@@ -307,11 +307,11 @@ function TrustSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mb-12">
           {trustItems.map((item, index) => (
             <div
               key={index}
-              className="flex items-start gap-4 p-6 rounded-xl bg-white border border-gray-200"
+              className="flex items-start gap-4 p-6 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="w-12 h-12 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
                 <item.icon className="w-6 h-6 text-green-600" />
@@ -326,6 +326,48 @@ function TrustSection() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Payment Providers & Security Badges */}
+        <div className="text-center">
+          <p className="text-sm text-gray-500 mb-4">Trusted payment partners</p>
+          <div className="flex flex-wrap items-center justify-center gap-6 sm:gap-8">
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200">
+              <div className="w-6 h-6 bg-green-600 rounded flex items-center justify-center">
+                <span className="text-white text-xs font-bold">e</span>
+              </div>
+              <span className="text-sm font-medium text-gray-700">eSewa</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200">
+              <div className="w-6 h-6 bg-purple-600 rounded flex items-center justify-center">
+                <span className="text-white text-xs font-bold">K</span>
+              </div>
+              <span className="text-sm font-medium text-gray-700">Khalti</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200">
+              <div className="w-6 h-6 bg-blue-600 rounded flex items-center justify-center">
+                <span className="text-white text-xs font-bold">R</span>
+              </div>
+              <span className="text-sm font-medium text-gray-700">Razorpay</span>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 bg-white rounded-lg border border-gray-200">
+              <div className="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center">
+                <span className="text-white text-xs font-bold">S</span>
+              </div>
+              <span className="text-sm font-medium text-gray-700">Stripe</span>
+            </div>
+          </div>
+          <div className="flex items-center justify-center gap-4 mt-6 text-sm text-gray-500">
+            <div className="flex items-center gap-1">
+              <Shield className="w-4 h-4 text-green-600" />
+              <span>SSL Encrypted</span>
+            </div>
+            <div className="w-px h-4 bg-gray-300" />
+            <div className="flex items-center gap-1">
+              <Shield className="w-4 h-4 text-green-600" />
+              <span>PCI Compliant</span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
