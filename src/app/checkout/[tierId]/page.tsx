@@ -182,8 +182,77 @@ export default function CheckoutPage() {
           return;
         }
       } else if (paymentMethod === "upi") {
-        // UPI integration placeholder
-        alert("UPI payment coming soon!");
+        // Razorpay UPI payment
+        const res = await fetch("/api/payments/razorpay/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tierId: tier.id,
+            currency: "INR",
+          }),
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to create Razorpay order");
+        }
+
+        // Load Razorpay script if not loaded
+        if (!(window as unknown as { Razorpay: unknown }).Razorpay) {
+          const script = document.createElement("script");
+          script.src = "https://checkout.razorpay.com/v1/checkout.js";
+          script.async = true;
+          await new Promise((resolve) => {
+            script.onload = resolve;
+            document.body.appendChild(script);
+          });
+        }
+
+        // Open Razorpay checkout
+        const options = {
+          key: data.keyId,
+          amount: data.amount,
+          currency: data.currency,
+          name: "CreatorConnect",
+          description: data.description,
+          order_id: data.orderId,
+          prefill: data.prefill,
+          handler: async (response: { razorpay_order_id: string; razorpay_payment_id: string; razorpay_signature: string }) => {
+            // Verify payment
+            const verifyRes = await fetch("/api/payments/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_signature: response.razorpay_signature,
+                type: "subscription",
+              }),
+            });
+            
+            const verifyData = await verifyRes.json();
+            
+            if (verifyData.success) {
+              router.push("/payment/success?provider=razorpay");
+            } else {
+              alert("Payment verification failed");
+            }
+          },
+          modal: {
+            ondismiss: () => {
+              setIsProcessing(false);
+            },
+          },
+          theme: {
+            color: "#7C3AED",
+          },
+        };
+
+        const RazorpayConstructor = (window as unknown as { Razorpay: new (options: unknown) => { open: () => void } }).Razorpay;
+        const razorpay = new RazorpayConstructor(options);
+        razorpay.open();
+        return;
       } else if (paymentMethod === "bank") {
         // Bank transfer - show instructions
         alert("Bank transfer instructions will be sent to your email.");
