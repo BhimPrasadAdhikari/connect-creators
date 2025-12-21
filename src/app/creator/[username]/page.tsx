@@ -12,6 +12,7 @@ import {
   Heart,
   Users,
   FileText,
+  Download,
 } from "lucide-react";
 import { Avatar, Card, CardContent, TierCard, PostCard, Button, Badge } from "@/components/ui";
 import { Header } from "@/components/layout/Header";
@@ -67,6 +68,40 @@ async function getCreator(username: string) {
   return creator;
 }
 
+// Fetch user's subscriptions and purchases for this creator
+async function getUserPurchaseStatus(userId: string | null, creatorId: string, productIds: string[]) {
+  if (!userId) {
+    return {
+      subscribedTierIds: new Set<string>(),
+      purchasedProductIds: new Set<string>(),
+    };
+  }
+
+  const [subscriptions, purchases] = await Promise.all([
+    prisma.subscription.findMany({
+      where: {
+        fanId: userId,
+        creatorId: creatorId,
+        status: "ACTIVE",
+      },
+      select: { tierId: true },
+    }),
+    prisma.purchase.findMany({
+      where: {
+        userId: userId,
+        status: "COMPLETED",
+        productId: { in: productIds },
+      },
+      select: { productId: true },
+    }),
+  ]);
+
+  return {
+    subscribedTierIds: new Set(subscriptions.map((s) => s.tierId)),
+    purchasedProductIds: new Set(purchases.map((p) => p.productId).filter(Boolean) as string[]),
+  };
+}
+
 // Parse social links
 function getSocialIcon(key: string) {
   switch (key.toLowerCase()) {
@@ -102,6 +137,14 @@ export default async function CreatorProfilePage({ params }: PageProps) {
   if (!creator) {
     notFound();
   }
+
+  const userId = (session?.user as { id?: string })?.id || null;
+  const productIds = creator.digitalProducts.map((p) => p.id);
+  const { subscribedTierIds, purchasedProductIds } = await getUserPurchaseStatus(
+    userId,
+    creator.id,
+    productIds
+  );
 
   const displayName = creator.displayName || creator.user.name || creator.username;
   const socialLinks = (creator.socialLinks as Record<string, string>) || {};
@@ -302,16 +345,31 @@ export default async function CreatorProfilePage({ params }: PageProps) {
                           ))}
                         </ul>
                         
-                        <Link
-                          href={`/checkout/${tier.id}`}
-                          className={`block w-full text-center py-3.5 rounded-xl font-semibold transition-all duration-200 ${
-                            index === 0
-                              ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
-                              : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                          }`}
-                        >
-                          Subscribe Now
-                        </Link>
+                        {subscribedTierIds.has(tier.id) ? (
+                          <div className="space-y-2">
+                            <div className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-100 text-green-800 font-semibold">
+                              <CheckCircle className="w-5 h-5" />
+                              You're Subscribed
+                            </div>
+                            <Link
+                              href="/subscriptions"
+                              className="block w-full text-center py-2 text-sm text-gray-600 hover:text-gray-900"
+                            >
+                              Manage subscription →
+                            </Link>
+                          </div>
+                        ) : (
+                          <Link
+                            href={`/checkout/${tier.id}`}
+                            className={`block w-full text-center py-3.5 rounded-xl font-semibold transition-all duration-200 ${
+                              index === 0
+                                ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
+                                : "bg-gray-100 text-gray-900 hover:bg-gray-200"
+                            }`}
+                          >
+                            Subscribe Now
+                          </Link>
+                        )}
                       </div>
                     </div>
                   ))}
@@ -349,15 +407,33 @@ export default async function CreatorProfilePage({ params }: PageProps) {
                           )}
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className="font-bold text-lg text-purple-600">
-                            {formatPrice(product.price)}
-                          </p>
-                          <Link
-                            href={`/products/${product.id}`}
-                            className="text-sm text-purple-600 hover:underline font-medium"
-                          >
-                            Buy Now →
-                          </Link>
+                          {purchasedProductIds.has(product.id) ? (
+                            <>
+                              <div className="flex items-center gap-1 text-green-600 font-semibold mb-1">
+                                <CheckCircle className="w-4 h-4" />
+                                Owned
+                              </div>
+                              <Link
+                                href={`/products/${product.id}`}
+                                className="text-sm text-purple-600 hover:underline font-medium flex items-center gap-1"
+                              >
+                                <Download className="w-3 h-3" />
+                                View →
+                              </Link>
+                            </>
+                          ) : (
+                            <>
+                              <p className="font-bold text-lg text-purple-600">
+                                {formatPrice(product.price)}
+                              </p>
+                              <Link
+                                href={`/products/${product.id}`}
+                                className="text-sm text-purple-600 hover:underline font-medium"
+                              >
+                                Buy Now →
+                              </Link>
+                            </>
+                          )}
                         </div>
                       </div>
                     </div>
