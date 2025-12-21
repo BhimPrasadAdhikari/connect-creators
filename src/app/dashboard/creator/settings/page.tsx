@@ -24,6 +24,9 @@ import {
   Instagram,
   Twitter,
   Youtube,
+  Lock,
+  Shield,
+  AlertTriangle,
 } from "lucide-react";
 import {
   Button,
@@ -83,6 +86,14 @@ export default function CreatorSettingsPage() {
   const [bankName, setBankName] = useState("");
   const [accountNumber, setAccountNumber] = useState("");
   const [ifscCode, setIfscCode] = useState("");
+
+  // Account/Password
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSaved, setPasswordSaved] = useState(false);
+  const [revokingSession, setRevokingSession] = useState(false);
 
   useEffect(() => {
     fetchCreatorProfile();
@@ -219,6 +230,7 @@ export default function CreatorSettingsPage() {
     { id: "monetization", label: "Monetization", icon: DollarSign },
     { id: "notifications", label: "Notifications", icon: Bell },
     { id: "payout", label: "Payout", icon: CreditCard },
+    { id: "account", label: "Account & Security", icon: Shield },
   ];
 
   return (
@@ -710,6 +722,189 @@ export default function CreatorSettingsPage() {
                     </div>
                   </CardContent>
                 </Card>
+              )}
+
+              {/* Account & Security Section */}
+              {activeSection === "account" && (
+                <div className="space-y-6">
+                  {/* Password Change */}
+                  <Card>
+                    <CardContent>
+                      <div className="flex items-center gap-3 mb-6">
+                        <Lock className="w-5 h-5 text-gray-600" />
+                        <h2 className="text-lg font-semibold text-gray-900">
+                          Change Password
+                        </h2>
+                      </div>
+
+                      {passwordSaved && (
+                        <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-lg flex items-center gap-2">
+                          <Check className="w-5 h-5" />
+                          Password changed successfully!
+                        </div>
+                      )}
+                      {passwordError && (
+                        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
+                          {passwordError}
+                        </div>
+                      )}
+
+                      <div className="space-y-4">
+                        <Input
+                          label="Current Password"
+                          type="password"
+                          value={currentPassword}
+                          onChange={(e) => setCurrentPassword(e.target.value)}
+                          placeholder="Enter your current password"
+                        />
+
+                        <Input
+                          label="New Password"
+                          type="password"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                          placeholder="Enter new password"
+                        />
+                        <p className="text-sm text-gray-500 -mt-2">
+                          Min 8 characters, include uppercase, lowercase, and number
+                        </p>
+
+                        <Input
+                          label="Confirm New Password"
+                          type="password"
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="Confirm new password"
+                        />
+                      </div>
+
+                      <div className="mt-6 flex justify-end">
+                        <Button
+                          onClick={async () => {
+                            if (newPassword !== confirmPassword) {
+                              setPasswordError("Passwords do not match");
+                              return;
+                            }
+                            if (newPassword.length < 8) {
+                              setPasswordError("Password must be at least 8 characters");
+                              return;
+                            }
+                            setLoading(true);
+                            setPasswordError(null);
+                            try {
+                              const res = await fetch("/api/settings/password", {
+                                method: "PUT",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({ currentPassword, newPassword }),
+                              });
+                              if (!res.ok) {
+                                const data = await res.json();
+                                throw new Error(data.error || "Failed to change password");
+                              }
+                              setPasswordSaved(true);
+                              setCurrentPassword("");
+                              setNewPassword("");
+                              setConfirmPassword("");
+                              setTimeout(() => setPasswordSaved(false), 3000);
+                            } catch (err) {
+                              setPasswordError(err instanceof Error ? err.message : "Failed to change password");
+                            } finally {
+                              setLoading(false);
+                            }
+                          }}
+                          disabled={loading || !currentPassword || !newPassword || !confirmPassword}
+                        >
+                          {loading ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Lock className="w-4 h-4" />
+                          )}
+                          Change Password
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Session Security */}
+                  <Card>
+                    <CardContent>
+                      <div className="flex items-center gap-3 mb-6">
+                        <Shield className="w-5 h-5 text-gray-600" />
+                        <h2 className="text-lg font-semibold text-gray-900">
+                          Session Security
+                        </h2>
+                      </div>
+
+                      <p className="text-gray-600 mb-4">
+                        If you suspect unauthorized access to your account, you can sign out from all devices.
+                        This will require you to log in again on all devices.
+                      </p>
+
+                      <Button
+                        variant="outline"
+                        onClick={async () => {
+                          if (!confirm("Are you sure you want to sign out from all devices?")) {
+                            return;
+                          }
+                          setRevokingSession(true);
+                          try {
+                            const res = await fetch("/api/settings/sessions", {
+                              method: "DELETE",
+                            });
+                            if (res.ok) {
+                              alert("All sessions revoked. Please log in again.");
+                              router.push("/login");
+                            }
+                          } catch (err) {
+                            console.error("Failed to revoke sessions:", err);
+                          } finally {
+                            setRevokingSession(false);
+                          }
+                        }}
+                        disabled={revokingSession}
+                      >
+                        {revokingSession ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <LogOut className="w-4 h-4" />
+                        )}
+                        Sign Out All Devices
+                      </Button>
+                    </CardContent>
+                  </Card>
+
+                  {/* Danger Zone */}
+                  <Card className="border-red-200">
+                    <CardContent>
+                      <div className="flex items-center gap-3 mb-6">
+                        <AlertTriangle className="w-5 h-5 text-red-600" />
+                        <h2 className="text-lg font-semibold text-red-600">
+                          Danger Zone
+                        </h2>
+                      </div>
+
+                      <p className="text-gray-600 mb-4">
+                        Once you delete your account, there is no going back. All your content,
+                        subscribers, and earnings will be permanently deleted.
+                      </p>
+
+                      <Button
+                        variant="outline"
+                        className="text-red-600 border-red-300 hover:bg-red-50"
+                        onClick={() => {
+                          if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
+                            if (confirm("This will permanently delete all your content, subscribers, and earnings. Type 'DELETE' to confirm.")) {
+                              // TODO: Implement account deletion
+                              alert("Account deletion would be processed here");
+                            }
+                          }
+                        }}
+                      >
+                        Delete Account
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
               )}
             </div>
           </div>

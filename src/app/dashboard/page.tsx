@@ -82,8 +82,15 @@ export default async function FanDashboardPage() {
   }
 
   const userId = (session.user as { id?: string }).id;
+  const userRole = (session.user as { role?: string }).role;
+  
   if (!userId) {
     redirect("/login");
+  }
+
+  // Redirect creators to their dashboard
+  if (userRole === "CREATOR") {
+    redirect("/dashboard/creator");
   }
 
   const { subscriptions, feed } = await getDashboardData(userId);
