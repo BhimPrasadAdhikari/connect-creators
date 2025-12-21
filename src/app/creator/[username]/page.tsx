@@ -14,7 +14,7 @@ import {
   FileText,
   Download,
 } from "lucide-react";
-import { Avatar, Card, CardContent, TierCard, PostCard, Button, Badge } from "@/components/ui";
+import { Avatar, Card, CardContent, TierCard, PostCard, Button, Badge, Breadcrumbs } from "@/components/ui";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { authOptions } from "@/lib/auth";
@@ -153,6 +153,16 @@ export default async function CreatorProfilePage({ params }: PageProps) {
   return (
     <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <Header />
+
+      {/* Breadcrumbs */}
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <Breadcrumbs
+          items={[
+            { label: "Explore", href: "/explore" },
+            { label: displayName, href: `/creator/${username}` },
+          ]}
+        />
+      </div>
 
       {/* Cover Image Section */}
       <div className="relative">

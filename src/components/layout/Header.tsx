@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Heart, Menu, X, Search } from "lucide-react";
 import { useState } from "react";
-import { Avatar } from "@/components/ui";
+import { Avatar, NotificationDropdown, Notification } from "@/components/ui";
 import { useRouter } from "next/navigation";
 
 interface HeaderProps {
@@ -25,6 +25,40 @@ export function Header({ transparent = false }: HeaderProps) {
     if (searchQuery.trim()) {
       router.push(`/explore?q=${encodeURIComponent(searchQuery.trim())}`);
     }
+  };
+
+  // Demo notifications - in production, fetch from API
+  const getDemoNotifications = (): Notification[] => {
+    if (!isLoggedIn) return [];
+    return [
+      {
+        id: "1",
+        type: "subscription",
+        title: "New Subscriber!",
+        message: "Someone subscribed to your Fan tier",
+        read: false,
+        createdAt: new Date(Date.now() - 1000 * 60 * 5), // 5 mins ago
+        href: "/dashboard/creator",
+      },
+      {
+        id: "2",
+        type: "message",
+        title: "New Message",
+        message: "You have a new message from a fan",
+        read: false,
+        createdAt: new Date(Date.now() - 1000 * 60 * 30), // 30 mins ago
+        href: "/messages",
+      },
+      {
+        id: "3",
+        type: "purchase",
+        title: "Product Sold!",
+        message: "Your preset pack was purchased",
+        read: true,
+        createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2), // 2 hours ago
+        href: "/dashboard/creator/products",
+      },
+    ];
   };
 
   return (
@@ -84,14 +118,21 @@ export function Header({ transparent = false }: HeaderProps) {
           </nav>
 
           {/* Auth Section */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {status === "loading" ? (
               <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
             ) : isLoggedIn ? (
               <>
+                {/* Notifications */}
+                <NotificationDropdown
+                  notifications={getDemoNotifications()}
+                  onMarkRead={(id) => console.log("Mark read:", id)}
+                  onMarkAllRead={() => console.log("Mark all read")}
+                />
+                
                 <Link
                   href={userRole === "CREATOR" ? "/dashboard/creator" : "/dashboard"}
-                  className="hidden sm:inline-flex text-gray-600 hover:text-blue-600 transition-colors px-4 py-2"
+                  className="hidden sm:inline-flex text-gray-600 hover:text-blue-600 transition-colors px-3 py-2 text-sm font-medium"
                 >
                   Dashboard
                 </Link>
