@@ -138,8 +138,27 @@ export default function CheckoutPage() {
           return; // Form will redirect to eSewa
         }
       } else if (paymentMethod === "khalti") {
-        // Khalti integration placeholder
-        alert("Khalti payment coming soon!");
+        // Khalti payment
+        const res = await fetch("/api/payments/khalti/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tierId: tier.id,
+            currency: "NPR",
+          }),
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to create Khalti payment");
+        }
+        
+        // Redirect to Khalti payment page
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+          return;
+        }
       } else if (paymentMethod === "card") {
         // Stripe card payment
         const res = await fetch("/api/payments/stripe/create", {

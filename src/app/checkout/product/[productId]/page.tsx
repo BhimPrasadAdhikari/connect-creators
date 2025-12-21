@@ -123,7 +123,27 @@ export default function ProductCheckoutPage() {
           return;
         }
       } else if (paymentMethod === "khalti") {
-        alert("Khalti payment coming soon!");
+        // Khalti payment
+        const res = await fetch("/api/payments/khalti/product/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: product.id,
+            currency: "NPR",
+          }),
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to create Khalti payment");
+        }
+        
+        // Redirect to Khalti payment page
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+          return;
+        }
       } else if (paymentMethod === "card") {
         // Stripe card payment
         const res = await fetch("/api/payments/stripe/product/create", {

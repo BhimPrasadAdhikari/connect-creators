@@ -10,7 +10,7 @@ const KHALTI_CONFIG = {
   publicKey: process.env.KHALTI_PUBLIC_KEY || "",
   baseUrl: process.env.NODE_ENV === "production"
     ? "https://khalti.com/api/v2"
-    : "https://a.khalti.com/api/v2",
+    : "https://dev.khalti.com/api/v2",
 };
 
 export const khaltiProvider: PaymentProviderInterface = {
@@ -56,7 +56,8 @@ export const khaltiProvider: PaymentProviderInterface = {
     }
   },
 
-  async verifyPayment(pidx: string): Promise<PaymentVerification> {
+  async verifyPayment(orderId: string, _paymentId?: string, _signature?: string): Promise<PaymentVerification> {
+    const pidx = orderId; // Khalti uses orderId as pidx
     try {
       const response = await fetch(`${KHALTI_CONFIG.baseUrl}/epayment/lookup/`, {
         method: "POST",
