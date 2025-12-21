@@ -9,6 +9,9 @@ import {
   Compass,
   Users,
   CreditCard,
+  Package,
+  Download,
+  ShoppingBag,
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { Avatar, Card, CardContent, PostCard } from "@/components/ui";
@@ -45,6 +48,27 @@ async function getDashboardData(userId: string) {
     },
   });
 
+  // Get user's purchases
+  const purchases = await prisma.purchase.findMany({
+    where: {
+      userId,
+      status: "COMPLETED",
+    },
+    include: {
+      product: {
+        include: {
+          creator: {
+            include: {
+              user: { select: { name: true, image: true } },
+            },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 5,
+  });
+
   // Build feed from subscribed creators' posts
   const feed = subscriptions.flatMap((sub) =>
     sub.creator.posts.map((post) => ({
@@ -71,6 +95,20 @@ async function getDashboardData(userId: string) {
       endDate: sub.endDate,
     })),
     feed: feed.slice(0, 10), // Latest 10 posts
+    purchases: purchases.filter(p => p.product).map((p) => ({
+      id: p.id,
+      amount: p.amount,
+      currency: p.currency,
+      createdAt: p.createdAt,
+      product: {
+        id: p.product!.id,
+        title: p.product!.title,
+        fileUrl: p.product!.fileUrl,
+        fileType: p.product!.fileType,
+        creatorName: p.product!.creator.displayName || p.product!.creator.user.name || p.product!.creator.username,
+        creatorUsername: p.product!.creator.username,
+      },
+    })),
   };
 }
 
@@ -93,7 +131,7 @@ export default async function FanDashboardPage() {
     redirect("/dashboard/creator");
   }
 
-  const { subscriptions, feed } = await getDashboardData(userId);
+  const { subscriptions, feed, purchases } = await getDashboardData(userId);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -141,6 +179,13 @@ export default async function FanDashboardPage() {
             >
               <CreditCard className="w-5 h-5" />
               Billing
+            </Link>
+            <Link
+              href="#purchases"
+              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              My Purchases
             </Link>
             <Link
               href="/settings"
@@ -280,6 +325,64 @@ export default async function FanDashboardPage() {
                         </CardContent>
                       </Card>
                     </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* My Purchases */}
+            <div className="space-y-6" id="purchases">
+              <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-purple-500" />
+                My Purchases
+              </h2>
+
+              {purchases.length === 0 ? (
+                <Card>
+                  <CardContent className="text-center py-8">
+                    <p className="text-gray-500 text-sm">
+                      No purchases yet.
+                    </p>
+                    <Link
+                      href="/explore"
+                      className="text-blue-600 text-sm hover:underline mt-2 inline-block"
+                    >
+                      Browse products →
+                    </Link>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {purchases.map((purchase) => (
+                    <Card key={purchase.id} className="hover:shadow-md transition-shadow">
+                      <CardContent className="py-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                            <Package className="w-5 h-5 text-purple-600" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <Link
+                              href={`/products/${purchase.product.id}`}
+                              className="font-medium text-gray-900 hover:text-purple-600 truncate block"
+                            >
+                              {purchase.product.title}
+                            </Link>
+                            <p className="text-sm text-gray-500">
+                              by {purchase.product.creatorName}
+                            </p>
+                          </div>
+                          <a
+                            href={purchase.product.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-purple-600 text-white text-sm rounded-lg hover:bg-purple-700 transition-colors"
+                          >
+                            <Download className="w-4 h-4" />
+                            Download
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
                   ))}
                 </div>
               )}

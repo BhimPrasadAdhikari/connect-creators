@@ -28,3 +28,6 @@ export type { SelectProps } from "./Select";
 
 export { Textarea } from "./Textarea";
 export type { TextareaProps } from "./Textarea";
+
+export { Skeleton, CardSkeleton, PostCardSkeleton, ProductCardSkeleton } from "./Skeleton";
+
