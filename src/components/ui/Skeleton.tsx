@@ -253,3 +253,62 @@ export function SkeletonGrid({
     </div>
   );
 }
+
+// Product card skeleton for products management page
+export function ProductCardSkeleton() {
+  return (
+    <div className="p-4 bg-white rounded-xl border border-gray-200">
+      <div className="flex items-start justify-between">
+        <div className="flex-1 space-y-2">
+          <div className="flex items-center gap-2">
+            <Skeleton height={20} width="50%" />
+            <Skeleton height={20} width={60} />
+          </div>
+          <Skeleton height={24} width={80} />
+          <Skeleton height={16} width="70%" />
+          <div className="flex gap-4 pt-2">
+            <Skeleton height={14} width={60} />
+            <Skeleton height={14} width={80} />
+          </div>
+        </div>
+        <Skeleton height={36} width={36} />
+      </div>
+    </div>
+  );
+}
+
+// Tiers page skeleton
+export function TiersPageSkeleton() {
+  return (
+    <div className="max-w-3xl mx-auto space-y-8">
+      <Skeleton height={24} width={160} />
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <Skeleton height={32} width={200} />
+          <Skeleton height={20} width={250} />
+        </div>
+        <Skeleton height={40} width={100} />
+      </div>
+      <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+        <Skeleton height={80} width="100%" />
+      </div>
+      <div className="space-y-4">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="p-4 bg-white rounded-xl border border-gray-200">
+            <div className="flex items-start justify-between">
+              <div className="space-y-2 flex-1">
+                <Skeleton height={20} width="30%" />
+                <Skeleton height={28} width={80} />
+                <Skeleton height={16} width="60%" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton height={36} width={36} />
+                <Skeleton height={36} width={36} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

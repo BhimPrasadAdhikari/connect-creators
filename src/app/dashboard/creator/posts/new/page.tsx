@@ -6,7 +6,7 @@ import { useSession } from "next-auth/react";
 import { ArrowLeft, Upload, Eye, Lock } from "lucide-react";
 import Link from "next/link";
 import { Header } from "@/components/layout/Header";
-import { Button, Card, CardContent, Input } from "@/components/ui";
+import { Button, Card, CardContent, Input, useToastActions } from "@/components/ui";
 
 interface Tier {
   id: string;
@@ -17,6 +17,7 @@ interface Tier {
 export default function NewPostPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const toast = useToastActions();
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
@@ -72,14 +73,15 @@ export default function NewPostPage() {
       });
 
       if (res.ok) {
+        toast.success("Post published!", "Your post is now live.");
         router.push("/dashboard/creator/posts");
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to create post");
+        toast.error("Failed to create post", data.error || "Please try again.");
       }
     } catch (error) {
       console.error("Error creating post:", error);
-      alert("Failed to create post");
+      toast.error("Failed to create post", "Please try again.");
     } finally {
       setLoading(false);
     }

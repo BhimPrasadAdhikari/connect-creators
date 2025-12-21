@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Trash2, ArrowLeft, Package } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { Button, Card, CardContent, Badge, Input } from "@/components/ui";
+import { Button, Card, CardContent, Badge, Input, useToastActions } from "@/components/ui";
 import { Skeleton, ProductCardSkeleton } from "@/components/ui/Skeleton";
 
 interface Product {
@@ -23,6 +23,7 @@ interface Product {
 export default function ProductsManagementPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const toast = useToastActions();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -102,15 +103,17 @@ export default function ProductsManagementPage() {
       });
       
       if (res.ok) {
+        toast.success("Product created!", "Your product is now available for sale.");
         setShowForm(false);
         setFormData({ title: "", description: "", price: "", fileUrl: "", fileType: "", thumbnailUrl: "" });
         fetchProducts();
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to create product");
+        toast.error("Failed to create product", data.error || "Please try again.");
       }
     } catch (error) {
       console.error("Error creating product:", error);
+      toast.error("Failed to create product", "Please try again.");
     }
   };
 

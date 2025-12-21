@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Plus, Edit, Trash2, ArrowLeft, Check, Info } from "lucide-react";
 import { Header } from "@/components/layout/Header";
-import { Button, Card, CardContent, Input, Badge } from "@/components/ui";
+import { Button, Card, CardContent, Input, Badge, useToastActions } from "@/components/ui";
 import { TiersPageSkeleton } from "@/components/ui/Skeleton";
 
 interface Tier {
@@ -31,6 +31,7 @@ const SUGGESTED_TIERS = [
 export default function TiersManagementPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
+  const toast = useToastActions();
   const [tiers, setTiers] = useState<Tier[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -98,16 +99,18 @@ export default function TiersManagementPage() {
       });
       
       if (res.ok) {
+        toast.success(editingTier ? "Tier updated!" : "Tier created!");
         setShowForm(false);
         setEditingTier(null);
         setFormData({ name: "", description: "", price: "", benefits: [""] });
         fetchTiers();
       } else {
         const data = await res.json();
-        alert(data.error || "Failed to save tier");
+        toast.error("Failed to save tier", data.error || "Please try again.");
       }
     } catch (error) {
       console.error("Error saving tier:", error);
+      toast.error("Failed to save tier", "Please try again.");
     }
   };
 
