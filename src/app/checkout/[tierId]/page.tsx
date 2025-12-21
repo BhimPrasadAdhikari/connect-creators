@@ -1,38 +1,59 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Heart, Check, Shield, CreditCard, Smartphone, Building } from "lucide-react";
+import { Heart, Check, Shield, CreditCard, Smartphone, Building, Loader2 } from "lucide-react";
 import { Avatar, Badge, Button, Card, CardContent } from "@/components/ui";
 import { formatPrice, calculateFees } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
-// Demo data
-const DEMO_TIER = {
-  id: "tier-standard",
-  name: "Premium",
-  price: 19900, // ₹199
-  benefits: [
-    "All Supporter benefits",
-    "Weekly tutorials & tips",
-    "Discord community access",
-    "Download high-res artwork",
-  ],
+interface Tier {
+  id: string;
+  name: string;
+  price: number;
+  benefits: string[];
   creator: {
-    username: "demo",
-    name: "Priya Sharma",
-    image: null,
-  },
-};
+    username: string;
+    displayName: string;
+    user: {
+      image: string | null;
+    };
+  };
+}
 
 type PaymentMethod = "upi" | "card" | "esewa" | "khalti" | "bank";
 
 export default function CheckoutPage() {
-  const tier = DEMO_TIER;
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
+  const params = useParams();
+  const router = useRouter();
+  const tierId = params.tierId as string;
+  
+  const [tier, setTier] = useState<Tier | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("esewa");
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const fees = calculateFees(tier.price);
+  useEffect(() => {
+    if (!tierId) return;
+    
+    fetch(`/api/tiers/${tierId}`)
+      .then(res => {
+        if (!res.ok) throw new Error("Tier not found");
+        return res.json();
+      })
+      .then(data => {
+        setTier(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
+      });
+  }, [tierId]);
+
+  const fees = tier ? calculateFees(tier.price) : null;
 
   const paymentMethods = [
     {
@@ -75,11 +96,87 @@ export default function CheckoutPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!tier) return;
+    
     setIsProcessing(true);
-    // Payment integration will go here
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsProcessing(false);
+    
+    try {
+      if (paymentMethod === "esewa") {
+        // Call API to create eSewa payment
+        const res = await fetch("/api/payments/esewa/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tierId: tier.id,
+            amount: tier.price,
+            currency: "NPR",
+          }),
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to create payment");
+        }
+        
+        // eSewa requires form submission - create and submit form
+        if (data.formData && data.redirectUrl) {
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = data.redirectUrl;
+          
+          Object.entries(data.formData as Record<string, string>).forEach(([key, value]) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = value;
+            form.appendChild(input);
+          });
+          
+          document.body.appendChild(form);
+          form.submit();
+          return; // Form will redirect to eSewa
+        }
+      } else if (paymentMethod === "khalti") {
+        // Khalti integration placeholder
+        alert("Khalti payment coming soon!");
+      } else if (paymentMethod === "upi" || paymentMethod === "card") {
+        // Razorpay/Stripe integration placeholder
+        alert("This payment method is coming soon!");
+      } else if (paymentMethod === "bank") {
+        // Bank transfer - show instructions
+        alert("Bank transfer instructions will be sent to your email.");
+      }
+    } catch (error) {
+      console.error("Payment error:", error);
+      alert(error instanceof Error ? error.message : "Payment failed");
+    } finally {
+      setIsProcessing(false);
+    }
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      </main>
+    );
+  }
+
+  // Error state
+  if (error || !tier) {
+    return (
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-text-primary mb-4">
+            {error || "Tier not found"}
+          </h1>
+          <Button onClick={() => router.back()}>Go Back</Button>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-background">
@@ -109,8 +206,8 @@ export default function CheckoutPage() {
                   {/* Creator Info */}
                   <div className="flex items-center gap-4 pb-6 border-b border-border mb-6">
                     <Avatar
-                      src={tier.creator.image}
-                      name={tier.creator.name}
+                      src={tier.creator.user?.image}
+                      name={tier.creator.displayName}
                       size="lg"
                     />
                     <div>
@@ -118,7 +215,7 @@ export default function CheckoutPage() {
                         Subscribing to
                       </p>
                       <p className="font-semibold text-text-primary">
-                        {tier.creator.name}
+                        {tier.creator.displayName}
                       </p>
                       <Badge variant="accent">{tier.name}</Badge>
                     </div>
@@ -272,7 +369,7 @@ export default function CheckoutPage() {
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-text-secondary">Subscription</span>
                       <span className="text-text-primary">
-                        {formatPrice(fees.total)}
+                      {formatPrice(fees!.total)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
@@ -280,15 +377,15 @@ export default function CheckoutPage() {
                         Creator receives
                       </span>
                       <span className="text-secondary font-medium">
-                        {formatPrice(fees.creatorEarnings)}
+                        {formatPrice(fees!.creatorEarnings)}
                       </span>
                     </div>
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-text-secondary">
-                        Platform fee ({fees.platformFeePercent}%)
+                        Platform fee ({fees!.platformFeePercent}%)
                       </span>
                       <span className="text-text-secondary">
-                        {formatPrice(fees.platformFee)}
+                        {formatPrice(fees!.platformFee)}
                       </span>
                     </div>
                   </div>
@@ -299,7 +396,7 @@ export default function CheckoutPage() {
                       Total (Monthly)
                     </span>
                     <span className="text-xl font-bold text-text-primary">
-                      {formatPrice(fees.total)}
+                      {formatPrice(fees!.total)}
                     </span>
                   </div>
 
