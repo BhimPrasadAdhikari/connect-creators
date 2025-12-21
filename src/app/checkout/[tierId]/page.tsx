@@ -140,9 +140,31 @@ export default function CheckoutPage() {
       } else if (paymentMethod === "khalti") {
         // Khalti integration placeholder
         alert("Khalti payment coming soon!");
-      } else if (paymentMethod === "upi" || paymentMethod === "card") {
-        // Razorpay/Stripe integration placeholder
-        alert("This payment method is coming soon!");
+      } else if (paymentMethod === "card") {
+        // Stripe card payment
+        const res = await fetch("/api/payments/stripe/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tierId: tier.id,
+            currency: "USD",
+          }),
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to create payment session");
+        }
+        
+        // Redirect to Stripe Checkout
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+          return;
+        }
+      } else if (paymentMethod === "upi") {
+        // UPI integration placeholder
+        alert("UPI payment coming soon!");
       } else if (paymentMethod === "bank") {
         // Bank transfer - show instructions
         alert("Bank transfer instructions will be sent to your email.");

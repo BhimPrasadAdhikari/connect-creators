@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
-import { Heart, Check, Shield, Smartphone, Loader2, Package, ArrowLeft } from "lucide-react";
+import { Heart, Check, Shield, Smartphone, Loader2, Package, ArrowLeft, CreditCard } from "lucide-react";
 import { Button, Card, CardContent, Badge } from "@/components/ui";
 import { formatPrice, calculateFees } from "@/lib/utils";
 import { cn } from "@/lib/utils";
@@ -24,7 +24,7 @@ interface Product {
   };
 }
 
-type PaymentMethod = "esewa" | "khalti";
+type PaymentMethod = "esewa" | "khalti" | "card";
 
 export default function ProductCheckoutPage() {
   const params = useParams();
@@ -57,6 +57,13 @@ export default function ProductCheckoutPage() {
   }, [productId]);
 
   const paymentMethods = [
+    {
+      id: "card" as const,
+      name: "Card",
+      description: "Visa, Mastercard, Amex",
+      icon: CreditCard,
+      region: "International",
+    },
     {
       id: "esewa" as const,
       name: "eSewa",
@@ -117,6 +124,28 @@ export default function ProductCheckoutPage() {
         }
       } else if (paymentMethod === "khalti") {
         alert("Khalti payment coming soon!");
+      } else if (paymentMethod === "card") {
+        // Stripe card payment
+        const res = await fetch("/api/payments/stripe/product/create", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: product.id,
+            currency: "USD",
+          }),
+        });
+        
+        const data = await res.json();
+        
+        if (!res.ok || !data.success) {
+          throw new Error(data.error || "Failed to create payment session");
+        }
+        
+        // Redirect to Stripe Checkout
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+          return;
+        }
       }
     } catch (error) {
       console.error("Payment error:", error);
