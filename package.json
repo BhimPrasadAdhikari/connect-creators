@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
-    "@prisma/client": "^6.19.1",
+    "@prisma/client": "^7.2.0",
     "@sendgrid/mail": "^8.1.6",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",
