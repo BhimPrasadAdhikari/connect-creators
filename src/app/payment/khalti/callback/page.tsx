@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Heart, Loader2, XCircle, Download } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
 
-export default function KhaltiCallbackPage() {
+function KhaltiCallbackContent() {
   const searchParams = useSearchParams();
   
   const pidx = searchParams.get("pidx");
@@ -154,5 +154,20 @@ export default function KhaltiCallbackPage() {
         </CardContent>
       </Card>
     </main>
+  );
+}
+
+export default function KhaltiCallbackPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-b from-purple-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-purple-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </main>
+    }>
+      <KhaltiCallbackContent />
+    </Suspense>
   );
 }

@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Heart, Loader2, Download, Package } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
 
-export default function StripeSuccessPage() {
+function StripeSuccessContent() {
   const searchParams = useSearchParams();
   const sessionId = searchParams.get("session_id");
   const type = searchParams.get("type");
@@ -140,5 +140,20 @@ export default function StripeSuccessPage() {
         </CardContent>
       </Card>
     </main>
+  );
+}
+
+export default function StripeSuccessPage() {
+  return (
+    <Suspense fallback={
+      <main className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto mb-4" />
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </main>
+    }>
+      <StripeSuccessContent />
+    </Suspense>
   );
 }
