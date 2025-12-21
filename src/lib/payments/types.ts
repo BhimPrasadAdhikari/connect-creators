@@ -22,6 +22,7 @@ export interface PaymentResult {
   paymentId?: string;
   error?: string;
   redirectUrl?: string;
+  formData?: Record<string, string>; // For form-based payment providers like eSewa
 }
 
 export interface PaymentVerification {
@@ -45,6 +46,7 @@ export interface PaymentProviderInterface {
   createOrder(config: PaymentConfig): Promise<PaymentResult>;
   verifyPayment(orderId: string, paymentId: string, signature?: string): Promise<PaymentVerification>;
   processWebhook(payload: WebhookPayload): Promise<void>;
+  checkStatus?(transactionId: string, amount: number): Promise<PaymentVerification>; // Optional status check
 }
 
 /**
