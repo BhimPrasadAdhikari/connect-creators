@@ -1,6 +1,6 @@
 import Link from "next/link";
-import { Search, Filter } from "lucide-react";
 import { Avatar, Badge, Card, CardContent, Button, SkeletonCreatorCard, SkeletonGrid } from "@/components/ui";
+import { ExploreFilters } from "@/components/ui/ExploreFilters";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
@@ -18,9 +18,31 @@ function formatPrice(amountInPaise: number): string {
   }).format(amount);
 }
 
-// Fetch creators from database
-async function getCreators() {
+// Fetch creators from database with filtering
+async function getCreators(filters: {
+  q?: string;
+  category?: string;
+  sort?: string;
+}) {
+  const { q, sort } = filters;
+  
+  // Build orderBy based on sort
+  let orderBy: Record<string, string> = { createdAt: "desc" };
+  if (sort === "new") {
+    orderBy = { createdAt: "desc" };
+  } else if (sort === "price-low" || sort === "price-high") {
+    // Will sort after fetch since price is in related table
+    orderBy = { createdAt: "desc" };
+  }
+
   const creators = await prisma.creatorProfile.findMany({
+    where: q ? {
+      OR: [
+        { displayName: { contains: q, mode: "insensitive" } },
+        { username: { contains: q, mode: "insensitive" } },
+        { bio: { contains: q, mode: "insensitive" } },
+      ],
+    } : undefined,
     include: {
       user: {
         select: {
@@ -41,12 +63,10 @@ async function getCreators() {
         },
       },
     },
-    orderBy: {
-      createdAt: "desc",
-    },
+    orderBy,
   });
 
-  return creators.map((creator) => ({
+  let mappedCreators = creators.map((creator) => ({
     username: creator.username,
     name: creator.displayName || creator.user.name || creator.username,
     bio: creator.bio,
@@ -54,8 +74,19 @@ async function getCreators() {
     isVerified: creator.isVerified,
     subscriberCount: creator._count.subscriptions,
     startingPrice: creator.tiers[0]?.price || 9900,
-    category: "Creator", // Could be added as a field later
+    category: "Creator",
   }));
+
+  // Apply price sorting
+  if (sort === "price-low") {
+    mappedCreators.sort((a, b) => a.startingPrice - b.startingPrice);
+  } else if (sort === "price-high") {
+    mappedCreators.sort((a, b) => b.startingPrice - a.startingPrice);
+  } else if (sort === "popular") {
+    mappedCreators.sort((a, b) => b.subscriberCount - a.subscriberCount);
+  }
+
+  return mappedCreators;
 }
 
 const CATEGORIES = [
@@ -70,7 +101,13 @@ const CATEGORIES = [
   "Lifestyle",
 ];
 
-export default async function ExplorePage() {
+interface PageProps {
+  searchParams: Promise<{ q?: string; category?: string; sort?: string }>;
+}
+
+export default async function ExplorePage({ searchParams }: PageProps) {
+  const params = await searchParams;
+  
   return (
     <main className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -87,41 +124,15 @@ export default async function ExplorePage() {
           </p>
         </div>
 
-        {/* Search and Filter */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <div className="flex-1 relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search creators..."
-              className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
-            />
-          </div>
-          <Button variant="outline" className="flex items-center gap-2">
-            <Filter className="w-5 h-5" />
-            Filters
-          </Button>
-        </div>
-
-        {/* Categories */}
-        <div className="flex flex-wrap gap-2 mb-8">
-          {CATEGORIES.map((category, index) => (
-            <button
-              key={category}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                index === 0
-                  ? "bg-blue-600 text-white"
-                  : "bg-white border border-gray-200 text-gray-600 hover:border-blue-500 hover:text-blue-600"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
+        {/* Filters */}
+        <ExploreFilters categories={CATEGORIES} className="mb-8" />
 
         {/* Creators Grid with Suspense */}
-        <Suspense fallback={<SkeletonGrid count={9} component={SkeletonCreatorCard} />}>
-          <CreatorsContent />
+        <Suspense 
+          key={JSON.stringify(params)} 
+          fallback={<SkeletonGrid count={9} component={SkeletonCreatorCard} />}
+        >
+          <CreatorsContent filters={params} />
         </Suspense>
       </div>
 
@@ -135,17 +146,25 @@ export default async function ExplorePage() {
 }
 
 // Separate component for data fetching
-async function CreatorsContent() {
-  const creators = await getCreators();
+async function CreatorsContent({ filters }: { filters: { q?: string; category?: string; sort?: string } }) {
+  const creators = await getCreators(filters);
 
   return (
     <>
       {creators.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500">No creators found. Be the first to join!</p>
-          <Link href="/signup?role=creator" className="text-blue-600 hover:underline mt-2 inline-block">
-            Become a Creator
-          </Link>
+          <p className="text-gray-500 mb-2">
+            {filters.q ? `No creators found for "${filters.q}"` : "No creators found. Be the first to join!"}
+          </p>
+          {filters.q ? (
+            <Link href="/explore" className="text-blue-600 hover:underline">
+              Clear search
+            </Link>
+          ) : (
+            <Link href="/signup?role=creator" className="text-blue-600 hover:underline">
+              Become a Creator
+            </Link>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

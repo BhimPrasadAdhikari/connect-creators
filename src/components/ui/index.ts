@@ -65,3 +65,7 @@ export {
   NotificationBadge 
 } from "./NotificationDropdown";
 export type { Notification } from "./NotificationDropdown";
+
+// Page Components
+export { ExploreFilters } from "./ExploreFilters";
+export { Tabs, TabPanels } from "./Tabs";
