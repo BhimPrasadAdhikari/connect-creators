@@ -6,6 +6,8 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { esewaProvider } from "@/lib/payments/esewa";
+import { sendSubscriptionConfirmationEmail } from "@/lib/email/service";
+import { formatAmount } from "@/lib/payments/types";
 
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +16,10 @@ export async function POST(req: NextRequest) {
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = (session.user as { id?: string }).id;
+    const userEmail = session.user.email;
+    const userName = session.user.name;
 
     const { data } = await req.json();
 
@@ -57,6 +63,14 @@ export async function POST(req: NextRequest) {
         providerOrderId: decodedData.transaction_uuid,
         status: "PENDING",
       },
+      include: {
+        subscription: {
+          include: {
+            tier: true,
+            creator: true,
+          },
+        },
+      },
     });
 
     if (payment) {
@@ -69,11 +83,28 @@ export async function POST(req: NextRequest) {
       });
 
       // Activate subscription if this was a subscription payment
-      if (payment.subscriptionId) {
+      if (payment.subscriptionId && payment.subscription) {
         await prisma.subscription.update({
           where: { id: payment.subscriptionId },
           data: { status: "ACTIVE" },
         });
+
+        // Send subscription confirmation email
+        if (userEmail) {
+          const nextBillingDate = new Date();
+          nextBillingDate.setDate(nextBillingDate.getDate() + 30);
+          
+          await sendSubscriptionConfirmationEmail(userEmail, userName || "", {
+            creatorName: payment.subscription.creator.displayName || "Creator",
+            tierName: payment.subscription.tier.name,
+            amount: formatAmount(payment.amount, payment.currency),
+            nextBillingDate: nextBillingDate.toLocaleDateString("en-IN", {
+              dateStyle: "medium",
+            }),
+          });
+          
+          console.log(`[eSewa] Subscription confirmation email sent to: ${userEmail}`);
+        }
       }
     }
 
@@ -93,3 +124,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

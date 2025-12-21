@@ -3,7 +3,7 @@
 
 import sgMail from "@sendgrid/mail";
 
-const FROM_EMAIL = "noreply@creatorconnect.com";
+const FROM_EMAIL = process.env.FROM_EMAIL || "no-reply@creatorconnect.com";
 const FROM_NAME = "CreatorConnect";
 
 // Initialize SendGrid
@@ -250,6 +250,121 @@ If you didn't request this, you can safely ignore this email.
       If you didn't request this, you can safely ignore this email.
     </p>
     <p style="color: #6b7280; font-size: 14px;">- The CreatorConnect Security Team</p>
+  </div>
+</body>
+</html>`;
+
+  return sendEmail({ to, subject, text, html });
+}
+
+export async function sendSubscriptionConfirmationEmail(
+  to: string,
+  userName: string,
+  details: {
+    creatorName: string;
+    tierName: string;
+    amount: string;
+    nextBillingDate: string;
+  }
+): Promise<boolean> {
+  const subject = "Subscription Confirmed! 🎉";
+  const text = `Hi ${userName || "there"},
+
+Your subscription to ${details.creatorName} has been confirmed!
+
+Subscription Details:
+- Tier: ${details.tierName}
+- Amount: ${details.amount}
+- Next billing date: ${details.nextBillingDate}
+
+You now have full access to exclusive content. Head to your dashboard to start enjoying your subscription!
+
+Thank you for supporting creators on CreatorConnect.
+
+- The CreatorConnect Team`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #2563eb;">🎉 Subscription Confirmed!</h2>
+    <p>Hi ${userName || "there"},</p>
+    <p>Your subscription to <strong>${details.creatorName}</strong> has been confirmed!</p>
+    <div style="background: #f3f4f6; border-radius: 8px; padding: 16px; margin: 16px 0;">
+      <p style="margin: 0;"><strong>Tier:</strong> ${details.tierName}</p>
+      <p style="margin: 8px 0 0;"><strong>Amount:</strong> ${details.amount}</p>
+      <p style="margin: 8px 0 0;"><strong>Next billing date:</strong> ${details.nextBillingDate}</p>
+    </div>
+    <p>You now have full access to exclusive content.</p>
+    <div style="margin: 24px 0;">
+      <a href="${process.env.NEXTAUTH_URL}/dashboard" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">
+        Go to Dashboard
+      </a>
+    </div>
+    <p style="color: #6b7280; font-size: 14px;">Thank you for supporting creators on CreatorConnect.</p>
+    <p style="color: #6b7280; font-size: 14px;">- The CreatorConnect Team</p>
+  </div>
+</body>
+</html>`;
+
+  return sendEmail({ to, subject, text, html });
+}
+
+export async function sendPurchaseConfirmationEmail(
+  to: string,
+  userName: string,
+  details: {
+    productName: string;
+    creatorName: string;
+    amount: string;
+    downloadUrl?: string;
+  }
+): Promise<boolean> {
+  const subject = "Purchase Confirmed! 🛍️";
+  const text = `Hi ${userName || "there"},
+
+Your purchase has been confirmed!
+
+Purchase Details:
+- Product: ${details.productName}
+- Creator: ${details.creatorName}
+- Amount: ${details.amount}
+
+${details.downloadUrl ? `Download your product here: ${details.downloadUrl}` : "You can access your purchase from your dashboard."}
+
+Thank you for supporting creators on CreatorConnect.
+
+- The CreatorConnect Team`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #2563eb;">🛍️ Purchase Confirmed!</h2>
+    <p>Hi ${userName || "there"},</p>
+    <p>Your purchase has been confirmed!</p>
+    <div style="background: #f3f4f6; border-radius: 8px; padding: 16px; margin: 16px 0;">
+      <p style="margin: 0;"><strong>Product:</strong> ${details.productName}</p>
+      <p style="margin: 8px 0 0;"><strong>Creator:</strong> ${details.creatorName}</p>
+      <p style="margin: 8px 0 0;"><strong>Amount:</strong> ${details.amount}</p>
+    </div>
+    ${details.downloadUrl ? `
+    <div style="margin: 24px 0;">
+      <a href="${details.downloadUrl}" style="display: inline-block; background: #10b981; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">
+        Download Now
+      </a>
+    </div>
+    ` : `
+    <div style="margin: 24px 0;">
+      <a href="${process.env.NEXTAUTH_URL}/dashboard" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">
+        View in Dashboard
+      </a>
+    </div>
+    `}
+    <p style="color: #6b7280; font-size: 14px;">Thank you for supporting creators on CreatorConnect.</p>
+    <p style="color: #6b7280; font-size: 14px;">- The CreatorConnect Team</p>
   </div>
 </body>
 </html>`;
