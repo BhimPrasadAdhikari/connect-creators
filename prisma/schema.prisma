@@ -301,3 +301,36 @@ model Tip {
   toCreator CreatorProfile @relation("TipsReceived", fields: [toCreatorId], references: [id], onDelete: Cascade)
   post      Post?          @relation(fields: [postId], references: [id])
 }
+
+// Security: Audit Logging
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String   // LOGIN, LOGOUT, PASSWORD_CHANGE, PAYMENT, SETTINGS_UPDATE, etc.
+  resource   String?  // user, payment, subscription, post, etc.
+  resourceId String?
+  ipAddress  String?
+  userAgent  String?
+  metadata   Json?
+  status     String   @default("SUCCESS") // SUCCESS, FAILURE, BLOCKED
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// Security: Webhook Idempotency
+model WebhookEvent {
+  id          String   @id @default(cuid())
+  providerId  String   // Provider's event ID
+  provider    String   // stripe, razorpay
+  eventType   String
+  payload     Json?
+  createdAt   DateTime @default(now())
+  processedAt DateTime @default(now())
+
+  @@unique([providerId, provider])
+  @@index([createdAt])
+}
+
