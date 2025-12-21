@@ -210,3 +210,49 @@ If you didn't make this change, please contact support immediately.
   await sendEmail({ to: oldEmail, subject, text, html });
   return sendEmail({ to: newEmail, subject, text, html });
 }
+
+export async function sendPasswordResetEmail(
+  to: string,
+  userName: string,
+  resetUrl: string
+): Promise<boolean> {
+  const subject = "Reset your password";
+  const text = `Hi ${userName || "there"},
+
+You requested to reset your password for your CreatorConnect account.
+
+Click the link below to reset your password:
+${resetUrl}
+
+This link will expire in 1 hour.
+
+If you didn't request this, you can safely ignore this email.
+
+- The CreatorConnect Security Team`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #2563eb;">Reset Your Password</h2>
+    <p>Hi ${userName || "there"},</p>
+    <p>You requested to reset your password for your CreatorConnect account.</p>
+    <div style="margin: 24px 0;">
+      <a href="${resetUrl}" style="display: inline-block; background: #2563eb; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">
+        Reset Password
+      </a>
+    </div>
+    <p style="color: #6b7280; font-size: 14px;">
+      This link will expire in 1 hour.
+    </p>
+    <p style="color: #6b7280; font-size: 14px;">
+      If you didn't request this, you can safely ignore this email.
+    </p>
+    <p style="color: #6b7280; font-size: 14px;">- The CreatorConnect Security Team</p>
+  </div>
+</body>
+</html>`;
+
+  return sendEmail({ to, subject, text, html });
+}
