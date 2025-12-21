@@ -1,12 +1,13 @@
 // eSewa Payment Verification API
 // Verifies the base64-encoded response from eSewa
+// Handles both subscription payments and product purchases
 
 import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { esewaProvider } from "@/lib/payments/esewa";
-import { sendSubscriptionConfirmationEmail } from "@/lib/email/service";
+import { sendSubscriptionConfirmationEmail, sendPurchaseConfirmationEmail } from "@/lib/email/service";
 import { formatAmount } from "@/lib/payments/types";
 
 export async function POST(req: NextRequest) {
@@ -57,7 +58,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Find pending payment record and update it
+    // Try to find subscription payment first
     const payment = await prisma.payment.findFirst({
       where: {
         providerOrderId: decodedData.transaction_uuid,
@@ -74,6 +75,7 @@ export async function POST(req: NextRequest) {
     });
 
     if (payment) {
+      // This is a subscription payment
       await prisma.payment.update({
         where: { id: payment.id },
         data: {
@@ -82,7 +84,6 @@ export async function POST(req: NextRequest) {
         },
       });
 
-      // Activate subscription if this was a subscription payment
       if (payment.subscriptionId && payment.subscription) {
         await prisma.subscription.update({
           where: { id: payment.subscriptionId },
@@ -106,9 +107,53 @@ export async function POST(req: NextRequest) {
           console.log(`[eSewa] Subscription confirmation email sent to: ${userEmail}`);
         }
       }
-    }
 
-    console.log(`[eSewa] Payment verified successfully: ${verification.paymentId}`);
+      console.log(`[eSewa] Subscription payment verified: ${verification.paymentId}`);
+    } else {
+      // Check if this is a product purchase
+      // Find pending purchase for this user with matching amount
+      const pendingPurchase = await prisma.purchase.findFirst({
+        where: {
+          userId: userId!,
+          status: "PENDING",
+        },
+        include: {
+          product: {
+            include: {
+              creator: true,
+            },
+          },
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+
+      if (pendingPurchase && pendingPurchase.product) {
+        // Update purchase status
+        await prisma.purchase.update({
+          where: { id: pendingPurchase.id },
+          data: { status: "COMPLETED" },
+        });
+
+        // Send purchase confirmation email
+        if (userEmail) {
+          const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+          await sendPurchaseConfirmationEmail(userEmail, userName || "", {
+            productName: pendingPurchase.product.title,
+            creatorName: pendingPurchase.product.creator.displayName || "Creator",
+            amount: formatAmount(pendingPurchase.amount, pendingPurchase.currency),
+            downloadUrl: pendingPurchase.product.fileUrl,
+          });
+          
+          console.log(`[eSewa] Purchase confirmation email sent to: ${userEmail}`);
+        }
+
+        console.log(`[eSewa] Product purchase verified: ${verification.paymentId}, product: ${pendingPurchase.product.title}`);
+      } else {
+        console.log(`[eSewa] No pending payment/purchase found for: ${decodedData.transaction_uuid}`);
+      }
+    }
 
     return NextResponse.json({
       success: true,
@@ -124,4 +169,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
 
