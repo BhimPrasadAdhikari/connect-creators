@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     // Find pending payment record and update it
     const payment = await prisma.payment.findFirst({
       where: {
-        transactionId: decodedData.transaction_uuid,
+        providerOrderId: decodedData.transaction_uuid,
         status: "PENDING",
       },
     });
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
         where: { id: payment.id },
         data: {
           status: "COMPLETED",
-          provider: "ESEWA",
+          providerPayId: decodedData.transaction_code,
         },
       });
 
