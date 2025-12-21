@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { validatePassword } from "@/lib/auth/validation";
 import { invalidateUserSessions } from "@/lib/auth/session";
+import { logAudit, getClientIp, AuditAction } from "@/lib/security/audit";
+import { notifyPasswordChange } from "@/lib/security/notifications";
 
 export async function PUT(req: NextRequest) {
   try {
@@ -63,6 +65,15 @@ export async function PUT(req: NextRequest) {
     // Verify current password
     const isValid = await bcrypt.compare(currentPassword, user.password);
     if (!isValid) {
+      // Log failed attempt
+      await logAudit({
+        userId,
+        action: AuditAction.PASSWORD_CHANGE,
+        resource: "user",
+        resourceId: userId,
+        status: "FAILURE",
+        metadata: { reason: "Invalid current password" },
+      });
       return NextResponse.json(
         { error: "Current password is incorrect" },
         { status: 400 }
@@ -88,8 +99,20 @@ export async function PUT(req: NextRequest) {
     });
 
     // SECURITY: Invalidate all existing sessions after password change
-    // This forces all other devices to re-authenticate
     await invalidateUserSessions(userId);
+
+    // Log successful password change
+    const ipAddress = await getClientIp();
+    await logAudit({
+      userId,
+      action: AuditAction.PASSWORD_CHANGE,
+      resource: "user",
+      resourceId: userId,
+      status: "SUCCESS",
+    });
+
+    // Send email notification
+    await notifyPasswordChange(userId, ipAddress);
 
     return NextResponse.json({ 
       success: true,
