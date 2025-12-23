@@ -134,66 +134,77 @@ export default function ProductsManagementPage() {
     <main className="min-h-screen bg-gray-50">
       <Header />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-3xl mx-auto">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="max-w-4xl mx-auto">
           <Link
             href="/dashboard/creator"
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6"
+            className="inline-flex items-center text-sm font-medium text-gray-500 hover:text-gray-900 mb-8 transition-colors"
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <ArrowLeft className="w-4 h-4 mr-2" />
             Back to Dashboard
           </Link>
 
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-end justify-between mb-12">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">Digital Products</h1>
-              <p className="text-gray-600">Sell downloadable files to your fans</p>
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">Digital Products</h1>
+              <p className="text-gray-500 text-lg">Sell downloadable files directly to your audience.</p>
             </div>
             {!showForm && (
-              <Button onClick={() => setShowForm(true)}>
-                <Plus className="w-4 h-4 mr-2" />
+              <Button 
+                onClick={() => setShowForm(true)}
+                className="rounded-2xl bg-gray-900 hover:bg-black text-white px-6 py-3 shadow-lg shadow-gray-900/10"
+              >
+                <Plus className="w-5 h-5 mr-2" />
                 Add Product
               </Button>
             )}
           </div>
 
-          {/* Create Form */}
+          {/* Create Form - Clean Minimal */}
           {showForm && (
-            <Card className="mb-8">
-              <CardContent className="p-6">
-                <h2 className="text-lg font-semibold mb-6">Create Digital Product</h2>
+            <div className="mb-12 bg-white rounded-3xl border border-gray-100 p-8 shadow-sm">
+              <div className="flex justify-between items-center mb-8">
+                <h2 className="text-xl font-bold text-gray-900">Create New Product</h2>
+                <Button variant="ghost" size="sm" onClick={() => setShowForm(false)}>
+                  Close
+                </Button>
+              </div>
 
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <Input
-                    label="Product Title"
-                    placeholder="e.g., Photography Presets Pack"
-                    value={formData.title}
-                    onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    required
-                  />
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div className="space-y-6">
+                   <div className="grid md:grid-cols-2 gap-6">
+                       <Input
+                          label="Product Title"
+                          placeholder="e.g., Photography Presets Pack"
+                          value={formData.title}
+                          onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                          required
+                          className="rounded-xl border-gray-200 focus:ring-gray-900"
+                        />
+                        <Input
+                          label="Price (₹)"
+                          type="number"
+                          placeholder="99"
+                          value={formData.price}
+                          onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                          required
+                          min="49"
+                          className="rounded-xl border-gray-200 focus:ring-gray-900"
+                        />
+                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Description
                     </label>
                     <textarea
                       rows={3}
-                      placeholder="What's included in this product..."
+                      placeholder="What are you selling? (Markdown supported)"
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-900/10 focus:border-gray-900 transition-all placeholder:text-gray-400 bg-white"
                     />
                   </div>
-
-                  <Input
-                    label="Price (₹)"
-                    type="number"
-                    placeholder="99"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                    required
-                    min="49"
-                  />
 
                   <Input
                     label="File URL"
@@ -202,14 +213,16 @@ export default function ProductsManagementPage() {
                     value={formData.fileUrl}
                     onChange={(e) => setFormData({ ...formData, fileUrl: e.target.value })}
                     required
+                    className="rounded-xl border-gray-200 focus:ring-gray-900"
                   />
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-2 gap-6">
                     <Input
                       label="File Type"
-                      placeholder="pdf, zip, mp3..."
+                      placeholder="pdf, zip, mp3"
                       value={formData.fileType}
                       onChange={(e) => setFormData({ ...formData, fileType: e.target.value })}
+                      className="rounded-xl border-gray-200 focus:ring-gray-900"
                     />
                     <Input
                       label="Thumbnail URL (optional)"
@@ -217,65 +230,102 @@ export default function ProductsManagementPage() {
                       placeholder="https://..."
                       value={formData.thumbnailUrl}
                       onChange={(e) => setFormData({ ...formData, thumbnailUrl: e.target.value })}
+                      className="rounded-xl border-gray-200 focus:ring-gray-900"
                     />
                   </div>
+                </div>
 
-                  <div className="flex gap-3 pt-4">
-                    <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit" className="flex-1">
-                      Create Product
-                    </Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
+                <div className="flex gap-4 pt-4 border-t border-gray-50 mt-8">
+                  <Button 
+                    type="button" 
+                    variant="ghost" 
+                    onClick={() => setShowForm(false)}
+                    className="text-gray-500 hover:text-gray-900"
+                  >
+                    Cancel
+                  </Button>
+                  <Button 
+                    type="submit" 
+                    className="flex-1 rounded-xl bg-blue-600 hover:bg-blue-700 text-white py-6 text-lg font-semibold shadow-lg shadow-blue-600/20"
+                  >
+                    Publish Product
+                  </Button>
+                </div>
+              </form>
+            </div>
           )}
 
-          {/* Products List */}
+          {/* Products List - Clean List View */}
           {products.length === 0 && !showForm ? (
-            <Card>
-              <CardContent className="py-12 text-center">
-                <Package className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                <p className="text-gray-500 mb-4">No digital products yet.</p>
-                <Button onClick={() => setShowForm(true)}>
-                  <Plus className="w-4 h-4 mr-2" />
-                  Create Your First Product
-                </Button>
-              </CardContent>
-            </Card>
+            <div className="py-20 text-center bg-white rounded-3xl border border-gray-100 border-dashed">
+              <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-gray-400">
+                  <Package className="w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Start Selling Digital Products</h3>
+              <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+                 Monetize your expertise by selling ebooks, presets, templates, and more.
+              </p>
+              <Button 
+                onClick={() => setShowForm(true)}
+                className="rounded-xl bg-blue-600 hover:bg-blue-700 text-white px-6 py-3"
+              >
+                Create Your First Product
+              </Button>
+            </div>
           ) : (
             <div className="space-y-4">
               {products.map((product) => (
-                <Card key={product.id}>
-                  <CardContent className="p-4">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-gray-900">{product.title}</h3>
-                          {product.fileType && (
-                            <Badge variant="default">{product.fileType.toUpperCase()}</Badge>
-                          )}
-                          {!product.isActive && <Badge variant="warning">Inactive</Badge>}
-                        </div>
-                        <p className="text-lg font-bold text-blue-600">₹{product.price / 100}</p>
-                        {product.description && (
-                          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{product.description}</p>
-                        )}
-                        <div className="flex gap-4 mt-2 text-sm text-gray-500">
-                          <span>{product._count?.purchases || 0} sales</span>
-                          <span>₹{((product._count?.purchases || 0) * product.price / 100).toLocaleString()} earned</span>
-                        </div>
+                <div 
+                  key={product.id}
+                  className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300 flex items-start gap-6"
+                >
+                   {/* Thumbnail or Placeholder */}
+                   <div className="w-20 h-20 rounded-xl bg-gray-100 flex items-center justify-center shrink-0 text-gray-400">
+                      {product.fileType === 'pdf' ? <Package className="w-8 h-8" /> : <Package className="w-8 h-8" />}
+                   </div>
+
+                   <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between mb-1">
+                          <h3 className="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
+                              {product.title}
+                          </h3>
+                          <div className="flex items-center gap-3">
+                             {!product.isActive && (
+                                <span className="px-2 py-1 rounded-md bg-amber-50 text-amber-600 text-xs font-bold uppercase tracking-wider">
+                                   Draft
+                                </span>
+                             )}
+                             <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                onClick={() => handleDelete(product.id)}
+                                className="text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg p-2"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                          </div>
                       </div>
-                      <div className="flex gap-2">
-                        <Button variant="outline" size="sm" onClick={() => handleDelete(product.id)}>
-                          <Trash2 className="w-4 h-4 text-red-600" />
-                        </Button>
+                      
+                      <p className="text-2xl font-bold text-gray-900 mb-2">
+                         ₹{product.price / 100}
+                      </p>
+                      
+                      <div className="flex items-center gap-6 text-sm text-gray-500 font-medium">
+                         <span className="flex items-center gap-1.5">
+                            <span className="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                            {product._count?.purchases || 0} purchases
+                         </span>
+                         <span>
+                            Total: ₹{((product._count?.purchases || 0) * product.price / 100).toLocaleString()}
+                         </span>
+                         {product.fileType && (
+                             <span className="uppercase text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600">
+                                {product.fileType}
+                             </span>
+                         )}
                       </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                   </div>
+                </div>
               ))}
             </div>
           )}

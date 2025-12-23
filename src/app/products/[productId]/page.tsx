@@ -74,111 +74,109 @@ export default async function ProductPage({ params }: PageProps) {
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Product Details */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardContent className="p-8">
-                {/* Product Header */}
-                <div className="flex items-start gap-4 mb-6">
-                  <div className="w-16 h-16 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
-                    <Package className="w-8 h-8 text-purple-600" />
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
-                          {product.title}
-                        </h1>
-                        {product.fileType && (
-                          <Badge variant="accent">
-                            {product.fileType.toUpperCase()}
-                          </Badge>
-                        )}
-                      </div>
-                      <p className="text-2xl font-bold text-purple-600">
-                        {formatPrice(product.price, product.currency)}
-                      </p>
-                    </div>
-                  </div>
+            <div className="bg-white rounded-2xl p-8">
+              {/* Product Header */}
+              <div className="flex items-start gap-6 mb-8">
+                <div className="w-20 h-20 rounded-2xl bg-gray-50 flex items-center justify-center flex-shrink-0">
+                  <Package className="w-10 h-10 text-gray-300" />
                 </div>
-
-                {/* Description */}
-                <div className="prose prose-gray max-w-none">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                    About this product
-                  </h3>
-                  <p className="text-gray-700 whitespace-pre-wrap">
-                    {product.description || "No description provided."}
-                  </p>
-                </div>
-
-                {/* Creator Info */}
-                <div className="mt-8 pt-6 border-t border-gray-200">
-                  <h3 className="text-sm font-medium text-gray-500 mb-3">
-                    Created by
-                  </h3>
-                  <Link
-                    href={`/creator/${product.creator.username}`}
-                    className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                  >
-                    <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-200">
-                      {product.creator.user.image ? (
-                        <img
-                          src={product.creator.user.image}
-                          alt={displayName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center text-white font-bold text-lg">
-                          {(displayName || "C").charAt(0).toUpperCase()}
-                        </div>
+                <div className="flex-1">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2 tracking-tight">
+                        {product.title}
+                      </h1>
+                      {product.fileType && (
+                        <Badge variant="accent">
+                          {product.fileType.toUpperCase()}
+                        </Badge>
                       )}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-gray-900">{displayName}</p>
-                        {product.creator.isVerified && (
-                          <CheckCircle className="w-4 h-4 text-blue-500" />
-                        )}
-                      </div>
-                      <p className="text-sm text-gray-500">@{product.creator.username}</p>
-                    </div>
-                  </Link>
+                    <p className="text-3xl font-bold text-primary">
+                      {formatPrice(product.price, product.currency)}
+                    </p>
+                  </div>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+
+              {/* Description */}
+              <div className="prose prose-gray max-w-none prose-lg">
+                <h3 className="text-xl font-bold text-gray-900 mb-4">
+                  About this product
+                </h3>
+                <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
+                  {product.description || "No description provided."}
+                </p>
+              </div>
+
+              {/* Creator Info - Minimal */}
+              <div className="mt-12">
+                <h3 className="text-sm font-medium text-gray-500 mb-4">
+                  Created by
+                </h3>
+                <Link
+                  href={`/creator/${product.creator.username}`}
+                  className="flex items-center gap-4 group"
+                >
+                  <div className="w-14 h-14 rounded-full overflow-hidden bg-gray-100 border-2 border-transparent group-hover:border-primary transition-colors">
+                    {product.creator.user.image ? (
+                      <img
+                        src={product.creator.user.image}
+                        alt={displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 font-bold text-xl">
+                        {(displayName || "C").charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <p className="font-bold text-gray-900 text-lg group-hover:text-primary transition-colors">{displayName}</p>
+                      {product.creator.isVerified && (
+                        <CheckCircle className="w-5 h-5 text-primary fill-transparent" />
+                      )}
+                    </div>
+                    <p className="text-gray-500">@{product.creator.username}</p>
+                  </div>
+                </Link>
+              </div>
+            </div>
           </div>
 
           {/* Purchase Card */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-24">
-              <CardContent className="p-6">
-                <div className="text-center mb-6">
-                  <p className="text-3xl font-bold text-gray-900 mb-1">
+            <div className="sticky top-24">
+              <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                <div className="text-center mb-8">
+                  <p className="text-4xl font-bold text-gray-900 mb-2">
                     {formatPrice(product.price, product.currency)}
                   </p>
-                  <p className="text-sm text-gray-500">One-time purchase</p>
+                  <p className="text-sm text-gray-500 font-medium">One-time purchase</p>
                 </div>
 
                 {isOwner ? (
-                  <div className="text-center py-4 px-4 bg-gray-100 rounded-lg">
-                    <p className="text-gray-600">This is your product</p>
+                  <div className="text-center py-6 px-4 bg-gray-50 rounded-xl">
+                    <p className="text-gray-900 font-medium">This is your product</p>
                     <Link
                       href="/dashboard/creator/products"
-                      className="text-purple-600 hover:underline text-sm font-medium mt-2 block"
+                      className="text-primary hover:underline text-sm font-medium mt-2 block"
                     >
                       Manage Products →
                     </Link>
                   </div>
                 ) : hasPurchased ? (
                   <div className="space-y-4">
-                    <div className="text-center py-4 px-4 bg-green-50 rounded-lg border border-green-200">
+                    <div className="text-center py-4 px-4 bg-green-50 rounded-xl">
                       <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-2" />
-                      <p className="font-semibold text-green-800">You own this product!</p>
+                      <p className="font-bold text-green-800">You own this product!</p>
                     </div>
                     <a
                       href={product.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full py-3 bg-purple-600 text-white rounded-lg font-semibold hover:bg-purple-700 transition-colors"
+                      className="flex items-center justify-center gap-2 w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary-700 transition-colors"
                     >
                       <Download className="w-5 h-5" />
                       Download Now
@@ -187,22 +185,21 @@ export default async function ProductPage({ params }: PageProps) {
                 ) : session ? (
                   <Link
                     href={`/checkout/product/${product.id}`}
-                    className="flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all shadow-lg"
+                    className="flex items-center justify-center gap-2 w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary-700 transition-colors shadow-sm hover:shadow-md"
                   >
-                    <Heart className="w-5 h-5" />
                     Buy Now
                   </Link>
                 ) : (
-                  <div className="space-y-3">
+                  <div className="space-y-4">
                     <Link
                       href={`/login?callbackUrl=/products/${product.id}`}
-                      className="flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-purple-600 to-purple-700 text-white rounded-lg font-semibold hover:from-purple-700 hover:to-purple-800 transition-all"
+                      className="flex items-center justify-center gap-2 w-full py-4 bg-primary text-white rounded-xl font-bold hover:bg-primary-700 transition-colors"
                     >
                       Sign in to Purchase
                     </Link>
                     <p className="text-xs text-center text-gray-500">
                       Already have an account?{" "}
-                      <Link href="/login" className="text-purple-600 hover:underline">
+                      <Link href="/login" className="text-primary hover:underline font-medium">
                         Sign in
                       </Link>
                     </p>
@@ -210,27 +207,33 @@ export default async function ProductPage({ params }: PageProps) {
                 )}
 
                 {/* What's included */}
-                <div className="mt-6 pt-6 border-t border-gray-200">
-                  <h4 className="font-semibold text-gray-900 mb-3">What's included</h4>
-                  <ul className="space-y-2">
-                    <li className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                <div className="mt-8 pt-6">
+                  <h4 className="font-bold text-gray-900 mb-4">What's included</h4>
+                  <ul className="space-y-3">
+                    <li className="flex items-center gap-3 text-sm text-gray-700">
+                      <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <CheckCircle className="w-3 h-3 text-green-600" />
+                      </div>
                       Instant digital download
                     </li>
-                    <li className="flex items-center gap-2 text-sm text-gray-600">
-                      <CheckCircle className="w-4 h-4 text-green-500" />
+                    <li className="flex items-center gap-3 text-sm text-gray-700">
+                      <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                         <CheckCircle className="w-3 h-3 text-green-600" />
+                      </div>
                       Lifetime access
                     </li>
                     {product.fileType && (
-                      <li className="flex items-center gap-2 text-sm text-gray-600">
-                        <FileText className="w-4 h-4 text-green-500" />
+                      <li className="flex items-center gap-3 text-sm text-gray-700">
+                         <div className="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                           <FileText className="w-3 h-3 text-gray-500" />
+                         </div>
                         {product.fileType.toUpperCase()} format
                       </li>
                     )}
                   </ul>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+            </div>
           </div>
         </div>
       </div>

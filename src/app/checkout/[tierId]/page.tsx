@@ -314,14 +314,15 @@ export default function CheckoutPage() {
               <Card>
                 <CardContent>
                   {/* Creator Info */}
-                  <div className="flex items-center gap-4 pb-6 border-b border-border mb-6">
+                  <div className="flex items-center gap-6 pb-8 mb-8">
                     <Avatar
                       src={tier.creator.user?.image}
                       name={tier.creator.displayName}
                       size="lg"
+                      className="w-16 h-16"
                     />
                     <div>
-                      <p className="text-sm text-text-secondary">
+                      <p className="text-sm text-text-secondary font-medium mb-1">
                         Subscribing to
                       </p>
                       <p className="font-semibold text-text-primary">
@@ -344,10 +345,10 @@ export default function CheckoutPage() {
                           type="button"
                           onClick={() => setPaymentMethod(method.id)}
                           className={cn(
-                            "w-full flex items-center gap-4 p-4 rounded-lg border-2 text-left transition-all",
+                            "w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all border-0 ring-1",
                             paymentMethod === method.id
-                              ? "border-primary bg-primary/5"
-                              : "border-border hover:border-text-secondary"
+                              ? "ring-primary bg-primary/5 shadow-sm"
+                              : "ring-gray-200 hover:ring-gray-300 hover:bg-gray-50"
                           )}
                         >
                           <method.icon
@@ -432,17 +433,19 @@ export default function CheckoutPage() {
                   </h3>
 
                   {/* Tier Details */}
-                  <div className="pb-4 border-b border-border mb-4">
-                    <p className="font-medium text-text-primary mb-2">
-                      {tier.name} Subscription
+                  <div className="pb-6 mb-6">
+                    <p className="font-bold text-lg text-text-primary mb-4">
+                      {tier.name}
                     </p>
-                    <ul className="space-y-2">
+                    <ul className="space-y-3">
                       {tier.benefits.map((benefit, index) => (
                         <li
                           key={index}
-                          className="flex items-start gap-2 text-sm text-text-secondary"
+                          className="flex items-start gap-3 text-sm text-text-secondary"
                         >
-                          <Check className="w-4 h-4 text-secondary flex-shrink-0 mt-0.5" />
+                          <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                            <Check className="w-3 h-3 text-secondary" />
+                          </div>
                           <span>{benefit}</span>
                         </li>
                       ))}
@@ -450,7 +453,7 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Price Breakdown */}
-                  <div className="space-y-3 pb-4 border-b border-border mb-4">
+                  <div className="space-y-3 pb-6 mb-6 bg-gray-50 rounded-xl p-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-text-secondary">Subscription</span>
                       <span className="text-text-primary">

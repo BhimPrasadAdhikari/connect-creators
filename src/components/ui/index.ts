@@ -69,3 +69,7 @@ export type { Notification } from "./NotificationDropdown";
 // Page Components
 export { ExploreFilters } from "./ExploreFilters";
 export { Tabs, TabPanels } from "./Tabs";
+export { SectionHeader } from "./SectionHeader";
+export type { SectionHeaderProps } from "./SectionHeader";
+export { FeatureCard } from "./FeatureCard";
+export type { FeatureCardProps } from "./FeatureCard";

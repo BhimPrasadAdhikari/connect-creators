@@ -1,6 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
+import { useState, useEffect } from "react";
 import {
   CheckCircle,
   Instagram,
@@ -12,93 +14,69 @@ import {
   Heart,
   Users,
   FileText,
-  Download,
+  Share2,
+  ExternalLink,
+  Lock,
+  Info,
+  ChevronRight,
+  ShieldCheck,
 } from "lucide-react";
-import { Avatar, Card, CardContent, TierCard, PostCard, Button, Badge, Breadcrumbs } from "@/components/ui";
+import { Card, CardContent, Badge, Breadcrumbs, Button } from "@/components/ui";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { authOptions } from "@/lib/auth";
-import prisma from "@/lib/prisma";
 
 interface PageProps {
   params: Promise<{ username: string }>;
 }
 
-// Fetch creator by username
-async function getCreator(username: string) {
-  const creator = await prisma.creatorProfile.findUnique({
-    where: { username },
-    include: {
-      user: {
-        select: {
-          id: true,
-          name: true,
-          image: true,
-        },
-      },
-      tiers: {
-        where: { isActive: true },
-        orderBy: { price: "asc" },
-      },
-      posts: {
-        where: { isPublished: true },
-        orderBy: { createdAt: "desc" },
-        take: 10,
-        include: {
-          requiredTier: true,
-        },
-      },
-      digitalProducts: {
-        where: { isActive: true },
-        orderBy: { createdAt: "desc" },
-        take: 6,
-      },
-      _count: {
-        select: {
-          subscriptions: {
-            where: { status: "ACTIVE" },
-          },
-          posts: true,
-          digitalProducts: true,
-        },
-      },
-    },
-  });
-
-  return creator;
+// Types for data
+interface Tier {
+  id: string;
+  name: string;
+  price: number;
+  description: string | null;
+  benefits: string[];
 }
 
-// Fetch user's subscriptions and purchases for this creator
-async function getUserPurchaseStatus(userId: string | null, creatorId: string, productIds: string[]) {
-  if (!userId) {
-    return {
-      subscribedTierIds: new Set<string>(),
-      purchasedProductIds: new Set<string>(),
-    };
-  }
+interface Post {
+  id: string;
+  title: string;
+  content: string;
+  isPaid: boolean;
+  mediaUrl: string | null;
+  mediaType: string | null;
+  createdAt: Date;
+  requiredTier: { name: string } | null;
+}
 
-  const [subscriptions, purchases] = await Promise.all([
-    prisma.subscription.findMany({
-      where: {
-        fanId: userId,
-        creatorId: creatorId,
-        status: "ACTIVE",
-      },
-      select: { tierId: true },
-    }),
-    prisma.purchase.findMany({
-      where: {
-        userId: userId,
-        status: "COMPLETED",
-        productId: { in: productIds },
-      },
-      select: { productId: true },
-    }),
-  ]);
+interface DigitalProduct {
+  id: string;
+  title: string;
+  description: string | null;
+  price: number;
+  fileType: string | null;
+  coverImage: string | null;
+}
 
-  return {
-    subscribedTierIds: new Set(subscriptions.map((s) => s.tierId)),
-    purchasedProductIds: new Set(purchases.map((p) => p.productId).filter(Boolean) as string[]),
+interface Creator {
+  id: string;
+  username: string;
+  displayName: string | null;
+  bio: string | null;
+  isVerified: boolean;
+  socialLinks: Record<string, string>;
+  user: {
+    id: string;
+    name: string | null;
+    image: string | null;
+  };
+  tiers: Tier[];
+  posts: Post[];
+  digitalProducts: DigitalProduct[];
+  _count: {
+    subscriptions: number;
+    posts: number;
+    digitalProducts: number;
   };
 }
 
@@ -111,8 +89,6 @@ function getSocialIcon(key: string) {
       return Youtube;
     case "twitter":
       return Twitter;
-    case "spotify":
-      return Heart;
     default:
       return LinkIcon;
   }
@@ -129,33 +105,98 @@ function formatPrice(amountInPaise: number): string {
   }).format(amount);
 }
 
-export default async function CreatorProfilePage({ params }: PageProps) {
-  const { username } = await params;
-  const creator = await getCreator(username);
-  const session = await getServerSession(authOptions);
+// Share profile function
+function shareProfile(username: string, displayName: string) {
+  const url = `${window.location.origin}/creator/${username}`;
+  if (navigator.share) {
+    navigator.share({
+      title: `${displayName} on CreatorConnect`,
+      text: `Check out ${displayName}'s exclusive content!`,
+      url: url,
+    });
+  } else {
+    navigator.clipboard.writeText(url);
+    alert("Profile link copied!");
+  }
+}
+
+export default function CreatorProfilePage({ params }: PageProps) {
+  const [creator, setCreator] = useState<Creator | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [username, setUsername] = useState<string>("");
+  const [userId, setUserId] = useState<string | null>(null);
+  const [subscribedTierIds, setSubscribedTierIds] = useState<Set<string>>(new Set());
+  const [purchasedProductIds, setPurchasedProductIds] = useState<Set<string>>(new Set());
+  const [isOwner, setIsOwner] = useState(false);
+  const [activeTab, setActiveTab] = useState("posts");
+
+  useEffect(() => {
+    async function loadData() {
+      const { username: usernameParam } = await params;
+      setUsername(usernameParam);
+
+      // Fetch creator data
+      try {
+        const response = await fetch(`/api/creator/${usernameParam}`);
+        if (!response.ok) {
+          setLoading(false);
+          return;
+        }
+        const data = await response.json();
+        setCreator(data.creator);
+        setUserId(data.userId);
+        setIsOwner(data.isOwner);
+        setSubscribedTierIds(new Set(data.subscribedTierIds || []));
+        setPurchasedProductIds(new Set(data.purchasedProductIds || []));
+      } catch (error) {
+        console.error("Failed to load creator", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, [params]);
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-white">
+        <Header />
+        <div className="container mx-auto px-4 py-12 max-w-5xl">
+          <div className="animate-pulse space-y-8">
+            <div className="flex gap-6 items-center">
+              <div className="w-24 h-24 bg-gray-100 rounded-full" />
+              <div className="space-y-4 flex-1">
+                <div className="h-6 bg-gray-100 rounded w-1/4" />
+                <div className="h-4 bg-gray-100 rounded w-1/3" />
+              </div>
+            </div>
+            <div className="h-8 bg-gray-100 rounded w-full" />
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (!creator) {
     notFound();
   }
 
-  const userId = (session?.user as { id?: string })?.id || null;
-  const productIds = creator.digitalProducts.map((p) => p.id);
-  const { subscribedTierIds, purchasedProductIds } = await getUserPurchaseStatus(
-    userId,
-    creator.id,
-    productIds
-  );
-
   const displayName = creator.displayName || creator.user.name || creator.username;
-  const socialLinks = (creator.socialLinks as Record<string, string>) || {};
-  const isOwner = session?.user?.id === creator.user.id;
+  const socialLinks = creator.socialLinks || {};
+
+  const tabs = [
+    { id: "posts", label: "Posts", count: creator._count.posts },
+    { id: "products", label: "Products", count: creator._count.digitalProducts },
+    { id: "tiers", label: "Membership" },
+    { id: "about", label: "About" },
+  ];
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+    <main className="min-h-screen bg-white text-text-primary font-sans">
       <Header />
 
       {/* Breadcrumbs */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <div className="container mx-auto px-4 py-4 max-w-6xl">
         <Breadcrumbs
           items={[
             { label: "Explore", href: "/explore" },
@@ -164,427 +205,412 @@ export default async function CreatorProfilePage({ params }: PageProps) {
         />
       </div>
 
-      {/* Cover Image Section */}
-      <div className="relative">
-        <div className="h-56 sm:h-72 lg:h-80 w-full overflow-hidden">
-          {creator.coverImage ? (
-            <img
-              src={creator.coverImage}
-              alt="Cover"
-              className="w-full h-full object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-blue-600 via-blue-500 to-purple-600" />
-          )}
-          {/* Overlay gradient */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent" />
-        </div>
-
-        {/* Profile Card - overlapping cover */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative -mt-24 sm:-mt-32 bg-white rounded-2xl shadow-xl border border-gray-100 p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row gap-6">
-              {/* Avatar */}
-              <div className="flex-shrink-0 -mt-20 sm:-mt-24">
-                <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-lg overflow-hidden bg-gray-200">
-                  {creator.user.image ? (
-                    <img
-                      src={creator.user.image}
-                      alt={displayName}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-4xl font-bold">
-                      {displayName.charAt(0).toUpperCase()}
-                    </div>
-                  )}
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
+        <div className="grid lg:grid-cols-12 gap-12">
+          {/* Left Column: Creator Info & Content (8 cols) */}
+          <div className="lg:col-span-8">
+            
+            {/* Header / Bio Section */}
+            <div className="mb-10">
+              <div className="flex items-start gap-6 mb-6">
+                <div className="relative">
+                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border border-border overflow-hidden bg-gray-50">
+                    {creator.user.image ? (
+                      <img
+                        src={creator.user.image}
+                        alt={displayName}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-3xl font-medium">
+                        {displayName.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                  </div>
+                </div>
+                
+                <div className="flex-1 pt-2">
+                  <div className="flex items-center gap-2 mb-1">
+                    <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
+                      {displayName}
+                    </h1>
+                    {creator.isVerified && (
+                      <CheckCircle className="w-5 h-5 text-primary fill-transparent" strokeWidth={2.5} />
+                    )}
+                  </div>
+                  <p className="text-text-secondary font-medium mb-3">@{creator.username}</p>
+                  <p className="text-gray-700 leading-relaxed max-w-2xl mb-4">
+                    {creator.bio || "Digital creator."}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-4 items-center">
+                     {/* Social Links - Minimal text links */}
+                    {Object.entries(socialLinks).map(([key, url]) => {
+                      return (
+                        <a
+                          key={key}
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-sm font-medium text-text-secondary hover:text-primary transition-colors capitalize"
+                        >
+                          {key}
+                        </a>
+                      );
+                    })}
+                    {Object.keys(socialLinks).length > 0 && <span className="text-gray-300">|</span>}
+                    <button
+                      onClick={() => shareProfile(creator.username, displayName)}
+                      className="text-sm font-medium text-text-secondary hover:text-primary transition-colors flex items-center gap-1"
+                    >
+                      <Share2 className="w-4 h-4" />
+                      Share
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Info */}
-              <div className="flex-1">
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                        {displayName}
-                      </h1>
-                      {creator.isVerified && (
-                        <CheckCircle className="w-6 h-6 text-blue-500 fill-blue-500" />
-                      )}
-                    </div>
-                    <p className="text-gray-500 mb-3">@{creator.username}</p>
-
-                    {/* Bio */}
-                    <p className="text-gray-700 max-w-xl leading-relaxed">
-                      {creator.bio || "Welcome to my page! Subscribe to access exclusive content."}
-                    </p>
-                  </div>
-
-                  {/* Stats */}
-                  <div className="flex gap-6 sm:gap-8">
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <Users className="w-4 h-4 text-gray-400" />
-                        <p className="text-2xl font-bold text-gray-900">
-                          {creator._count.subscriptions}
-                        </p>
-                      </div>
-                      <p className="text-sm text-gray-500">Subscribers</p>
-                    </div>
-                    <div className="text-center">
-                      <div className="flex items-center justify-center gap-1">
-                        <FileText className="w-4 h-4 text-gray-400" />
-                        <p className="text-2xl font-bold text-gray-900">
-                          {creator._count.posts}
-                        </p>
-                      </div>
-                      <p className="text-sm text-gray-500">Posts</p>
-                    </div>
-                  </div>
+              {/* Stats Bar */}
+              <div className="flex gap-8 py-4">
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-text-primary">{creator._count.subscriptions}</span>
+                  <span className="text-text-secondary text-sm">Musters</span>
                 </div>
-
-                {/* Social Links & Actions */}
-                <div className="flex flex-wrap items-center gap-3 mt-6">
-                  {/* Social Links */}
-                  {Object.entries(socialLinks).map(([key, url]) => {
-                    const IconComponent = getSocialIcon(key);
-                    return (
-                      <a
-                        key={key}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 hover:bg-gray-200 transition-all hover:scale-105"
-                      >
-                        <IconComponent className="w-4 h-4" />
-                        <span className="text-sm font-medium capitalize">{key}</span>
-                      </a>
-                    );
-                  })}
-
-                  {/* Spacer */}
-                  <div className="flex-1" />
-
-                  {/* Action Buttons */}
-                  {!isOwner && (
-                    <Link
-                      href={`/messages?creator=${creator.id}`}
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-900 text-white hover:bg-gray-800 transition-colors font-medium"
-                    >
-                      <MessageCircle className="w-4 h-4" />
-                      Message
-                    </Link>
-                  )}
-                  {isOwner && (
-                    <Link
-                      href="/dashboard/creator"
-                      className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors font-medium"
-                    >
-                      Edit Profile
-                    </Link>
-                  )}
+                <div className="flex items-center gap-2">
+                  <span className="font-bold text-text-primary">{creator._count.posts}</span>
+                  <span className="text-text-secondary text-sm">Posts</span>
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
 
-      {/* Main Content */}
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Left Column - Tiers & Products */}
-          <div className="lg:col-span-1 space-y-8">
-            {/* Subscription Tiers */}
-            <div>
-              <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <Heart className="w-5 h-5 text-pink-500" />
-                Support {displayName.split(" ")[0]}
-              </h2>
+            {/* Tabs */}
+            <div className="mb-8">
+              <nav className="flex gap-8">
+                {tabs.map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
+                      activeTab === tab.id
+                        ? "border-primary text-primary"
+                        : "border-transparent text-text-secondary hover:text-text-primary"
+                    }`}
+                  >
+                    {tab.label}
+                    {tab.count !== undefined && (
+                      <span className="ml-2 text-text-tertiary font-normal">{tab.count}</span>
+                    )}
+                  </button>
+                ))}
+              </nav>
+            </div>
 
-              {creator.tiers.length === 0 ? (
-                <Card>
-                  <CardContent className="py-8 text-center text-gray-500">
-                    No subscription tiers available yet.
-                  </CardContent>
-                </Card>
-              ) : (
-                <div className="space-y-5">
-                  {creator.tiers.map((tier, index) => (
-                    <div
-                      key={tier.id}
-                      className={`relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 ${
-                        index === 0 
-                          ? "ring-2 ring-blue-500 shadow-blue-100" 
-                          : "border border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      {/* Popular badge - inside card */}
-                      {index === 0 && (
-                        <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-center py-2 text-sm font-semibold">
-                          ⭐ Most Popular
+            {/* Tab Content */}
+            <div className="space-y-8">
+              {activeTab === "posts" && (
+                <div className="space-y-6">
+                  {creator.posts.length === 0 ? (
+                    <div className="text-center py-12 bg-gray-50 rounded-lg border border-border">
+                      <p className="text-text-secondary">No posts yet.</p>
+                    </div>
+                  ) : (
+                    creator.posts.map((post) => (
+                      <PostCard
+                        key={post.id}
+                        post={post}
+                        creator={creator}
+                        displayName={displayName}
+                        formatPrice={formatPrice}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+
+              {activeTab === "products" && (
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {creator.digitalProducts.length === 0 ? (
+                    <div className="col-span-full text-center py-12 bg-gray-50 rounded-lg border border-border">
+                      <p className="text-text-secondary">No products available.</p>
+                    </div>
+                  ) : (
+                    creator.digitalProducts.map((product) => (
+                      <ProductCard
+                        key={product.id}
+                        product={product}
+                        isPurchased={purchasedProductIds.has(product.id)}
+                        formatPrice={formatPrice}
+                      />
+                    ))
+                  )}
+                </div>
+              )}
+
+              {activeTab === "tiers" && (
+                 <div className="space-y-4">
+                  {creator.tiers.length === 0 ? (
+                    <div className="text-center py-12 bg-gray-50 rounded-lg border border-border">
+                      <p className="text-text-secondary">No membership tiers.</p>
+                    </div>
+                  ) : (
+                    creator.tiers.map((tier) => (
+                      <div key={tier.id} className="bg-gray-50 rounded-xl p-8 hover:bg-gray-100 transition-colors">
+                        <div className="flex justify-between items-start mb-4">
+                          <div>
+                            <h3 className="font-bold text-lg text-text-primary">{tier.name}</h3>
+                            <p className="text-text-secondary mt-1">{tier.description}</p>
+                          </div>
+                          <div className="text-right">
+                            <span className="block font-bold text-xl text-primary">{formatPrice(tier.price)}</span>
+                            <span className="text-sm text-text-secondary">/month</span>
+                          </div>
                         </div>
-                      )}
-                      
-                      <div className="p-6">
-                        <h3 className="font-bold text-xl text-gray-900 mb-2">
-                          {tier.name}
-                        </h3>
-                        <div className="flex items-baseline gap-1 mb-4">
-                          <span className="text-3xl font-bold text-gray-900">
-                            {formatPrice(tier.price)}
-                          </span>
-                          <span className="text-gray-500">/month</span>
-                        </div>
-                        
-                        {tier.description && (
-                          <p className="text-gray-600 mb-5 pb-5 border-b border-gray-100">
-                            {tier.description}
-                          </p>
-                        )}
-                        
-                        <ul className="space-y-3 mb-6">
-                          {tier.benefits.map((benefit: string, i: number) => (
-                            <li key={i} className="flex items-start gap-3 text-gray-700">
-                              <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <CheckCircle className="w-3.5 h-3.5 text-green-600" />
-                              </div>
+                        <ul className="mb-6 space-y-2">
+                          {tier.benefits.map((benefit, i) => (
+                            <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                              <CheckCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                               <span>{benefit}</span>
                             </li>
                           ))}
                         </ul>
-                        
                         {subscribedTierIds.has(tier.id) ? (
-                          <div className="space-y-2">
-                            <div className="flex items-center justify-center gap-2 py-3.5 rounded-xl bg-green-100 text-green-800 font-semibold">
-                              <CheckCircle className="w-5 h-5" />
-                              You're Subscribed
-                            </div>
-                            <Link
-                              href="/subscriptions"
-                              className="block w-full text-center py-2 text-sm text-gray-600 hover:text-gray-900"
-                            >
-                              Manage subscription →
-                            </Link>
-                          </div>
+                           <Link
+                            href="/subscriptions"
+                            className="inline-flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg border border-border bg-gray-50 text-text-primary font-medium hover:bg-gray-100 transition-colors"
+                          >
+                            Manage Subscription
+                          </Link>
                         ) : (
                           <Link
                             href={`/checkout/${tier.id}`}
-                            className={`block w-full text-center py-3.5 rounded-xl font-semibold transition-all duration-200 ${
-                              index === 0
-                                ? "bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg shadow-blue-500/25"
-                                : "bg-gray-100 text-gray-900 hover:bg-gray-200"
-                            }`}
+                            className="inline-flex items-center justify-center gap-2 w-full px-4 py-3 rounded-lg bg-primary text-white font-medium hover:bg-primary-700 transition-colors shadow-sm"
                           >
-                            Subscribe Now
+                            Join
                           </Link>
                         )}
                       </div>
-                    </div>
-                  ))}
+                    ))
+                  )}
+                 </div>
+              )}
+
+              {activeTab === "about" && (
+                <div className="max-w-2xl">
+                  <h3 className="text-lg font-bold text-text-primary mb-4">About</h3>
+                  <div className="prose prose-gray">
+                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                      {creator.bio || "No bio available."}
+                    </p>
+                  </div>
+                  
+                  {Object.keys(socialLinks).length > 0 && (
+                     <div className="marginTop-8 pt-8">
+                        <h4 className="font-bold text-text-primary mb-4">Links</h4>
+                        <ul className="space-y-2">
+                           {Object.entries(socialLinks).map(([key, url]) => (
+                              <li key={key}>
+                                 <a href={url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 text-text-secondary hover:text-primary transition-colors">
+                                    <ExternalLink className="w-4 h-4" />
+                                    <span className="capitalize">{key}</span>
+                                 </a>
+                              </li>
+                           ))}
+                        </ul>
+                     </div>
+                  )}
                 </div>
               )}
             </div>
-
-            {/* Digital Products */}
-            {creator.digitalProducts && creator.digitalProducts.length > 0 && (
-              <div className="mt-8">
-                <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-                  <Package className="w-5 h-5 text-purple-500" />
-                  Digital Products
-                </h2>
-                <div className="space-y-3">
-                  {creator.digitalProducts.map((product) => (
-                    <div
-                      key={product.id}
-                      className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md hover:border-purple-200 transition-all"
-                    >
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 truncate">
-                            {product.title}
-                          </h3>
-                          {product.description && (
-                            <p className="text-sm text-gray-500 line-clamp-2 mt-1">
-                              {product.description}
-                            </p>
-                          )}
-                          {product.fileType && (
-                            <span className="inline-block mt-2 px-2 py-0.5 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">
-                              {product.fileType.toUpperCase()}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-right flex-shrink-0">
-                          {purchasedProductIds.has(product.id) ? (
-                            <>
-                              <div className="flex items-center gap-1 text-green-600 font-semibold mb-1">
-                                <CheckCircle className="w-4 h-4" />
-                                Owned
-                              </div>
-                              <Link
-                                href={`/products/${product.id}`}
-                                className="text-sm text-purple-600 hover:underline font-medium flex items-center gap-1"
-                              >
-                                <Download className="w-3 h-3" />
-                                View →
-                              </Link>
-                            </>
-                          ) : (
-                            <>
-                              <p className="font-bold text-lg text-purple-600">
-                                {formatPrice(product.price)}
-                              </p>
-                              <Link
-                                href={`/products/${product.id}`}
-                                className="text-sm text-purple-600 hover:underline font-medium"
-                              >
-                                Buy Now →
-                              </Link>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Send a Message (for non-owners) */}
-            {!isOwner && (
-              <div className="mt-6">
-                <Link
-                  href={`/messages?creator=${creator.id}`}
-                  className="flex items-center justify-center gap-3 w-full py-4 rounded-xl bg-gradient-to-r from-gray-900 to-gray-800 text-white font-semibold hover:from-gray-800 hover:to-gray-700 transition-all shadow-lg"
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  Send a Message
-                </Link>
-              </div>
-            )}
           </div>
 
-          {/* Right Column - Posts */}
-          <div className="lg:col-span-2">
-            <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-500" />
-              Posts
-            </h2>
-
-            {creator.posts.length === 0 ? (
-              <Card>
-                <CardContent className="py-16 text-center">
-                  <FileText className="w-12 h-12 text-gray-300 mx-auto mb-4" />
-                  <p className="text-gray-500">No posts yet. Check back soon!</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-6">
-                {creator.posts.map((post) => (
-                  <div
-                    key={post.id}
-                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
-                  >
-                    {/* Post Header */}
-                    <div className="p-5">
-                      <div className="flex items-center gap-3 mb-4">
-                        <div className="w-10 h-10 rounded-full overflow-hidden bg-gray-200">
-                          {creator.user.image ? (
-                            <img
-                              src={creator.user.image}
-                              alt={displayName}
-                              className="w-full h-full object-cover"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-sm font-bold">
-                              {displayName.charAt(0)}
-                            </div>
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <p className="font-semibold text-gray-900">{displayName}</p>
-                          <p className="text-sm text-gray-500">
-                            {new Date(post.createdAt).toLocaleDateString("en-IN", {
-                              day: "numeric",
-                              month: "short",
-                              year: "numeric",
-                            })}
-                          </p>
-                        </div>
-                        {post.isPaid && (
-                          <Badge variant="accent">
-                            {post.requiredTier?.name || "Premium"}
-                          </Badge>
-                        )}
-                      </div>
-
-                      <Link href={`/post/${post.id}`}>
-                        <h3 className="text-lg font-bold text-gray-900 hover:text-blue-600 transition-colors mb-2">
-                          {post.title}
-                        </h3>
-                      </Link>
-
-                      {/* Content preview or locked state */}
-                      {post.isPaid ? (
-                        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-6 text-center border border-gray-200">
-                          <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-gray-200 flex items-center justify-center">
-                            <Heart className="w-6 h-6 text-gray-400" />
-                          </div>
-                          <p className="text-gray-600 mb-4">
-                            Subscribe to unlock this content
-                          </p>
-                          <Link
-                            href={`/checkout/${creator.tiers[0]?.id}`}
-                            className="inline-block px-5 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-                          >
-                            Subscribe from {creator.tiers[0] ? formatPrice(creator.tiers[0].price) : "₹99"}/mo
-                          </Link>
-                        </div>
-                      ) : (
-                        <p className="text-gray-700 line-clamp-3">{post.content}</p>
-                      )}
-                    </div>
-
-                    {/* Post Media */}
-                    {post.mediaUrl && !post.isPaid && (
-                      <div className="border-t border-gray-100">
-                        {post.mediaType === "image" && (
-                          <img
-                            src={post.mediaUrl}
-                            alt={post.title}
-                            className="w-full max-h-96 object-cover"
-                          />
-                        )}
-                        {post.mediaType === "video" && (
-                          <video
-                            src={post.mediaUrl}
-                            controls
-                            className="w-full max-h-96"
-                          />
-                        )}
-                      </div>
-                    )}
-
-                    {/* Post Footer */}
-                    <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
-                      <Link
-                        href={`/post/${post.id}`}
-                        className="text-blue-600 text-sm font-medium hover:underline"
-                      >
-                        View full post →
-                      </Link>
-                    </div>
+          {/* Right Column: Sticky Sidebar (4 cols) */}
+          <div className="lg:col-span-4 pl-8 hidden lg:block">
+            <div className="sticky top-24 space-y-8">
+              
+              {/* Membership CTA */}
+              <div>
+                <h3 className="font-bold text-text-primary mb-4 flex items-center gap-2">
+                  Support {displayName.split(" ")[0]}
+                </h3>
+                {creator.tiers.length > 0 ? (
+                  <div className="bg-gray-50 rounded-xl p-6">
+                    <p className="text-sm text-text-secondary mb-4">
+                      Get exclusive access to posts and content.
+                    </p>
+                    <Link
+                      href={`/checkout/${creator.tiers[0].id}`}
+                      className="block w-full text-center py-3 bg-primary text-white rounded font-medium hover:bg-primary-700 transition-colors mb-3 shadow-sm"
+                    >
+                      Join for {formatPrice(creator.tiers[0].price)}
+                    </Link>
+                     <button
+                        onClick={() => setActiveTab("tiers")}
+                        className="block w-full text-center text-sm text-text-secondary hover:text-primary transition-colors"
+                     >
+                        View all options
+                     </button>
                   </div>
-                ))}
+                ) : (
+                  <p className="text-text-secondary text-sm">No memberships available yet.</p>
+                )}
               </div>
-            )}
+              
+              {/* Products CTA */}
+              {creator.digitalProducts.length > 0 && (
+                 <div>
+                    <h3 className="font-bold text-text-primary mb-4">Latest Products</h3>
+                    <div className="space-y-3">
+                       {creator.digitalProducts.slice(0, 3).map(product => (
+                          <Link key={product.id} href={`/products/${product.id}`} className="block bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
+                             <div className="flex justify-between items-start">
+                                <span className="font-medium text-text-primary line-clamp-1">{product.title}</span>
+                                <span className="text-sm font-semibold text-primary">{formatPrice(product.price)}</span>
+                             </div>
+                             <span className="text-xs text-text-secondary mt-1 block">Digital Download</span>
+                          </Link>
+                       ))}
+                    </div>
+                 </div>
+              )}
+
+              {!isOwner && (
+                 <Link
+                   href={`/messages?creator=${creator.id}`}
+                   className="flex items-center justify-center gap-2 w-full py-2.5 bg-gray-50 rounded text-text-secondary font-medium hover:bg-gray-100 hover:text-text-primary transition-colors"
+                 >
+                   <MessageCircle className="w-4 h-4" />
+                   Message
+                 </Link>
+              )}
+            </div>
           </div>
         </div>
       </div>
-
       <Footer />
     </main>
+  );
+}
+
+// Minimal Post Card - Borderless
+function PostCard({
+  post,
+  creator,
+  displayName,
+  formatPrice,
+}: {
+  post: Post;
+  creator: Creator;
+  displayName: string;
+  formatPrice: (price: number) => string;
+}) {
+  return (
+    <article className="group bg-white rounded-lg transition-colors hover:bg-gray-50/50">
+      <div className="py-6 border-gray-100 last:border-0 border-b-0">
+        <div className="flex items-center justify-between mb-3 text-sm">
+          <div className="flex items-center gap-2 text-text-secondary">
+             <span className="font-medium text-text-primary">{displayName}</span>
+             <span>•</span>
+             <span>{new Date(post.createdAt).toLocaleDateString()}</span>
+          </div>
+          {post.isPaid && (
+            <Badge variant="warning" className="flex items-center gap-1">
+              <Lock className="w-3 h-3" />
+              Premium
+            </Badge>
+          )}
+        </div>
+
+        <Link href={`/post/${post.id}`}>
+          <h3 className="text-xl font-bold text-text-primary mb-3 leading-tight group-hover:text-primary transition-colors">
+            {post.title}
+          </h3>
+        </Link>
+        
+        {post.isPaid ? (
+          <div className="mt-4 bg-gray-50 rounded-xl p-8 text-center">
+            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+               <Lock className="w-5 h-5 text-text-tertiary" />
+            </div>
+            <p className="text-text-primary font-bold mb-1">Locked Content</p>
+            <p className="text-text-secondary text-sm mb-5">Join membership to view this post.</p>
+             {creator.tiers[0] && (
+               <Link
+                 href={`/checkout/${creator.tiers[0].id}`}
+                 className="inline-block px-5 py-2.5 bg-primary text-white text-sm font-medium rounded-full hover:bg-primary-700 transition-colors shadow-sm"
+               >
+                 Unlock for {formatPrice(creator.tiers[0].price)}
+               </Link>
+             )}
+          </div>
+        ) : (
+          <div className="mt-2 text-gray-700 leading-relaxed max-w-none prose prose-gray">
+             <p className="line-clamp-3">{post.content}</p>
+          </div>
+        )}
+        
+        {post.mediaUrl && !post.isPaid && (
+          <div className="mt-4 rounded-xl overflow-hidden bg-gray-100">
+             <div className="aspect-video w-full flex items-center justify-center">
+               {post.mediaType === "image" ? (
+                 <img src={post.mediaUrl} alt="Post media" className="w-full h-full object-cover" />
+               ) : (
+                 <video src={post.mediaUrl} controls className="w-full h-full object-cover" />
+               )}
+             </div>
+          </div>
+        )}
+
+        {!post.isPaid && (
+           <div className="mt-4 flex justify-between items-center">
+              <Link href={`/post/${post.id}`} className="text-sm font-medium text-text-secondary hover:text-primary">
+                 Read more
+              </Link>
+              <div className="flex gap-5">
+                 <button className="text-text-tertiary hover:text-red-500 transition-colors"><Heart className="w-5 h-5" /></button>
+                 <button className="text-text-tertiary hover:text-text-primary transition-colors"><Share2 className="w-5 h-5" /></button>
+              </div>
+           </div>
+        )}
+      </div>
+    </article>
+  );
+}
+
+// Minimal Product Card - Borderless
+function ProductCard({
+  product,
+  isPurchased,
+  formatPrice,
+}: {
+  product: DigitalProduct;
+  isPurchased: boolean;
+  formatPrice: (price: number) => string;
+}) {
+  return (
+    <Link
+      href={`/products/${product.id}`}
+      className="group block rounded-xl p-4 hover:bg-gray-50 transition-colors"
+    >
+      <div className="mb-4 aspect-[4/3] bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden">
+        {product.coverImage ? (
+           <img src={product.coverImage} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+        ) : (
+           <Package className="w-10 h-10 text-gray-200" />
+        )}
+      </div>
+      <div>
+        <h4 className="font-bold text-lg text-text-primary group-hover:text-primary transition-colors line-clamp-1">{product.title}</h4>
+        <p className="text-sm text-text-secondary mt-1 line-clamp-2">{product.description}</p>
+      </div>
+      <div className="mt-4 pt-4 flex items-center justify-between">
+        {isPurchased ? (
+          <span className="flex items-center gap-1.5 text-sm font-medium text-green-600">
+            <CheckCircle className="w-4 h-4" /> Owned
+          </span>
+        ) : (
+          <span className="font-bold text-primary">{formatPrice(product.price)}</span>
+        )}
+      </div>
+    </Link>
   );
 }

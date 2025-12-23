@@ -63,7 +63,7 @@ export function Header({ transparent = false }: HeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-sticky border-b border-gray-200 ${
+      className={`sticky top-0 z-40 border-b border-gray-200 ${
         transparent
           ? "bg-white/80 backdrop-blur-md"
           : "bg-white"

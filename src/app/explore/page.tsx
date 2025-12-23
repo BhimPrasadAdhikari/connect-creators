@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { Avatar, Badge, Card, CardContent, Button, SkeletonCreatorCard, SkeletonGrid } from "@/components/ui";
+import { Users as UsersIcon } from "lucide-react";
+import { Avatar, Badge, Button, SkeletonCreatorCard, SkeletonGrid } from "@/components/ui";
 import { ExploreFilters } from "@/components/ui/ExploreFilters";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -120,7 +121,8 @@ export default async function ExplorePage({ searchParams }: PageProps) {
             Explore Creators
           </h1>
           <p className="text-gray-600 max-w-xl mx-auto">
-            Discover amazing creators from Nepal & India. Subscribe to access exclusive content.
+            Support creators you love. Join their exclusive communities.
+            Starting at just ₹99/month.
           </p>
         </div>
 
@@ -169,66 +171,52 @@ async function CreatorsContent({ filters }: { filters: { q?: string; category?: 
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {creators.map((creator) => (
-            <Link key={creator.username} href={`/creator/${creator.username}`}>
-              <Card variant="interactive">
-                <CardContent>
-                  <div className="flex items-start gap-4 mb-4">
+            <Link key={creator.username} href={`/creator/${creator.username}`} className="block group">
+              <div className="h-full p-5 rounded-3xl bg-white border border-transparent hover:border-gray-200 hover:shadow-lg transition-all duration-300">
+                <div className="flex items-start gap-4 mb-4">
+                  <div className="relative">
                     <Avatar
                       src={creator.image}
                       name={creator.name}
                       size="lg"
+                      className="w-16 h-16 ring-4 ring-gray-50 group-hover:ring-white transition-all"
                     />
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="font-semibold text-gray-900 truncate">
-                          {creator.name}
-                        </h3>
-                        {creator.isVerified && (
-                          <div className="w-4 h-4 bg-blue-600 rounded-full flex items-center justify-center shrink-0">
-                            <svg
-                              className="w-2.5 h-2.5 text-white"
-                              fill="currentColor"
-                              viewBox="0 0 20 20"
-                            >
-                              <path
-                                fillRule="evenodd"
-                                d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                                clipRule="evenodd"
-                              />
-                            </svg>
-                          </div>
-                        )}
+                    {creator.isVerified && (
+                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
+                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                          </svg>
+                        </div>
                       </div>
-                      <p className="text-sm text-gray-500">
-                        @{creator.username}
-                      </p>
-                    </div>
+                    )}
                   </div>
-
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {creator.bio || "Creator on CreatorConnect"}
-                  </p>
-
-                  <div className="flex items-center justify-between">
-                    <Badge variant="default">{creator.category}</Badge>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">From</p>
-                      <p className="font-semibold text-blue-600">
-                        {formatPrice(creator.startingPrice)}/mo
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="mt-4 pt-4 border-t border-gray-100">
-                    <p className="text-sm text-gray-500">
-                      <span className="font-medium text-gray-900">
-                        {creator.subscriberCount.toLocaleString()}
-                      </span>{" "}
-                      subscribers
+                  
+                  <div className="flex-1 min-w-0 pt-1">
+                    <h3 className="font-bold text-gray-900 truncate text-lg group-hover:text-blue-600 transition-colors">
+                      {creator.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 font-medium">
+                      @{creator.username}
                     </p>
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+
+                <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed min-h-[40px]">
+                  {creator.bio || "Creator on CreatorConnect. Join to see their exclusive content."}
+                </p>
+
+                <div className="flex items-center justify-between pt-4 border-t border-gray-50 group-hover:border-gray-100 transition-colors">
+                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                    <UsersIcon className="w-4 h-4" />
+                    <span className="font-semibold text-gray-900">{creator.subscriberCount.toLocaleString()}</span>
+                  </div>
+                  
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-bold group-hover:bg-blue-600 group-hover:text-white transition-all">
+                    <span>{formatPrice(creator.startingPrice)}</span>
+                  </div>
+                </div>
+              </div>
             </Link>
           ))}
         </div>

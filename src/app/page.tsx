@@ -112,20 +112,17 @@ function ProblemSection() {
     {
       icon: TrendingDown,
       title: "Algorithms control reach",
-      description:
-        "Social platforms decide who sees your content, not your fans.",
+      description: "Social platforms decide who sees your content, not your fans.",
     },
     {
       icon: CreditCard,
       title: "Income is unpredictable",
-      description:
-        "Brand deals come and go. Ad revenue keeps dropping.",
+      description: "Brand deals come and go. Ad revenue keeps dropping.",
     },
     {
       icon: Users,
       title: "Fans want more",
-      description:
-        "Your audience wants exclusive content, but there's no direct way to deliver.",
+      description: "Your audience wants exclusive content, but there's no direct way to deliver.",
     },
   ];
 
@@ -143,19 +140,12 @@ function ProblemSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
           {problems.map((problem, index) => (
-            <div
-              key={index}
-              className="text-center p-6 rounded-xl hover:bg-gray-50 transition-colors"
-            >
+            <div key={index} className="text-center p-6 rounded-xl hover:bg-gray-50 transition-colors">
               <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
                 <problem.icon className="w-7 h-7 text-red-500" />
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                {problem.title}
-              </h3>
-              <p className="text-gray-600 text-sm">
-                {problem.description}
-              </p>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">{problem.title}</h3>
+              <p className="text-gray-600 text-sm">{problem.description}</p>
             </div>
           ))}
         </div>
