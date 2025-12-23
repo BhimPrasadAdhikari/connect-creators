@@ -213,34 +213,57 @@ export default function CreatorSettingsPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-12 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">Creator Settings</h1>
+    <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto">
+      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Creator Settings</h1>
 
-        <div className="grid md:grid-cols-4 gap-6">
-          {/* Settings Navigation */}
-          <nav className="md:col-span-1">
-            <Card>
-              <CardContent className="p-2">
-                  {sections.map((section) => {
-                    const Icon = section.icon;
-                    return (
-                      <button
-                        key={section.id}
-                        onClick={() => setActiveSection(section.id)}
-                        className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                          activeSection === section.id
-                            ? "bg-blue-50 text-blue-600"
-                            : "text-gray-600 hover:bg-gray-50"
-                        }`}
-                      >
-                        <Icon className="w-5 h-5" />
-                        <span className="text-sm font-medium">{section.label}</span>
-                      </button>
-                    );
-                  })}
-                </CardContent>
-              </Card>
-            </nav>
+      {/* Mobile Tabs - Horizontal scroll on mobile */}
+      <div className="md:hidden mb-6 -mx-4 px-4">
+        <nav className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+          {sections.map((section) => {
+            const Icon = section.icon;
+            return (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                  activeSection === section.id
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {section.label}
+              </button>
+            );
+          })}
+        </nav>
+      </div>
+
+      <div className="grid md:grid-cols-4 gap-6">
+        {/* Settings Navigation - Desktop only */}
+        <nav className="md:col-span-1 hidden md:block">
+          <Card>
+            <CardContent className="p-2">
+              {sections.map((section) => {
+                const Icon = section.icon;
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => setActiveSection(section.id)}
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                      activeSection === section.id
+                        ? "bg-blue-50 text-blue-600"
+                        : "text-gray-600 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Icon className="w-5 h-5" />
+                    <span className="text-sm font-medium">{section.label}</span>
+                  </button>
+                );
+              })}
+            </CardContent>
+          </Card>
+        </nav>
 
             {/* Content */}
             <div className="md:col-span-3">

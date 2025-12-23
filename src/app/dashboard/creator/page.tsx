@@ -110,14 +110,14 @@ export default async function CreatorDashboardPage() {
   const { profile, stats } = data;
 
   return (
-    <div className="p-6 lg:p-12 max-w-7xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-12 max-w-7xl mx-auto">
         {/* Welcome & Quick Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
               Welcome back, {profile.displayName || profile.user.name}
             </h1>
-            <p className="text-gray-500 text-lg">
+            <p className="text-gray-500 text-base sm:text-lg">
               Here's what's happening with your content today.
             </p>
           </div>

@@ -54,7 +54,7 @@ export default function ProductsManagementPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="p-6 lg:p-12 max-w-5xl mx-auto">
+      <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto">
         <Skeleton className="h-6 w-40 mb-6" />
         <div className="flex justify-between mb-8">
           <div>
@@ -123,7 +123,7 @@ export default function ProductsManagementPage() {
   };
 
   return (
-    <div className="p-6 lg:p-12 max-w-5xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto">
         <div className="flex items-end justify-between mb-12">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Digital Products</h1>

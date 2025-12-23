@@ -97,7 +97,7 @@ export default async function EarningsPage() {
   const { creator, stats, earningsBreakdown, payoutEligibility, recentTips, tiers } = data;
 
   return (
-    <div className="p-6 lg:p-12 max-w-5xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Earnings & Analytics</h1>
 
         {/* Overview Cards */}

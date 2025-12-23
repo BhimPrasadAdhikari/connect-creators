@@ -205,16 +205,16 @@ export default function CreatorProfilePage({ params }: PageProps) {
         />
       </div>
 
-      <div className="container mx-auto px-4 py-8 max-w-6xl">
-        <div className="grid lg:grid-cols-12 gap-12">
+      <div className="container mx-auto px-4 py-6 sm:py-8 max-w-6xl">
+        <div className="grid lg:grid-cols-12 gap-8 lg:gap-12">
           {/* Left Column: Creator Info & Content (8 cols) */}
           <div className="lg:col-span-8">
             
             {/* Header / Bio Section */}
             <div className="mb-10">
-              <div className="flex items-start gap-6 mb-6">
-                <div className="relative">
-                  <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full border border-border overflow-hidden bg-gray-50">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6">
+                <div className="relative flex-shrink-0">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border border-border overflow-hidden bg-gray-50">
                     {creator.user.image ? (
                       <img
                         src={creator.user.image}
@@ -229,8 +229,8 @@ export default function CreatorProfilePage({ params }: PageProps) {
                   </div>
                 </div>
                 
-                <div className="flex-1 pt-2">
-                  <div className="flex items-center gap-2 mb-1">
+                <div className="flex-1 text-center sm:text-left">
+                  <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
                     <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-text-primary">
                       {displayName}
                     </h1>
@@ -271,26 +271,39 @@ export default function CreatorProfilePage({ params }: PageProps) {
               </div>
 
               {/* Stats Bar */}
-              <div className="flex gap-8 py-4">
+              <div className="flex justify-center sm:justify-start gap-6 sm:gap-8 py-4">
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-text-primary">{creator._count.subscriptions}</span>
-                  <span className="text-text-secondary text-sm">Musters</span>
+                  <span className="text-text-secondary text-sm">Members</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="font-bold text-text-primary">{creator._count.posts}</span>
                   <span className="text-text-secondary text-sm">Posts</span>
                 </div>
               </div>
+
+              {/* Mobile Subscribe CTA - Only shows on mobile */}
+              {creator.tiers.length > 0 && (
+                <div className="lg:hidden mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
+                  <p className="text-sm text-gray-600 mb-3 text-center">Get exclusive access to posts and content</p>
+                  <Link
+                    href={`/checkout/${creator.tiers[0].id}`}
+                    className="block w-full text-center py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                  >
+                    Join for {formatPrice(creator.tiers[0].price)}/month
+                  </Link>
+                </div>
+              )}
             </div>
 
-            {/* Tabs */}
-            <div className="mb-8">
-              <nav className="flex gap-8">
+            {/* Tabs - Horizontal scroll on mobile */}
+            <div className="mb-6 sm:mb-8 -mx-4 px-4 sm:mx-0 sm:px-0">
+              <nav className="flex gap-6 sm:gap-8 overflow-x-auto scrollbar-hide pb-1">
                 {tabs.map((tab) => (
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`pb-3 text-sm font-medium transition-colors border-b-2 ${
+                    className={`pb-3 text-sm font-medium transition-colors border-b-2 whitespace-nowrap ${
                       activeTab === tab.id
                         ? "border-primary text-primary"
                         : "border-transparent text-text-secondary hover:text-text-primary"
@@ -423,8 +436,8 @@ export default function CreatorProfilePage({ params }: PageProps) {
             </div>
           </div>
 
-          {/* Right Column: Sticky Sidebar (4 cols) */}
-          <div className="lg:col-span-4 pl-8 hidden lg:block">
+          {/* Right Column: Sticky Sidebar (4 cols) - Show on desktop, hidden on mobile */}
+          <div className="lg:col-span-4 lg:pl-8 hidden lg:block">
             <div className="sticky top-24 space-y-8">
               
               {/* Membership CTA */}

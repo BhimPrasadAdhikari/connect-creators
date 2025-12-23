@@ -41,7 +41,7 @@ export default async function CreatorPostsPage() {
   const posts = creator.posts;
 
   return (
-    <div className="p-6 lg:p-12 max-w-5xl mx-auto">
+    <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto">
         <div className="flex items-end justify-between mb-12">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">My Posts</h1>
