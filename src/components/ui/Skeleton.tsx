@@ -312,3 +312,21 @@ export function TiersPageSkeleton() {
     </div>
   );
 }
+
+// Message skeleton for messages/chat page
+export function MessageSkeleton() {
+  return (
+    <div className="flex items-start gap-3 py-3">
+      <SkeletonAvatar size="sm" />
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center gap-2">
+          <Skeleton height={14} width={100} />
+          <Skeleton height={12} width={60} />
+        </div>
+        <Skeleton height={16} width="80%" />
+        <Skeleton height={16} width="50%" />
+      </div>
+    </div>
+  );
+}
+
