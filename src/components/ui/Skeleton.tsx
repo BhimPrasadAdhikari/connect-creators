@@ -330,3 +330,186 @@ export function MessageSkeleton() {
   );
 }
 
+// Subscribers page skeleton
+export function SubscribersPageSkeleton() {
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div>
+        <Skeleton height={36} width={200} className="mb-2" />
+        <Skeleton height={20} width={160} />
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100">
+            <div className="flex items-center gap-4">
+              <Skeleton height={48} width={48} className="rounded-xl" />
+              <div className="flex-1">
+                <Skeleton height={14} width={80} className="mb-2" />
+                <Skeleton height={28} width={60} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Subscriber List */}
+      <div className="space-y-4">
+        <Skeleton height={24} width={150} className="mb-4" />
+        {[...Array(5)].map((_, i) => (
+          <div key={i} className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4">
+            <SkeletonAvatar size="md" />
+            <div className="flex-1">
+              <Skeleton height={18} width={120} className="mb-1" />
+              <Skeleton height={14} width={180} />
+            </div>
+            <div className="text-right">
+              <Skeleton height={20} width={70} className="mb-1" />
+              <Skeleton height={14} width={90} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Earnings page skeleton
+export function EarningsPageSkeleton() {
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <Skeleton height={36} width={250} />
+
+      {/* Stats Grid */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100">
+            <div className="flex items-center gap-3 mb-4">
+              <Skeleton height={40} width={40} className="rounded-xl" />
+              <Skeleton height={14} width={100} />
+            </div>
+            <Skeleton height={32} width={90} />
+          </div>
+        ))}
+      </div>
+
+      {/* Breakdown Section */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="bg-white p-6 rounded-3xl border border-gray-100">
+          <Skeleton height={24} width={150} className="mb-6" />
+          <div className="space-y-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex justify-between">
+                <Skeleton height={16} width={120} />
+                <Skeleton height={16} width={80} />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="bg-white p-6 rounded-3xl border border-gray-100">
+          <Skeleton height={24} width={130} className="mb-6" />
+          <div className="space-y-3">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <SkeletonAvatar size="sm" />
+                <div className="flex-1">
+                  <Skeleton height={14} width={100} />
+                </div>
+                <Skeleton height={14} width={60} />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Settings page skeleton
+export function SettingsPageSkeleton() {
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <Skeleton height={36} width={200} />
+
+      <div className="grid md:grid-cols-4 gap-6">
+        {/* Navigation */}
+        <nav className="md:col-span-1">
+          <div className="bg-white rounded-2xl border border-gray-100 p-2">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="flex items-center gap-3 px-4 py-3">
+                <Skeleton height={20} width={20} className="rounded" />
+                <Skeleton height={16} width={80} />
+              </div>
+            ))}
+          </div>
+        </nav>
+
+        {/* Content */}
+        <div className="md:col-span-3">
+          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+            <Skeleton height={24} width={150} className="mb-6" />
+            <div className="space-y-4">
+              <div>
+                <Skeleton height={14} width={100} className="mb-2" />
+                <Skeleton height={44} width="100%" className="rounded-lg" />
+              </div>
+              <div>
+                <Skeleton height={14} width={80} className="mb-2" />
+                <Skeleton height={44} width="100%" className="rounded-lg" />
+              </div>
+              <div>
+                <Skeleton height={14} width={40} className="mb-2" />
+                <Skeleton height={100} width="100%" className="rounded-lg" />
+              </div>
+              <div className="flex justify-end pt-4">
+                <Skeleton height={44} width={140} className="rounded-lg" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// Posts page skeleton
+export function PostsPageSkeleton() {
+  return (
+    <div className="space-y-8">
+      {/* Header */}
+      <div className="flex items-end justify-between">
+        <div>
+          <Skeleton height={36} width={140} className="mb-2" />
+          <Skeleton height={20} width={200} />
+        </div>
+        <Skeleton height={44} width={130} className="rounded-2xl" />
+      </div>
+
+      {/* Posts Grid */}
+      <div className="space-y-4">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100">
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <Skeleton height={24} width={60} className="rounded-full" />
+                  <Skeleton height={14} width={100} />
+                </div>
+                <Skeleton height={22} width="70%" className="mb-2" />
+                <Skeleton height={16} width="90%" />
+              </div>
+              <div className="flex gap-2">
+                <Skeleton height={36} width={36} className="rounded-lg" />
+                <Skeleton height={36} width={36} className="rounded-lg" />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}

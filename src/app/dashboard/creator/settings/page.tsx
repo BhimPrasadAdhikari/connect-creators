@@ -3,17 +3,7 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import {
-  Heart,
-  Settings,
-  LogOut,
-  Home,
-  FileText,
-  Users,
-  DollarSign,
-  Package,
-  MessageCircle,
   User,
   Link2,
   CreditCard,
@@ -27,6 +17,8 @@ import {
   Lock,
   Shield,
   AlertTriangle,
+  LogOut,
+  DollarSign,
 } from "lucide-react";
 import {
   Button,
@@ -36,21 +28,8 @@ import {
   Toggle,
   Select,
   Textarea,
-  Avatar,
 } from "@/components/ui";
-
-interface CreatorSettings {
-  displayName: string;
-  bio: string;
-  coverImage: string | null;
-  dmPrice: number | null;
-  socialLinks: {
-    instagram?: string;
-    twitter?: string;
-    youtube?: string;
-    tiktok?: string;
-  };
-}
+import { SettingsPageSkeleton } from "@/components/ui/Skeleton";
 
 export default function CreatorSettingsPage() {
   const router = useRouter();
@@ -213,8 +192,8 @@ export default function CreatorSettingsPage() {
 
   if (status === "loading" || profileLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="p-6 lg:p-12 max-w-5xl mx-auto">
+        <SettingsPageSkeleton />
       </div>
     );
   }
@@ -234,122 +213,14 @@ export default function CreatorSettingsPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Sidebar */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 hidden lg:block">
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="p-6 border-b border-gray-200">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                <Heart className="w-5 h-5 text-white" />
-              </div>
-              <span className="text-xl font-semibold text-gray-900">
-                CreatorConnect
-              </span>
-            </Link>
-          </div>
+    <div className="p-6 lg:p-12 max-w-5xl mx-auto">
+      <h1 className="text-3xl font-bold text-gray-900 mb-8">Creator Settings</h1>
 
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-1">
-            <Link
-              href="/dashboard/creator"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
-            >
-              <Home className="w-5 h-5" />
-              Dashboard
-            </Link>
-            <Link
-              href="/dashboard/creator/posts"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
-            >
-              <FileText className="w-5 h-5" />
-              Posts
-            </Link>
-            <Link
-              href="/dashboard/creator/products"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
-            >
-              <Package className="w-5 h-5" />
-              Products
-            </Link>
-            <Link
-              href="/messages"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
-            >
-              <MessageCircle className="w-5 h-5" />
-              Messages
-            </Link>
-            <Link
-              href="/dashboard/creator/subscribers"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
-            >
-              <Users className="w-5 h-5" />
-              Subscribers
-            </Link>
-            <Link
-              href="/dashboard/creator/earnings"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-50"
-            >
-              <DollarSign className="w-5 h-5" />
-              Earnings
-            </Link>
-            <Link
-              href="/dashboard/creator/settings"
-              className="flex items-center gap-3 px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-medium"
-            >
-              <Settings className="w-5 h-5" />
-              Settings
-            </Link>
-          </nav>
-
-          {/* User */}
-          <div className="p-4 border-t border-gray-200">
-            <div className="flex items-center gap-3 mb-3">
-              <Avatar src={session.user?.image} name={session.user?.name || ""} />
-              <div className="flex-1 min-w-0">
-                <p className="font-medium text-gray-900 truncate">
-                  {displayName || session.user?.name}
-                </p>
-                <p className="text-sm text-gray-500 truncate">@{username}</p>
-              </div>
-            </div>
-            <Link
-              href="/api/auth/signout"
-              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign out
-            </Link>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <main className="lg:ml-64 min-h-screen">
-        {/* Mobile Header */}
-        <header className="lg:hidden sticky top-0 bg-white border-b border-gray-200 z-30 px-4 py-3">
-          <div className="flex items-center justify-between">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                <Heart className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-semibold text-gray-900">Settings</span>
-            </Link>
-            <Avatar src={session.user?.image} name={session.user?.name || ""} />
-          </div>
-        </header>
-
-        <div className="p-6 lg:p-8">
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">
-            Creator Settings
-          </h1>
-
-          <div className="grid md:grid-cols-4 gap-6">
-            {/* Settings Navigation */}
-            <nav className="md:col-span-1">
-              <Card>
-                <CardContent className="p-2">
+        <div className="grid md:grid-cols-4 gap-6">
+          {/* Settings Navigation */}
+          <nav className="md:col-span-1">
+            <Card>
+              <CardContent className="p-2">
                   {sections.map((section) => {
                     const Icon = section.icon;
                     return (
@@ -906,10 +777,9 @@ export default function CreatorSettingsPage() {
                   </Card>
                 </div>
               )}
-            </div>
-          </div>
         </div>
-      </main>
+      </div>
     </div>
   );
 }
+
