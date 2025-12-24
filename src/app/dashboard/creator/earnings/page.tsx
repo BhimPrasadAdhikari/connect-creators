@@ -186,7 +186,7 @@ export default async function EarningsPage() {
               <h3 className="font-bold text-gray-900">Payout Status</h3>
               <p className="text-gray-600">{payoutEligibility.message}</p>
               <p className="text-sm text-gray-500 mt-2">
-                Payouts are processed {PAYOUT_SCHEDULE.frequency}, with a {PAYOUT_SCHEDULE.holdPeriod}-day hold period.
+                Payouts are processed {PAYOUT_SCHEDULE.frequencies[PAYOUT_SCHEDULE.defaultFrequency].name.toLowerCase()}, with a {PAYOUT_SCHEDULE.holdPeriod}-day hold period.
               </p>
             </div>
             {payoutEligibility.eligible && <Badge variant="success">Eligible</Badge>}
