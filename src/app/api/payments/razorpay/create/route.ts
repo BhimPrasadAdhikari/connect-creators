@@ -8,6 +8,7 @@ import prisma from "@/lib/prisma";
 import { razorpayProvider, getRazorpayKeyId } from "@/lib/payments/razorpay";
 import { calculateEarnings } from "@/lib/pricing";
 import { rateLimit } from "@/lib/api/rate-limit";
+import { handleIdempotency, cachePaymentResponse } from "@/lib/api/idempotency";
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,6 +40,15 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+
+    // Idempotency check - prevent duplicate orders from double-clicks
+    const { key: idempotencyKey, cachedResponse } = handleIdempotency(
+      req, 
+      userId, 
+      "razorpay_subscription_create", 
+      { tierId }
+    );
+    if (cachedResponse) return cachedResponse;
 
     // Find the subscription tier
     const tier = await prisma.subscriptionTier.findUnique({
@@ -155,7 +165,7 @@ export async function POST(req: NextRequest) {
     console.log(`[Razorpay] Order created: ${result.orderId} for subscription ${subscription.id}`);
     console.log(`[Razorpay] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 
-    return NextResponse.json({
+    const responseData = {
       success: true,
       orderId: result.orderId,
       keyId: getRazorpayKeyId(),
@@ -168,7 +178,12 @@ export async function POST(req: NextRequest) {
         email: userEmail || "",
       },
       subscriptionId: subscription.id,
-    });
+    };
+
+    // Cache response for idempotency (prevents duplicate orders on retry)
+    cachePaymentResponse(idempotencyKey, responseData);
+
+    return NextResponse.json(responseData);
   } catch (error) {
     console.error("[Razorpay] Create order error:", error);
     return NextResponse.json(
