@@ -138,6 +138,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Update purchase with providerOrderId and fee info for proper linking
+    await prisma.purchase.update({
+      where: { id: purchase.id },
+      data: {
+        providerOrderId: stripeSession.id,
+        provider: "STRIPE",
+        platformFee: earnings.platformCommission,
+        creatorEarnings: earnings.netEarnings,
+      },
+    });
+
     console.log(`[Stripe] Product checkout session created: ${stripeSession.id} for product ${product.id}`);
     console.log(`[Stripe Product] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 

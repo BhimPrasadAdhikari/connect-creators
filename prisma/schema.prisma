@@ -237,19 +237,30 @@ model Message {
 }
 
 model Purchase {
-  id            String   @id @default(cuid())
-  userId        String
-  postId        String?
-  productId     String?
-  amount        Int
-  currency      String   @default("INR")
-  status        String   @default("COMPLETED") // PENDING, COMPLETED, REFUNDED
-  createdAt     DateTime @default(now())
+  id              String           @id @default(cuid())
+  userId          String
+  postId          String?
+  productId       String?
+  amount          Int
+  currency        String           @default("INR")
+  status          String           @default("COMPLETED") // PENDING, COMPLETED, REFUNDED
+  // Payment tracking fields - links purchase to payment provider
+  provider        PaymentProvider?
+  providerOrderId String?          // Razorpay order ID, Stripe session ID, etc.
+  providerPayId   String?          // Payment ID after successful payment
+  platformFee     Int              @default(0)
+  creatorEarnings Int              @default(0)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @default(now()) @updatedAt
 
   // Relations
   user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   post    Post?           @relation("PostPurchases", fields: [postId], references: [id])
   product DigitalProduct? @relation("ProductPurchases", fields: [productId], references: [id])
+
+  // Index for faster lookups
+  @@index([providerOrderId])
+  @@index([userId, status])
 }
 
 model Comment {

@@ -117,6 +117,17 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    // Update purchase with providerOrderId and fee info for proper linking
+    await prisma.purchase.update({
+      where: { id: purchase.id },
+      data: {
+        providerOrderId: result.orderId,
+        provider: "ESEWA",
+        platformFee: earnings.platformCommission,
+        creatorEarnings: earnings.netEarnings,
+      },
+    });
+
     console.log(`[eSewa Product] Payment created: ${result.orderId} for purchase ${purchase.id}, product ${product.id}`);
     console.log(`[eSewa Product] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 

@@ -130,6 +130,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Update purchase with providerOrderId and fee info for proper linking
+    await prisma.purchase.update({
+      where: { id: purchase.id },
+      data: {
+        providerOrderId: result.orderId,
+        provider: "KHALTI",
+        platformFee: earnings.platformCommission,
+        creatorEarnings: earnings.netEarnings,
+      },
+    });
+
     console.log(`[Khalti] Product payment created: ${result.orderId} for purchase ${purchase.id}`);
     console.log(`[Khalti Product] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 
