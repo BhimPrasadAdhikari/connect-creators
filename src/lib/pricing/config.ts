@@ -2,19 +2,19 @@
  * Pricing and Revenue Configuration
  * 
  * Revenue Model:
- * - Platform takes 5-10% commission (configurable)
- * - Payment processing fees vary by method
- * - Creators keep 90-95% after all fees
+ * - Platform takes 15% commission (standard)
+ * - Payment processing fees vary by method (2-3%)
+ * - Creators keep ~82-83% after all fees
  */
 
 // Platform commission rates
 export const PLATFORM_COMMISSION = {
-  // Standard commission rate (10% of transaction)
-  STANDARD: 0.10,
-  // Premium creators (high volume) - reduced rate
-  PREMIUM: 0.05,
-  // Promotional rate for new creators (first 3 months)
-  PROMOTIONAL: 0.03,
+  // Standard commission rate (15% of transaction)
+  STANDARD: 0.15,
+  // Premium creators (high volume) - reduced rate (10%)
+  PREMIUM: 0.10,
+  // Promotional rate for new creators (first 3 months) - 5%
+  PROMOTIONAL: 0.05,
 } as const;
 
 // Payment processing fees by provider
@@ -115,20 +115,52 @@ export const FREEMIUM_LIMITS = {
   },
 } as const;
 
-// Minimum payout thresholds
+// Minimum payout thresholds (in smallest currency unit - paise/cents)
 export const PAYOUT_THRESHOLDS = {
-  INR: 50000, // ₹500
-  NPR: 100000, // NPR 1000
-  USD: 1000, // $10
+  INR: 50000, // ₹500 minimum
+  NPR: 100000, // NPR 1000 minimum
+  USD: 1000, // $10 minimum
 } as const;
 
-// Payout schedule
+// Maximum payout limits per transaction (anti-fraud measure)
+export const PAYOUT_LIMITS = {
+  INR: 10000000, // ₹100,000 max per payout
+  NPR: 20000000, // NPR 200,000 max per payout
+  USD: 500000, // $5,000 max per payout
+} as const;
+
+// Payout schedule configuration
 export const PAYOUT_SCHEDULE = {
-  frequency: "monthly",
-  processingDays: 7, // Days to process after month end
-  holdPeriod: 14, // Days to hold funds before eligible for payout
+  // Payout frequency options
+  frequencies: {
+    WEEKLY: {
+      name: "Weekly",
+      dayOfWeek: 1, // Monday
+      description: "Payouts processed every Monday",
+    },
+    BIWEEKLY: {
+      name: "Bi-weekly",
+      dayOfWeek: 1, // Every other Monday
+      description: "Payouts processed every 2 weeks on Monday",
+    },
+    MONTHLY: {
+      name: "Monthly",
+      dayOfMonth: 1, // 1st of each month
+      description: "Payouts processed on the 1st of each month",
+    },
+  },
+  // Default frequency
+  defaultFrequency: "MONTHLY" as const,
+  // Days to process after period ends
+  processingDays: 7,
+  // Hold period before funds are eligible (chargeback protection)
+  holdPeriod: 14, // 14 days
+  // Minimum days between payouts
+  minimumDaysBetweenPayouts: 7,
 } as const;
 
 export type PaymentProvider = keyof typeof PAYMENT_FEES;
 export type Currency = "INR" | "NPR" | "USD";
 export type CommissionTier = keyof typeof PLATFORM_COMMISSION;
+export type PayoutFrequency = keyof typeof PAYOUT_SCHEDULE.frequencies;
+

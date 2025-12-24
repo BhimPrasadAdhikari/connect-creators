@@ -1,13 +1,8 @@
-/**
- * Earnings Calculator
- * 
- * Calculates creator earnings after platform commission and payment fees
- */
-
 import {
   PLATFORM_COMMISSION,
   PAYMENT_FEES,
   PAYOUT_THRESHOLDS,
+  PAYOUT_LIMITS,
   type PaymentProvider,
   type Currency,
   type CommissionTier,
@@ -30,9 +25,11 @@ export interface PayoutEligibility {
   eligible: boolean;
   currentBalance: number;
   threshold: number;
+  maxLimit: number;
   deficit: number;
   currency: string;
   message: string;
+  warnings?: string[];
 }
 
 /**
@@ -138,15 +135,17 @@ export function calculateMonthlyRecurring(
 }
 
 /**
- * Check payout eligibility
+ * Check payout eligibility with minimum and maximum limits
  */
 export function checkPayoutEligibility(
   balance: number,
   currency: Currency
 ): PayoutEligibility {
   const threshold = PAYOUT_THRESHOLDS[currency];
+  const maxLimit = PAYOUT_LIMITS[currency];
   const eligible = balance >= threshold;
   const deficit = eligible ? 0 : threshold - balance;
+  const warnings: string[] = [];
   
   const currencySymbols: Record<Currency, string> = {
     INR: "₹",
@@ -158,10 +157,21 @@ export function checkPayoutEligibility(
   const formattedBalance = `${symbol}${(balance / 100).toFixed(2)}`;
   const formattedThreshold = `${symbol}${(threshold / 100).toFixed(2)}`;
   const formattedDeficit = `${symbol}${(deficit / 100).toFixed(2)}`;
+  const formattedMaxLimit = `${symbol}${(maxLimit / 100).toFixed(0)}`;
+  
+  // Check if balance exceeds maximum limit
+  if (balance > maxLimit) {
+    warnings.push(
+      `Balance exceeds maximum payout limit of ${formattedMaxLimit}. Please contact support for large payouts.`
+    );
+  }
   
   let message: string;
   if (eligible) {
     message = `You are eligible for payout! Current balance: ${formattedBalance}`;
+    if (warnings.length === 0) {
+      message += ` (Max per payout: ${formattedMaxLimit})`;
+    }
   } else {
     message = `Earn ${formattedDeficit} more to reach the ${formattedThreshold} payout threshold.`;
   }
@@ -170,10 +180,39 @@ export function checkPayoutEligibility(
     eligible,
     currentBalance: balance,
     threshold,
+    maxLimit,
     deficit,
     currency,
     message,
+    warnings: warnings.length > 0 ? warnings : undefined,
   };
+}
+
+/**
+ * Validate payout amount is within allowed range
+ */
+export function validatePayoutAmount(
+  amount: number,
+  currency: Currency
+): { valid: boolean; error?: string } {
+  const threshold = PAYOUT_THRESHOLDS[currency];
+  const maxLimit = PAYOUT_LIMITS[currency];
+  
+  if (amount < threshold) {
+    return {
+      valid: false,
+      error: `Payout amount must be at least ${formatCurrency(threshold, currency)}`,
+    };
+  }
+  
+  if (amount > maxLimit) {
+    return {
+      valid: false,
+      error: `Payout amount cannot exceed ${formatCurrency(maxLimit, currency)} per transaction`,
+    };
+  }
+  
+  return { valid: true };
 }
 
 /**

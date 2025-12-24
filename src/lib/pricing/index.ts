@@ -12,10 +12,12 @@ export {
   PRICING_RECOMMENDATIONS,
   FREEMIUM_LIMITS,
   PAYOUT_THRESHOLDS,
+  PAYOUT_LIMITS,
   PAYOUT_SCHEDULE,
   type PaymentProvider,
   type Currency,
   type CommissionTier,
+  type PayoutFrequency,
 } from "./config";
 
 // Earnings calculations
@@ -25,6 +27,7 @@ export {
   calculateEarnings,
   calculateMonthlyRecurring,
   checkPayoutEligibility,
+  validatePayoutAmount,
   formatCurrency,
   getRecommendedPaymentMethod,
   estimateAnnualEarnings,
