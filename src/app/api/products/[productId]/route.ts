@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { updateProductSchema, validateBody, idSchema } from "@/lib/api/validation";
 import { ApiErrors, logError } from "@/lib/api/errors";
 import { sanitizeContent, sanitizeUrl } from "@/lib/api/sanitize";
+import { logContent } from "@/lib/security/audit";
 
 interface RouteParams {
   params: Promise<{ productId: string }>;
@@ -172,6 +173,9 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
     }
 
     await prisma.digitalProduct.delete({ where: { id: productId } });
+
+    // Audit log: product deleted
+    logContent(session.user.id, productId, "product", "deleted").catch(console.error);
 
     return NextResponse.json({ success: true });
   } catch (error) {

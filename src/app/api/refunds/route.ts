@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { ApiErrors, logError } from "@/lib/api/errors";
 import { rateLimit } from "@/lib/api/rate-limit";
+import { logRefundRequest } from "@/lib/security/audit";
 
 // POST /api/refunds - Request a refund
 export async function POST(request: NextRequest) {
@@ -131,6 +132,9 @@ export async function POST(request: NextRequest) {
     });
 
     console.log(`[Refund] Created refund request ${refund.id} for user ${session.user.id}`);
+
+    // Audit log: refund request
+    logRefundRequest(session.user.id, refund.id, amount, reason.trim()).catch(console.error);
 
     return NextResponse.json({
       success: true,

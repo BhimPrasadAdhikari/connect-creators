@@ -10,6 +10,7 @@ import { sendSubscriptionConfirmationEmail, sendPurchaseConfirmationEmail } from
 import { formatAmount } from "@/lib/payments/types";
 import { generateSecureDownloadUrl } from "@/lib/downloads";
 import { rateLimit } from "@/lib/api/rate-limit";
+import { logPayment, logSubscription, logPurchase, AuditAction } from "@/lib/security/audit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -110,6 +111,9 @@ export async function POST(req: NextRequest) {
           console.log(`[Razorpay] Purchase confirmation email sent to: ${userEmail}`);
         }
 
+        // Audit log: purchase completed
+        logPurchase(userId, pendingPurchase.id, "product", pendingPurchase.amount, "SUCCESS").catch(console.error);
+
         console.log(`[Razorpay] Product purchase verified: ${razorpay_payment_id}`);
       }
     } else {
@@ -169,6 +173,14 @@ export async function POST(req: NextRequest) {
             
             console.log(`[Razorpay] Subscription confirmation email sent to: ${userEmail}`);
           }
+
+          // Audit log: subscription created
+          logSubscription(
+            userId || "unknown",
+            payment.subscriptionId || payment.id,
+            AuditAction.SUBSCRIPTION_CREATED,
+            { tierId: payment.subscription.tier.id, amount: payment.amount }
+          ).catch(console.error);
         }
 
         console.log(`[Razorpay] Subscription payment verified: ${razorpay_payment_id}`);

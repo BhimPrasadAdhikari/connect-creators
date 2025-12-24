@@ -6,6 +6,7 @@ import { createTipSchema, validateBody } from "@/lib/api/validation";
 import { ApiErrors, logError } from "@/lib/api/errors";
 import { sanitizeMessage } from "@/lib/api/sanitize";
 import { rateLimit } from "@/lib/api/rate-limit";
+import { logTipSent } from "@/lib/security/audit";
 
 // Pre-defined tip amounts (in paise)
 const TIP_AMOUNTS = {
@@ -127,6 +128,9 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Audit log: tip sent
+    logTipSent(session.user.id, creatorId, tipAmount, "INR").catch(console.error);
 
     return NextResponse.json({
       success: true,

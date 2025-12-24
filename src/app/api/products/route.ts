@@ -11,6 +11,7 @@ import {
 } from "@/lib/api/validation";
 import { ApiErrors, logError } from "@/lib/api/errors";
 import { sanitizeContent, sanitizeUrl } from "@/lib/api/sanitize";
+import { logContent } from "@/lib/security/audit";
 
 // GET /api/products - List digital products
 export async function GET(request: NextRequest) {
@@ -115,6 +116,9 @@ export async function POST(request: NextRequest) {
         thumbnailUrl: sanitizedThumbnailUrl,
       },
     });
+
+    // Audit log: product created
+    logContent(session.user.id, product.id, "product", "created").catch(console.error);
 
     return NextResponse.json({ product }, { status: 201 });
   } catch (error) {

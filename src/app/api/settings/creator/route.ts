@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { updateCreatorProfileSchema, validateBody } from "@/lib/api/validation";
 import { ApiErrors, logError } from "@/lib/api/errors";
 import { sanitizeContent, sanitizeUrl } from "@/lib/api/sanitize";
+import { logProfileUpdate } from "@/lib/security/audit";
 
 // GET /api/settings/creator - Get creator profile settings
 export async function GET() {
@@ -80,6 +81,11 @@ export async function PUT(req: NextRequest) {
         dmPrice: true,
       },
     });
+
+    // Audit log: creator profile updated
+    logProfileUpdate(session.user.id, "creator", { 
+      fieldsUpdated: Object.keys(updateData) 
+    }).catch(console.error);
 
     return NextResponse.json(updatedProfile);
   } catch (error) {

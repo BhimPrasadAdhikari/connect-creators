@@ -212,3 +212,106 @@ export async function getSecurityAuditLogs(
     orderBy: { createdAt: "desc" },
   });
 }
+
+// Log tip sent
+export async function logTipSent(
+  userId: string,
+  creatorId: string,
+  amount: number,
+  currency: string
+): Promise<void> {
+  await logAudit({
+    userId,
+    action: AuditAction.TIP_SENT,
+    resource: "tip",
+    resourceId: creatorId,
+    metadata: { amount, currency, creatorId },
+  });
+}
+
+// Log subscription event
+export async function logSubscription(
+  userId: string,
+  subscriptionId: string,
+  action: AuditAction.SUBSCRIPTION_CREATED | AuditAction.SUBSCRIPTION_CANCELLED,
+  metadata?: Record<string, unknown>
+): Promise<void> {
+  await logAudit({
+    userId,
+    action,
+    resource: "subscription",
+    resourceId: subscriptionId,
+    metadata,
+  });
+}
+
+// Log purchase (product or PPV)
+export async function logPurchase(
+  userId: string,
+  purchaseId: string,
+  type: "product" | "ppv",
+  amount: number,
+  status: AuditStatus
+): Promise<void> {
+  await logAudit({
+    userId,
+    action: status === "SUCCESS" ? AuditAction.PAYMENT_COMPLETED : AuditAction.PAYMENT_FAILED,
+    resource: "purchase",
+    resourceId: purchaseId,
+    status,
+    metadata: { type, amount },
+  });
+}
+
+// Log refund request
+export async function logRefundRequest(
+  userId: string,
+  refundId: string,
+  amount: number,
+  reason: string
+): Promise<void> {
+  await logAudit({
+    userId,
+    action: AuditAction.PAYOUT_REQUESTED, // Reusing for refunds
+    resource: "refund",
+    resourceId: refundId,
+    metadata: { amount, reason, type: "refund_request" },
+  });
+}
+
+// Log content creation/deletion
+export async function logContent(
+  userId: string,
+  contentId: string,
+  contentType: "post" | "product",
+  action: "created" | "deleted"
+): Promise<void> {
+  const auditAction = contentType === "post"
+    ? (action === "created" ? AuditAction.POST_CREATED : AuditAction.POST_DELETED)
+    : (action === "created" ? AuditAction.PRODUCT_CREATED : AuditAction.PRODUCT_DELETED);
+  
+  await logAudit({
+    userId,
+    action: auditAction,
+    resource: contentType,
+    resourceId: contentId,
+  });
+}
+
+// Log profile updates
+export async function logProfileUpdate(
+  userId: string,
+  profileType: "user" | "creator",
+  changes?: Record<string, unknown>
+): Promise<void> {
+  await logAudit({
+    userId,
+    action: profileType === "creator" 
+      ? AuditAction.CREATOR_PROFILE_UPDATE 
+      : AuditAction.PROFILE_UPDATE,
+    resource: profileType === "creator" ? "creator_profile" : "user",
+    resourceId: userId,
+    metadata: changes,
+  });
+}
+
