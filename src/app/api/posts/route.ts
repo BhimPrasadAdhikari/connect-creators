@@ -68,8 +68,12 @@ export async function GET(request: NextRequest) {
     });
 
     // Check if user has access to each post
+    // Need to check both subscriptions (for isPaid) and purchases (for isPPV)
     let userSubscriptions: string[] = [];
+    let userPPVPurchases: string[] = [];
+    
     if (session?.user?.id) {
+      // Get active subscriptions
       const subs = await prisma.subscription.findMany({
         where: {
           fanId: session.user.id,
@@ -78,18 +82,52 @@ export async function GET(request: NextRequest) {
         select: { tierId: true },
       });
       userSubscriptions = subs.map((s) => s.tierId);
+      
+      // Get PPV post purchases
+      const ppvPurchases = await prisma.purchase.findMany({
+        where: {
+          userId: session.user.id,
+          postId: { not: null },
+          status: "COMPLETED",
+        },
+        select: { postId: true },
+      });
+      userPPVPurchases = ppvPurchases.map((p) => p.postId).filter(Boolean) as string[];
     }
 
     const postsWithAccess = posts.map((post) => {
-      const hasAccess =
-        !post.isPaid ||
-        (session?.user?.id && post.creator.userId === session.user.id) ||
-        (post.requiredTierId && userSubscriptions.includes(post.requiredTierId));
+      const isCreator = session?.user?.id && post.creator.userId === session.user.id;
+      
+      // Determine access based on post type
+      let hasAccess = true;
+      let accessReason = "free";
+      
+      if (isCreator) {
+        hasAccess = true;
+        accessReason = "creator";
+      } else if (post.isPPV && post.ppvPrice) {
+        // PPV post - check if purchased
+        hasAccess = userPPVPurchases.includes(post.id);
+        accessReason = hasAccess ? "ppv_purchased" : "ppv_required";
+      } else if (post.isPaid && post.requiredTierId) {
+        // Subscription-gated post - check tier subscription
+        hasAccess = userSubscriptions.includes(post.requiredTierId);
+        accessReason = hasAccess ? "subscribed" : "subscription_required";
+      }
 
       return {
         ...post,
         hasAccess,
+        accessReason,
         content: hasAccess ? post.content : post.content.substring(0, 100) + "...",
+        // Hide media for PPV/paid posts without access
+        mediaUrl: hasAccess ? post.mediaUrl : null,
+        // Include PPV info for UI
+        ...(post.isPPV && {
+          isPPV: true,
+          ppvPrice: post.ppvPrice,
+          ppvPurchaseRequired: !hasAccess && accessReason === "ppv_required",
+        }),
       };
     });
 

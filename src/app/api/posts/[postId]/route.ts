@@ -46,15 +46,45 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
       return ApiErrors.notFound("Post");
     }
 
-    // Check access
-    let hasAccess = !post.isPaid;
+    // Comprehensive access control for paid content
+    // Two types of paid content:
+    // 1. isPaid (subscription-gated) - requires active subscription to specific tier
+    // 2. isPPV (pay-per-view) - requires one-time purchase
     
-    if (post.isPaid && session?.user?.id) {
-      // Check if viewer is the creator
-      if (post.creator.userId === session.user.id) {
-        hasAccess = true;
-      } else if (post.requiredTierId) {
-        // Check if viewer is subscribed to required tier
+    let hasAccess = true;
+    let accessReason = "free";
+    
+    // Check if user is the creator (always has access to own posts)
+    const isCreator = session?.user?.id && post.creator.userId === session.user.id;
+    
+    if (isCreator) {
+      hasAccess = true;
+      accessReason = "creator";
+    } else if (post.isPPV && post.ppvPrice) {
+      // PPV Post - Check if user has purchased this specific post
+      hasAccess = false;
+      accessReason = "ppv_required";
+      
+      if (session?.user?.id) {
+        const ppvPurchase = await prisma.purchase.findFirst({
+          where: {
+            postId: post.id,
+            userId: session.user.id,
+            status: "COMPLETED",
+          },
+        });
+        
+        if (ppvPurchase) {
+          hasAccess = true;
+          accessReason = "ppv_purchased";
+        }
+      }
+    } else if (post.isPaid && post.requiredTierId) {
+      // Subscription-gated Post - Check if user is subscribed to required tier
+      hasAccess = false;
+      accessReason = "subscription_required";
+      
+      if (session?.user?.id) {
         const subscription = await prisma.subscription.findFirst({
           where: {
             fanId: session.user.id,
@@ -62,18 +92,36 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             status: "ACTIVE",
           },
         });
-        hasAccess = !!subscription;
+        
+        if (subscription) {
+          hasAccess = true;
+          accessReason = "subscribed";
+        }
       }
     }
 
-    return NextResponse.json({
+    // Build response - hide sensitive content if no access
+    const response = {
       post: {
         ...post,
         hasAccess,
-        content: hasAccess ? post.content : post.content.substring(0, 100) + "...",
+        accessReason,
+        // Protect content: show preview only if no access
+        content: hasAccess ? post.content : (post.content.substring(0, 100) + "..."),
+        // Hide media URL for PPV posts without access
+        mediaUrl: hasAccess ? post.mediaUrl : null,
+        // Hide comments for paid content without access
         comments: hasAccess ? post.comments : [],
+        // Include purchase info for PPV posts
+        ...(post.isPPV && {
+          isPPV: true,
+          ppvPrice: post.ppvPrice,
+          ppvPurchaseRequired: !hasAccess,
+        }),
       },
-    });
+    };
+
+    return NextResponse.json(response);
   } catch (error) {
     logError("posts.[postId].GET", error);
     return ApiErrors.internal();
