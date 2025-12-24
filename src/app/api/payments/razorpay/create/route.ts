@@ -30,7 +30,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
-    const { tierId, currency } = await req.json();
+    // Only accept tierId from client - currency is determined server-side from tier
+    const { tierId } = await req.json();
 
     if (!tierId) {
       return NextResponse.json(
