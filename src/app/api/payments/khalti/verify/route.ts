@@ -8,6 +8,7 @@ import prisma from "@/lib/prisma";
 import { khaltiProvider } from "@/lib/payments/khalti";
 import { sendSubscriptionConfirmationEmail, sendPurchaseConfirmationEmail } from "@/lib/email/service";
 import { formatAmount } from "@/lib/payments/types";
+import { generateSecureDownloadUrl } from "@/lib/downloads";
 
 export async function POST(req: NextRequest) {
   try {
@@ -115,16 +116,26 @@ export async function POST(req: NextRequest) {
         // Update purchase status
         await prisma.purchase.update({
           where: { id: pendingPurchase.id },
-          data: { status: "COMPLETED" },
+          data: { 
+            status: "COMPLETED",
+            providerPayId: verification.paymentId,
+          },
         });
 
-        // Send purchase confirmation email
-        if (userEmail) {
+        // Send purchase confirmation email with SECURE download URL
+        if (userEmail && userId) {
+          // Generate secure download URL (expires in 24 hours)
+          const secureDownloadUrl = generateSecureDownloadUrl(
+            pendingPurchase.id,
+            pendingPurchase.product.id,
+            userId
+          );
+
           await sendPurchaseConfirmationEmail(userEmail, userName || "", {
             productName: pendingPurchase.product.title,
             creatorName: pendingPurchase.product.creator.displayName || "Creator",
             amount: formatAmount(pendingPurchase.amount, pendingPurchase.currency),
-            downloadUrl: pendingPurchase.product.fileUrl,
+            downloadUrl: secureDownloadUrl, // Use secure URL instead of raw fileUrl
           });
           
           console.log(`[Khalti] Purchase confirmation email sent to: ${userEmail}`);

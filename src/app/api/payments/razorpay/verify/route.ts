@@ -8,6 +8,7 @@ import prisma from "@/lib/prisma";
 import { razorpayProvider } from "@/lib/payments/razorpay";
 import { sendSubscriptionConfirmationEmail, sendPurchaseConfirmationEmail } from "@/lib/email/service";
 import { formatAmount } from "@/lib/payments/types";
+import { generateSecureDownloadUrl } from "@/lib/downloads";
 
 export async function POST(req: NextRequest) {
   try {
@@ -77,16 +78,26 @@ export async function POST(req: NextRequest) {
       if (pendingPurchase && pendingPurchase.product) {
         await prisma.purchase.update({
           where: { id: pendingPurchase.id },
-          data: { status: "COMPLETED" },
+          data: { 
+            status: "COMPLETED",
+            providerPayId: razorpay_payment_id,
+          },
         });
 
-        // Send purchase confirmation email
+        // Send purchase confirmation email with SECURE download URL
         if (userEmail) {
+          // Generate secure download URL (expires in 24 hours)
+          const secureDownloadUrl = generateSecureDownloadUrl(
+            pendingPurchase.id,
+            pendingPurchase.product.id,
+            userId
+          );
+
           await sendPurchaseConfirmationEmail(userEmail, userName || "", {
             productName: pendingPurchase.product.title,
             creatorName: pendingPurchase.product.creator.displayName || "Creator",
             amount: formatAmount(pendingPurchase.amount, pendingPurchase.currency),
-            downloadUrl: pendingPurchase.product.fileUrl,
+            downloadUrl: secureDownloadUrl, // Use secure URL instead of raw fileUrl
           });
           
           console.log(`[Razorpay] Purchase confirmation email sent to: ${userEmail}`);

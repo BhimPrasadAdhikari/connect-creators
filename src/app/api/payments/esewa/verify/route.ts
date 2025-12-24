@@ -9,6 +9,7 @@ import prisma from "@/lib/prisma";
 import { esewaProvider } from "@/lib/payments/esewa";
 import { sendSubscriptionConfirmationEmail, sendPurchaseConfirmationEmail } from "@/lib/email/service";
 import { formatAmount } from "@/lib/payments/types";
+import { generateSecureDownloadUrl } from "@/lib/downloads";
 
 export async function POST(req: NextRequest) {
   try {
@@ -133,17 +134,26 @@ export async function POST(req: NextRequest) {
         // Update purchase status
         await prisma.purchase.update({
           where: { id: pendingPurchase.id },
-          data: { status: "COMPLETED" },
+          data: { 
+            status: "COMPLETED",
+            providerPayId: decodedData.transaction_code,
+          },
         });
 
-        // Send purchase confirmation email
-        if (userEmail) {
-          const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
+        // Send purchase confirmation email with SECURE download URL
+        if (userEmail && userId) {
+          // Generate secure download URL (expires in 24 hours)
+          const secureDownloadUrl = generateSecureDownloadUrl(
+            pendingPurchase.id,
+            pendingPurchase.product.id,
+            userId
+          );
+
           await sendPurchaseConfirmationEmail(userEmail, userName || "", {
             productName: pendingPurchase.product.title,
             creatorName: pendingPurchase.product.creator.displayName || "Creator",
             amount: formatAmount(pendingPurchase.amount, pendingPurchase.currency),
-            downloadUrl: pendingPurchase.product.fileUrl,
+            downloadUrl: secureDownloadUrl, 
           });
           
           console.log(`[eSewa] Purchase confirmation email sent to: ${userEmail}`);
