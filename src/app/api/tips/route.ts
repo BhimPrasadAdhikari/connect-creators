@@ -5,6 +5,7 @@ import prisma from "@/lib/prisma";
 import { createTipSchema, validateBody } from "@/lib/api/validation";
 import { ApiErrors, logError } from "@/lib/api/errors";
 import { sanitizeMessage } from "@/lib/api/sanitize";
+import { rateLimit } from "@/lib/api/rate-limit";
 
 // Pre-defined tip amounts (in paise)
 const TIP_AMOUNTS = {
@@ -28,6 +29,10 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) {
       return ApiErrors.unauthorized("Must be logged in to send tips");
     }
+
+    // Rate limiting - prevent tip spam
+    const rateLimitResponse = rateLimit(request, "TIPS", session.user.id);
+    if (rateLimitResponse) return rateLimitResponse;
 
     const body = await request.json();
     

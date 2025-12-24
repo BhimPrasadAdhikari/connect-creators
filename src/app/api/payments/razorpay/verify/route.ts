@@ -9,6 +9,7 @@ import { razorpayProvider } from "@/lib/payments/razorpay";
 import { sendSubscriptionConfirmationEmail, sendPurchaseConfirmationEmail } from "@/lib/email/service";
 import { formatAmount } from "@/lib/payments/types";
 import { generateSecureDownloadUrl } from "@/lib/downloads";
+import { rateLimit } from "@/lib/api/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,12 @@ export async function POST(req: NextRequest) {
     if (!session?.user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = (session.user as { id?: string }).id;
+    
+    // Rate limiting - prevent brute force verification attempts
+    const rateLimitResponse = rateLimit(req, "PAYMENT_VERIFY", userId);
+    if (rateLimitResponse) return rateLimitResponse;
 
     const userEmail = session.user.email;
     const userName = session.user.name;

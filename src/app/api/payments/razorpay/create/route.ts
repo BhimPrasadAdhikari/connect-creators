@@ -7,6 +7,7 @@ import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { razorpayProvider, getRazorpayKeyId } from "@/lib/payments/razorpay";
 import { calculateEarnings } from "@/lib/pricing";
+import { rateLimit } from "@/lib/api/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,6 +18,11 @@ export async function POST(req: NextRequest) {
     }
 
     const userId = (session.user as { id?: string }).id;
+    
+    // Rate limiting - prevent brute force and DoS attacks
+    const rateLimitResponse = rateLimit(req, "PAYMENT_CREATE", userId);
+    if (rateLimitResponse) return rateLimitResponse;
+
     const userName = session.user.name;
     const userEmail = session.user.email;
     
