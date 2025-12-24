@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { esewaProvider } from "@/lib/payments/esewa";
+import { calculateEarnings } from "@/lib/pricing";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,11 +21,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
-    const { tierId, amount, currency } = await req.json();
+    const { tierId } = await req.json();
 
-    if (!tierId || !amount) {
+    if (!tierId) {
       return NextResponse.json(
-        { error: "Tier ID and amount are required" },
+        { error: "Tier ID is required" },
         { status: 400 }
       );
     }
@@ -42,27 +43,50 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if user already has an active subscription to this tier
+    // Use tier's currency, default to NPR for eSewa
+    const paymentCurrency = tier.currency || "NPR";
+
+    // Check for existing active OR pending subscription (prevent duplicates)
     const existingSubscription = await prisma.subscription.findFirst({
       where: {
         fanId: userId,
         tierId: tier.id,
-        status: "ACTIVE",
+        status: { in: ["ACTIVE", "PENDING"] },
       },
     });
 
     if (existingSubscription) {
+      if (existingSubscription.status === "ACTIVE") {
+        return NextResponse.json(
+          { error: "You already have an active subscription to this tier" },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: "You already have an active subscription to this tier" },
+        { error: "You have a pending subscription. Please complete or cancel it first." },
         { status: 400 }
       );
     }
+
+    // Calculate platform fee and creator earnings (15% platform commission)
+    const earnings = calculateEarnings(
+      tier.price,
+      "ESEWA",
+      "STANDARD",
+      paymentCurrency as "INR" | "NPR" | "USD"
+    );
+
+    console.log(`[eSewa] Fee calculation for ${tier.price} ${paymentCurrency}:`, {
+      grossAmount: earnings.grossAmount,
+      platformCommission: earnings.platformCommission,
+      creatorEarnings: earnings.netEarnings,
+    });
 
     // Create eSewa payment order first to get the orderId
     const result = await esewaProvider.createOrder({
       provider: "esewa",
       amount: tier.price,
-      currency: currency || "NPR",
+      currency: paymentCurrency,
       subscriptionId: "pending", // Will update after subscription creation
       userId,
     });
@@ -86,20 +110,29 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Create pending payment record
+    // Create pending payment record WITH platform fee and creator earnings
     await prisma.payment.create({
       data: {
         userId,
         subscriptionId: subscription.id,
         amount: tier.price,
-        currency: currency || "NPR",
+        currency: paymentCurrency,
         provider: "ESEWA",
         status: "PENDING",
         providerOrderId: result.orderId,
+        // NEW: Store platform fee and creator earnings
+        platformFee: earnings.platformCommission,
+        creatorEarnings: earnings.netEarnings,
+        metadata: {
+          paymentFeePercentage: earnings.paymentFeePercentage,
+          platformCommissionPercentage: earnings.platformCommissionPercentage,
+          creatorSharePercentage: earnings.creatorSharePercentage,
+        },
       },
     });
 
     console.log(`[eSewa] Payment created: ${result.orderId} for subscription ${subscription.id}`);
+    console.log(`[eSewa] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 
     return NextResponse.json({
       success: true,
@@ -116,4 +149,5 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
 

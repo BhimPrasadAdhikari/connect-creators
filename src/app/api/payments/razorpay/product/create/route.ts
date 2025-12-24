@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { razorpayProvider, getRazorpayKeyId } from "@/lib/payments/razorpay";
+import { calculateEarnings } from "@/lib/pricing";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
-    const { productId, currency } = await req.json();
+    const { productId } = await req.json();
 
     if (!productId) {
       return NextResponse.json(
@@ -45,18 +46,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if already purchased
+    // Use product's currency, not client-provided (security fix)
+    const paymentCurrency = product.currency || "INR";
+
+    // Check if already purchased (including PENDING to prevent duplicates)
     const existingPurchase = await prisma.purchase.findFirst({
       where: {
         userId,
         productId: product.id,
-        status: "COMPLETED",
+        status: { in: ["COMPLETED", "PENDING"] },
       },
     });
 
     if (existingPurchase) {
+      if (existingPurchase.status === "COMPLETED") {
+        return NextResponse.json(
+          { error: "You already own this product" },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: "You already own this product" },
+        { error: "You have a pending purchase. Please complete or cancel it first." },
         { status: 400 }
       );
     }
@@ -69,13 +79,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create pending purchase
+    // Calculate platform fee and creator earnings (15% platform commission)
+    const earnings = calculateEarnings(
+      product.price,
+      "RAZORPAY_UPI", // Default to UPI for Razorpay
+      "STANDARD", // Standard commission tier
+      paymentCurrency as "INR" | "NPR" | "USD"
+    );
+
+    console.log(`[Razorpay] Product fee calculation for ${product.price} ${paymentCurrency}:`, {
+      grossAmount: earnings.grossAmount,
+      platformCommission: earnings.platformCommission,
+      platformCommissionPercentage: earnings.platformCommissionPercentage,
+      paymentFee: earnings.paymentFee,
+      creatorEarnings: earnings.netEarnings,
+    });
+
+    // Create pending purchase with fee metadata
     const purchase = await prisma.purchase.create({
       data: {
         userId,
         productId: product.id,
         amount: product.price,
-        currency: currency || "INR",
+        currency: paymentCurrency,
         status: "PENDING",
       },
     });
@@ -84,7 +110,7 @@ export async function POST(req: NextRequest) {
     const result = await razorpayProvider.createOrder({
       provider: "razorpay",
       amount: product.price,
-      currency: currency || "INR",
+      currency: paymentCurrency,
       subscriptionId: `product_${purchase.id}`,
       userId,
       metadata: {
@@ -94,6 +120,11 @@ export async function POST(req: NextRequest) {
         creatorName: product.creator.displayName || product.creator.username,
         type: "product",
         purchaseId: purchase.id,
+        // NEW: Include fee information in metadata (as strings for Razorpay)
+        platformFee: earnings.platformCommission.toString(),
+        creatorEarnings: earnings.netEarnings.toString(),
+        platformCommissionPercentage: earnings.platformCommissionPercentage.toString(),
+        creatorSharePercentage: earnings.creatorSharePercentage.toString(),
       },
     });
 
@@ -107,13 +138,14 @@ export async function POST(req: NextRequest) {
     }
 
     console.log(`[Razorpay] Product order created: ${result.orderId} for purchase ${purchase.id}`);
+    console.log(`[Razorpay] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 
     return NextResponse.json({
       success: true,
       orderId: result.orderId,
       keyId: getRazorpayKeyId(),
       amount: product.price,
-      currency: currency || "INR",
+      currency: paymentCurrency,
       name: product.title,
       description: `Digital product by ${product.creator.displayName || product.creator.username}`,
       prefill: {
@@ -131,3 +163,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

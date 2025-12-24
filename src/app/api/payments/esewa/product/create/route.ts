@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { esewaProvider } from "@/lib/payments/esewa";
+import { calculateEarnings } from "@/lib/pricing";
 
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
-    const { productId, amount, currency } = await req.json();
+    const { productId } = await req.json();
 
     if (!productId) {
       return NextResponse.json(
@@ -42,18 +43,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if user already owns this product
+    // Use product's currency, default to NPR for eSewa
+    const paymentCurrency = product.currency || "NPR";
+
+    // Check if already purchased (including PENDING to prevent duplicates)
     const existingPurchase = await prisma.purchase.findFirst({
       where: {
         userId,
         productId: product.id,
-        status: "COMPLETED",
+        status: { in: ["COMPLETED", "PENDING"] },
       },
     });
 
     if (existingPurchase) {
+      if (existingPurchase.status === "COMPLETED") {
+        return NextResponse.json(
+          { error: "You already own this product" },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: "You already own this product" },
+        { error: "You have a pending purchase. Please complete or cancel it first." },
         { status: 400 }
       );
     }
@@ -66,11 +76,25 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Calculate platform fee and creator earnings (15% platform commission)
+    const earnings = calculateEarnings(
+      product.price,
+      "ESEWA",
+      "STANDARD",
+      paymentCurrency as "INR" | "NPR" | "USD"
+    );
+
+    console.log(`[eSewa Product] Fee calculation for ${product.price} ${paymentCurrency}:`, {
+      grossAmount: earnings.grossAmount,
+      platformCommission: earnings.platformCommission,
+      creatorEarnings: earnings.netEarnings,
+    });
+
     // Create eSewa payment order
     const result = await esewaProvider.createOrder({
       provider: "esewa",
       amount: product.price,
-      currency: currency || "NPR",
+      currency: paymentCurrency,
       subscriptionId: `product_${product.id}`, // Use product ID as reference
       userId,
     });
@@ -88,17 +112,13 @@ export async function POST(req: NextRequest) {
         userId,
         productId: product.id,
         amount: product.price,
-        currency: currency || "NPR",
+        currency: paymentCurrency,
         status: "PENDING",
       },
     });
 
-    // Store the mapping between eSewa order ID and purchase ID
-    // We'll use metadata or a separate lookup - for now store in console
     console.log(`[eSewa Product] Payment created: ${result.orderId} for purchase ${purchase.id}, product ${product.id}`);
-
-    // Store purchase ID in a way we can retrieve on callback
-    // Using cookies or session storage is one approach, or we can parse from the callback
+    console.log(`[eSewa Product] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 
     return NextResponse.json({
       success: true,
@@ -115,3 +135,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

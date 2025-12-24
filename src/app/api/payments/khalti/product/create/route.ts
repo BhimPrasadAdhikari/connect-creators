@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { khaltiProvider } from "@/lib/payments/khalti";
+import { calculateEarnings } from "@/lib/pricing";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
-    const { productId, currency } = await req.json();
+    const { productId } = await req.json();
 
     if (!productId) {
       return NextResponse.json(
@@ -45,18 +46,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if already purchased
+    // Use product's currency, default to NPR for Khalti
+    const paymentCurrency = product.currency || "NPR";
+
+    // Check if already purchased (including PENDING to prevent duplicates)
     const existingPurchase = await prisma.purchase.findFirst({
       where: {
         userId,
         productId: product.id,
-        status: "COMPLETED",
+        status: { in: ["COMPLETED", "PENDING"] },
       },
     });
 
     if (existingPurchase) {
+      if (existingPurchase.status === "COMPLETED") {
+        return NextResponse.json(
+          { error: "You already own this product" },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: "You already own this product" },
+        { error: "You have a pending purchase. Please complete or cancel it first." },
         { status: 400 }
       );
     }
@@ -69,13 +79,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Calculate platform fee and creator earnings (15% platform commission)
+    const earnings = calculateEarnings(
+      product.price,
+      "KHALTI",
+      "STANDARD",
+      paymentCurrency as "INR" | "NPR" | "USD"
+    );
+
+    console.log(`[Khalti Product] Fee calculation for ${product.price} ${paymentCurrency}:`, {
+      grossAmount: earnings.grossAmount,
+      platformCommission: earnings.platformCommission,
+      creatorEarnings: earnings.netEarnings,
+    });
+
     // Create pending purchase
     const purchase = await prisma.purchase.create({
       data: {
         userId,
         productId: product.id,
         amount: product.price,
-        currency: currency || "NPR",
+        currency: paymentCurrency,
         status: "PENDING",
       },
     });
@@ -84,7 +108,7 @@ export async function POST(req: NextRequest) {
     const result = await khaltiProvider.createOrder({
       provider: "khalti",
       amount: product.price,
-      currency: currency || "NPR",
+      currency: paymentCurrency,
       subscriptionId: `product_${purchase.id}`, // Use purchase ID as reference
       userId,
       metadata: {
@@ -107,6 +131,7 @@ export async function POST(req: NextRequest) {
     }
 
     console.log(`[Khalti] Product payment created: ${result.orderId} for purchase ${purchase.id}`);
+    console.log(`[Khalti Product] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 
     return NextResponse.json({
       success: true,
@@ -121,3 +146,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

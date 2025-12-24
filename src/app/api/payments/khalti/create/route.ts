@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { khaltiProvider } from "@/lib/payments/khalti";
+import { calculateEarnings } from "@/lib/pricing";
 
 export async function POST(req: NextRequest) {
   try {
@@ -23,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
-    const { tierId, currency } = await req.json();
+    const { tierId } = await req.json();
 
     if (!tierId) {
       return NextResponse.json(
@@ -45,21 +46,44 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check for existing active subscription
+    // Use tier's currency, default to NPR for Khalti
+    const paymentCurrency = tier.currency || "NPR";
+
+    // Check for existing active OR pending subscription (prevent duplicates)
     const existingSubscription = await prisma.subscription.findFirst({
       where: {
         fanId: userId,
         tierId: tier.id,
-        status: "ACTIVE",
+        status: { in: ["ACTIVE", "PENDING"] },
       },
     });
 
     if (existingSubscription) {
+      if (existingSubscription.status === "ACTIVE") {
+        return NextResponse.json(
+          { error: "You already have an active subscription to this tier" },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: "You already have an active subscription to this tier" },
+        { error: "You have a pending subscription. Please complete or cancel it first." },
         { status: 400 }
       );
     }
+
+    // Calculate platform fee and creator earnings (15% platform commission)
+    const earnings = calculateEarnings(
+      tier.price,
+      "KHALTI",
+      "STANDARD",
+      paymentCurrency as "INR" | "NPR" | "USD"
+    );
+
+    console.log(`[Khalti] Fee calculation for ${tier.price} ${paymentCurrency}:`, {
+      grossAmount: earnings.grossAmount,
+      platformCommission: earnings.platformCommission,
+      creatorEarnings: earnings.netEarnings,
+    });
 
     // Create a pending subscription
     const subscription = await prisma.subscription.create({
@@ -77,7 +101,7 @@ export async function POST(req: NextRequest) {
     const result = await khaltiProvider.createOrder({
       provider: "khalti",
       amount: tier.price, // Already in paisa
-      currency: currency || "NPR",
+      currency: paymentCurrency,
       subscriptionId: subscription.id,
       userId,
       metadata: {
@@ -97,20 +121,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Create pending payment record
+    // Create pending payment record WITH platform fee and creator earnings
     await prisma.payment.create({
       data: {
         userId,
         subscriptionId: subscription.id,
         amount: tier.price,
-        currency: currency || "NPR",
+        currency: paymentCurrency,
         provider: "KHALTI",
         status: "PENDING",
         providerOrderId: result.orderId!,
+        // NEW: Store platform fee and creator earnings
+        platformFee: earnings.platformCommission,
+        creatorEarnings: earnings.netEarnings,
+        metadata: {
+          paymentFeePercentage: earnings.paymentFeePercentage,
+          platformCommissionPercentage: earnings.platformCommissionPercentage,
+          creatorSharePercentage: earnings.creatorSharePercentage,
+        },
       },
     });
 
     console.log(`[Khalti] Payment created: ${result.orderId} for subscription ${subscription.id}`);
+    console.log(`[Khalti] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 
     return NextResponse.json({
       success: true,
@@ -125,3 +158,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+

@@ -6,6 +6,7 @@ import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import Stripe from "stripe";
+import { calculateEarnings } from "@/lib/pricing";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
   apiVersion: "2025-11-17.clover",
@@ -24,7 +25,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "User ID not found" }, { status: 401 });
     }
 
-    const { productId, currency } = await req.json();
+    const { productId } = await req.json();
 
     if (!productId) {
       return NextResponse.json(
@@ -46,18 +47,27 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if already purchased
+    // Use product's currency, default to USD for Stripe
+    const paymentCurrency = product.currency || "USD";
+
+    // Check if already purchased (including PENDING to prevent duplicates)
     const existingPurchase = await prisma.purchase.findFirst({
       where: {
         userId,
         productId: product.id,
-        status: "COMPLETED",
+        status: { in: ["COMPLETED", "PENDING"] },
       },
     });
 
     if (existingPurchase) {
+      if (existingPurchase.status === "COMPLETED") {
+        return NextResponse.json(
+          { error: "You already own this product" },
+          { status: 400 }
+        );
+      }
       return NextResponse.json(
-        { error: "You already own this product" },
+        { error: "You have a pending purchase. Please complete or cancel it first." },
         { status: 400 }
       );
     }
@@ -70,6 +80,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Calculate platform fee and creator earnings (15% platform commission)
+    const earnings = calculateEarnings(
+      product.price,
+      "STRIPE",
+      "STANDARD",
+      paymentCurrency as "INR" | "NPR" | "USD"
+    );
+
+    console.log(`[Stripe Product] Fee calculation for ${product.price} ${paymentCurrency}:`, {
+      grossAmount: earnings.grossAmount,
+      platformCommission: earnings.platformCommission,
+      creatorEarnings: earnings.netEarnings,
+    });
+
     const baseUrl = process.env.NEXTAUTH_URL || "http://localhost:3000";
 
     // Create pending purchase
@@ -78,7 +102,7 @@ export async function POST(req: NextRequest) {
         userId,
         productId: product.id,
         amount: product.price,
-        currency: currency || "USD",
+        currency: paymentCurrency,
         status: "PENDING",
       },
     });
@@ -89,7 +113,7 @@ export async function POST(req: NextRequest) {
       line_items: [
         {
           price_data: {
-            currency: (currency || "usd").toLowerCase(),
+            currency: paymentCurrency.toLowerCase(),
             product_data: {
               name: product.title,
               description: product.description || `Digital product by ${product.creator.displayName || "Creator"}`,
@@ -107,10 +131,15 @@ export async function POST(req: NextRequest) {
         productId: product.id,
         userId,
         type: "product",
+        // NEW: Include fee information in metadata
+        platformFee: earnings.platformCommission.toString(),
+        creatorEarnings: earnings.netEarnings.toString(),
+        platformCommissionPercentage: earnings.platformCommissionPercentage.toString(),
       },
     });
 
     console.log(`[Stripe] Product checkout session created: ${stripeSession.id} for product ${product.id}`);
+    console.log(`[Stripe Product] Platform fee: ${earnings.platformCommission}, Creator earnings: ${earnings.netEarnings}`);
 
     return NextResponse.json({
       success: true,
@@ -125,3 +154,4 @@ export async function POST(req: NextRequest) {
     );
   }
 }
+
