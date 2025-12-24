@@ -371,3 +371,58 @@ Thank you for supporting creators on CreatorConnect.
 
   return sendEmail({ to, subject, text, html });
 }
+
+export async function sendSubscriptionExpiryReminderEmail(
+  to: string,
+  userName: string,
+  details: {
+    creatorName: string;
+    tierName: string;
+    expiryDate: string;
+    daysRemaining: number;
+    renewUrl: string;
+  }
+): Promise<boolean> {
+  const subject = `⏰ Your subscription expires in ${details.daysRemaining} day${details.daysRemaining > 1 ? 's' : ''}`;
+  const text = `Hi ${userName || "there"},
+
+Your subscription to ${details.creatorName} (${details.tierName}) will expire on ${details.expiryDate}.
+
+You have ${details.daysRemaining} day${details.daysRemaining > 1 ? 's' : ''} remaining.
+
+To continue enjoying exclusive content, renew your subscription before it expires.
+
+Renew here: ${details.renewUrl}
+
+If you don't wish to renew, no action is needed. Your access will end on ${details.expiryDate}.
+
+Thank you for supporting creators on CreatorConnect.
+
+- The CreatorConnect Team`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #f59e0b;">⏰ Subscription Expiring Soon</h2>
+    <p>Hi ${userName || "there"},</p>
+    <p>Your subscription to <strong>${details.creatorName}</strong> (${details.tierName}) will expire soon.</p>
+    <div style="background: #fffbeb; border-left: 4px solid #f59e0b; padding: 16px; margin: 16px 0;">
+      <p style="margin: 0;"><strong>Expires:</strong> ${details.expiryDate}</p>
+      <p style="margin: 8px 0 0;"><strong>Days remaining:</strong> ${details.daysRemaining}</p>
+    </div>
+    <p>To continue enjoying exclusive content, renew your subscription before it expires.</p>
+    <div style="margin: 24px 0;">
+      <a href="${details.renewUrl}" style="display: inline-block; background: #f59e0b; color: white; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: 500;">
+        Renew Subscription
+      </a>
+    </div>
+    <p style="color: #6b7280; font-size: 14px;">If you don't wish to renew, no action is needed. Your access will end on ${details.expiryDate}.</p>
+    <p style="color: #6b7280; font-size: 14px;">- The CreatorConnect Team</p>
+  </div>
+</body>
+</html>`;
+
+  return sendEmail({ to, subject, text, html });
+}

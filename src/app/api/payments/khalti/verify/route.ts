@@ -69,9 +69,18 @@ export async function POST(req: NextRequest) {
       });
 
       if (payment.subscriptionId && payment.subscription) {
+        // Calculate subscription period (30 days from now)
+        const startDate = new Date();
+        const endDate = new Date();
+        endDate.setDate(endDate.getDate() + 30);
+
         await prisma.subscription.update({
           where: { id: payment.subscriptionId },
-          data: { status: "ACTIVE" },
+          data: { 
+            status: "ACTIVE",
+            startDate: startDate,
+            endDate: endDate,
+          },
         });
 
         // Send subscription confirmation email

@@ -43,5 +43,15 @@
                 }
             ]
         }
+    ],
+    "crons": [
+        {
+            "path": "/api/cron/expire-subscriptions",
+            "schedule": "0 0 * * *"
+        },
+        {
+            "path": "/api/cron/subscription-reminders",
+            "schedule": "0 9 * * *"
+        }
     ]
 }

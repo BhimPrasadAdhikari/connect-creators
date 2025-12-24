@@ -73,11 +73,16 @@ export async function GET(request: NextRequest) {
     let userPPVPurchases: string[] = [];
     
     if (session?.user?.id) {
-      // Get active subscriptions
+      // Get active subscriptions (also check endDate for defense in depth)
+      const now = new Date();
       const subs = await prisma.subscription.findMany({
         where: {
           fanId: session.user.id,
           status: "ACTIVE",
+          OR: [
+            { endDate: null }, // No expiry set (legacy subscriptions)
+            { endDate: { gte: now } }, // Not yet expired
+          ],
         },
         select: { tierId: true },
       });
