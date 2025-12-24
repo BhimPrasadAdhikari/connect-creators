@@ -45,8 +45,8 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if this is a product purchase or subscription
-    if (type === "product") {
+    // Check if this is a product/PPV purchase or subscription
+    if (type === "product" || type === "ppv") {
       // Get the user ID from session
       const userId = (session.user as { id?: string }).id;
       

@@ -6,11 +6,18 @@ import { createTipSchema, validateBody } from "@/lib/api/validation";
 import { ApiErrors, logError } from "@/lib/api/errors";
 import { sanitizeMessage } from "@/lib/api/sanitize";
 
-// Pre-defined tip amounts
+// Pre-defined tip amounts (in paise)
 const TIP_AMOUNTS = {
   small: 5000, // ₹50
   medium: 10000, // ₹100
   large: 25000, // ₹250
+};
+
+// Tip validation limits (in paise)
+const TIP_LIMITS = {
+  MIN: 100, // ₹1 minimum (100 paise)
+  MAX: 1000000, // ₹10,000 maximum per tip (anti-fraud/money laundering)
+  WARN_THRESHOLD: 500000, // ₹5,000 - tips above this should be flagged
 };
 
 // POST /api/tips - Send a tip to a creator
@@ -32,13 +39,43 @@ export async function POST(request: NextRequest) {
     
     const { creatorId, postId, amount, message } = validation.data;
 
-    // Calculate tip amount
-    const tipAmount = typeof amount === "string" 
-      ? TIP_AMOUNTS[amount as keyof typeof TIP_AMOUNTS] 
-      : amount;
+    // Calculate tip amount - handle both preset and custom amounts
+    let tipAmount: number;
     
-    if (!tipAmount || tipAmount < 5000) {
-      return ApiErrors.badRequest("Invalid tip amount (minimum ₹50)");
+    if (typeof amount === "string") {
+      // Preset amount (small, medium, large)
+      tipAmount = TIP_AMOUNTS[amount as keyof typeof TIP_AMOUNTS];
+      if (!tipAmount) {
+        return ApiErrors.badRequest("Invalid tip preset. Use 'small', 'medium', or 'large'");
+      }
+    } else if (typeof amount === "number") {
+      // Custom numeric amount
+      tipAmount = Math.floor(amount); // Ensure integer
+    } else {
+      return ApiErrors.badRequest("Invalid tip amount type");
+    }
+
+    // Comprehensive tip amount validation
+    // 1. Check for non-positive values (negative or zero)
+    if (tipAmount <= 0) {
+      return ApiErrors.badRequest("Tip amount must be a positive number");
+    }
+    
+    // 2. Check minimum (₹1 = 100 paise)
+    if (tipAmount < TIP_LIMITS.MIN) {
+      return ApiErrors.badRequest(`Minimum tip amount is ₹${TIP_LIMITS.MIN / 100}`);
+    }
+    
+    // 3. Check maximum (anti-fraud protection)
+    if (tipAmount > TIP_LIMITS.MAX) {
+      return ApiErrors.badRequest(
+        `Maximum tip amount is ₹${TIP_LIMITS.MAX / 100}. For larger amounts, please contact support.`
+      );
+    }
+    
+    // 4. Log large tips for fraud monitoring
+    if (tipAmount >= TIP_LIMITS.WARN_THRESHOLD) {
+      console.warn(`[Tips] Large tip detected: ₹${tipAmount / 100} from user ${session.user.id} to creator ${creatorId}`);
     }
 
     // Verify creator exists
