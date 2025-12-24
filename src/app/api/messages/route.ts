@@ -121,7 +121,53 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if DM is paid
-    const isPaid = !!creator.dmPrice && creator.dmPrice > 0;
+    const dmPrice = creator.dmPrice || 0;
+    const isPaidDM = dmPrice > 0;
+
+    // For paid DMs, check if user has an available paid message
+    const { paymentId } = body;
+    
+    if (isPaidDM) {
+      // Check for a COMPLETED payment with available messages
+      // Find payments where messagesUsed < messagesAllowed
+      const availablePayment = await prisma.dMPayment.findFirst({
+        where: {
+          userId: session.user.id,
+          creatorId: creatorId,
+          status: "COMPLETED",
+          OR: [
+            { expiresAt: null },
+            { expiresAt: { gte: new Date() } },
+          ],
+        },
+        orderBy: { createdAt: "asc" }, // Use oldest payment first
+      });
+
+      // Check if payment has available messages
+      const hasAvailableMessages = availablePayment && 
+        availablePayment.messagesUsed < availablePayment.messagesAllowed;
+
+      if (!hasAvailableMessages) {
+        // Return price info so client can initiate payment
+        return NextResponse.json({
+          requiresPayment: true,
+          dmPrice: dmPrice,
+          currency: "INR",
+          creatorId: creator.id,
+          creatorName: creator.displayName || creator.username,
+          message: `This creator charges ₹${dmPrice / 100} per message. Please complete payment first.`,
+          paymentUrl: `/api/payments/razorpay/dm`,
+        }, { status: 402 }); // 402 Payment Required
+      }
+
+      // Use the payment - increment messagesUsed
+      await prisma.dMPayment.update({
+        where: { id: availablePayment.id },
+        data: { messagesUsed: { increment: 1 } },
+      });
+
+      console.log(`[Messages] Using DM payment ${availablePayment.id} (${availablePayment.messagesUsed + 1}/${availablePayment.messagesAllowed} messages used)`);
+    }
 
     // Create message
     const message = await prisma.message.create({
@@ -129,8 +175,8 @@ export async function POST(request: NextRequest) {
         conversationId: conversation.id,
         senderId: session.user.id,
         content: sanitizedContent,
-        isPaid,
-        price: isPaid ? creator.dmPrice : null,
+        isPaid: isPaidDM,
+        price: isPaidDM ? dmPrice : null,
       },
     });
 
@@ -146,8 +192,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message,
       conversationId: conversation.id,
-      isPaid,
-      price: creator.dmPrice,
+      isPaid: isPaidDM,
+      price: dmPrice,
     }, { status: 201 });
   } catch (error) {
     logError("messages.POST", error);

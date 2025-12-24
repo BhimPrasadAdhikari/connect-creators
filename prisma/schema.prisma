@@ -61,6 +61,8 @@ model User {
   conversations  Conversation[]
   messages       Message[]
   purchases      Purchase[]
+  dmPayments     DMPayment[]
+  refunds        Refund[]
 }
 
 // NextAuth required models
@@ -121,6 +123,7 @@ model CreatorProfile {
   tipsReceived    Tip[]              @relation("TipsReceived")
   digitalProducts DigitalProduct[]
   conversations   Conversation[]
+  dmPayments      DMPayment[]
 }
 
 model SubscriptionTier {
@@ -214,9 +217,10 @@ model Conversation {
   updatedAt    DateTime @updatedAt
 
   // Relations
-  creator  CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
-  fan      User           @relation(fields: [fanId], references: [id], onDelete: Cascade)
-  messages Message[]
+  creator    CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  fan        User           @relation(fields: [fanId], references: [id], onDelete: Cascade)
+  messages   Message[]
+  dmPayments DMPayment[]
 
   @@unique([creatorId, fanId])
 }
@@ -257,6 +261,7 @@ model Purchase {
   user    User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   post    Post?           @relation("PostPurchases", fields: [postId], references: [id])
   product DigitalProduct? @relation("ProductPurchases", fields: [productId], references: [id])
+  refunds Refund[]
 
   // Index for faster lookups
   @@index([providerOrderId])
@@ -295,6 +300,7 @@ model Payment {
   // Relations
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   subscription Subscription? @relation(fields: [subscriptionId], references: [id])
+  refunds      Refund[]
 }
 
 model Tip {
@@ -355,5 +361,69 @@ model PasswordResetToken {
 
   @@index([email])
   @@index([token])
+}
+
+// DM Payment (Paid Direct Messages)
+model DMPayment {
+  id              String           @id @default(cuid())
+  userId          String           // Fan who paid
+  creatorId       String           // Creator receiving message
+  conversationId  String?          // Optional: for specific conversation
+  amount          Int              // Amount in paise/cents
+  currency        String           @default("INR")
+  status          String           @default("PENDING") // PENDING, COMPLETED, EXPIRED, REFUNDED
+  provider        PaymentProvider?
+  providerOrderId String?          // Payment gateway order ID
+  providerPayId   String?          // Payment ID after success
+  platformFee     Int              @default(0)
+  creatorEarnings Int              @default(0)
+  messagesAllowed Int              @default(1) // Number of messages this payment covers
+  messagesUsed    Int              @default(0) // Number of messages sent using this payment
+  expiresAt       DateTime?        // When unused payment expires
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relations
+  user         User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  creator      CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  conversation Conversation?  @relation(fields: [conversationId], references: [id])
+
+  @@index([userId, creatorId, status])
+  @@index([providerOrderId])
+  @@index([status, expiresAt])
+}
+
+// Refund tracking
+model Refund {
+  id              String           @id @default(cuid())
+  userId          String           // User requesting refund
+  purchaseId      String?          // Related purchase (product/PPV)
+  paymentId       String?          // Related subscription payment
+  amount          Int              // Refund amount in paise/cents
+  currency        String           @default("INR")
+  reason          String           @db.Text // Reason for refund
+  status          String           @default("PENDING") // PENDING, APPROVED, REJECTED, COMPLETED
+  provider        PaymentProvider?
+  providerRefundId String?         // Refund ID from payment provider
+  
+  // Admin/creator response
+  reviewedBy      String?          // Admin or creator who reviewed
+  reviewNote      String?          @db.Text
+  reviewedAt      DateTime?
+  
+  // Tracking
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  completedAt     DateTime?        // When refund was completed
+
+  // Relations
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  purchase Purchase? @relation(fields: [purchaseId], references: [id])
+  payment  Payment?  @relation(fields: [paymentId], references: [id])
+
+  @@index([userId, status])
+  @@index([purchaseId])
+  @@index([paymentId])
+  @@index([status, createdAt])
 }
 
