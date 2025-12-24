@@ -46,9 +46,20 @@ export async function POST(req: NextRequest) {
 
     // Check if this is a product purchase or subscription
     if (type === "product") {
+      // Get the user ID from session
+      const userId = (session.user as { id?: string }).id;
+      
+      if (!userId) {
+        return NextResponse.json(
+          { error: "User ID not found" },
+          { status: 401 }
+        );
+      }
+
       // Find the pending purchase
       const pendingPurchase = await prisma.purchase.findFirst({
         where: {
+          userId: userId, 
           status: "PENDING",
         },
         include: {
