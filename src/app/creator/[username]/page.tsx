@@ -230,10 +230,14 @@ export default function CreatorProfilePage({ params }: PageProps) {
       } else if (tipPaymentMethod === "stripe") {
         // Stripe uses redirect URL
         if (data.redirectUrl) {
+          const redirectUrl = data.redirectUrl;
           // Close modal and reset body overflow before redirect to prevent black overlay
           setTipModalOpen(false);
           document.body.style.overflow = "";
-          window.location.href = data.redirectUrl;
+          // Use setTimeout to allow React to process state update before redirect
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 100);
         } else {
           throw new Error("Stripe checkout URL not received");
         }
@@ -241,24 +245,29 @@ export default function CreatorProfilePage({ params }: PageProps) {
       } else if (tipPaymentMethod === "esewa") {
         // eSewa requires form submission with POST
         if (data.formData && data.redirectUrl) {
+          const formData = data.formData as Record<string, string>;
+          const redirectUrl = data.redirectUrl;
           // Close modal and reset body overflow before redirect to prevent black overlay
           setTipModalOpen(false);
           document.body.style.overflow = "";
           
-          const form = document.createElement("form");
-          form.method = "POST";
-          form.action = data.redirectUrl;
-          
-          Object.entries(data.formData as Record<string, string>).forEach(([key, value]) => {
-            const input = document.createElement("input");
-            input.type = "hidden";
-            input.name = key;
-            input.value = value;
-            form.appendChild(input);
-          });
-          
-          document.body.appendChild(form);
-          form.submit();
+          // Use setTimeout to allow React to process state update before form submit
+          setTimeout(() => {
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = redirectUrl;
+            
+            Object.entries(formData).forEach(([key, value]) => {
+              const input = document.createElement("input");
+              input.type = "hidden";
+              input.name = key;
+              input.value = value;
+              form.appendChild(input);
+            });
+            
+            document.body.appendChild(form);
+            form.submit();
+          }, 100);
           return; // Form will redirect to eSewa
         } else {
           throw new Error("eSewa payment details not received");
@@ -267,10 +276,14 @@ export default function CreatorProfilePage({ params }: PageProps) {
       } else if (tipPaymentMethod === "khalti") {
         // Khalti uses direct redirect
         if (data.redirectUrl) {
+          const redirectUrl = data.redirectUrl;
           // Close modal and reset body overflow before redirect to prevent black overlay
           setTipModalOpen(false);
           document.body.style.overflow = "";
-          window.location.href = data.redirectUrl;
+          // Use setTimeout to allow React to process state update before redirect
+          setTimeout(() => {
+            window.location.href = redirectUrl;
+          }, 100);
         } else {
           throw new Error("Khalti payment URL not received");
         }
