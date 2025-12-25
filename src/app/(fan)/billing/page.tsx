@@ -1,18 +1,13 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
 import {
-  ArrowLeft,
   CreditCard,
-  Download,
   CheckCircle,
   XCircle,
   Clock,
   Heart,
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
-import { Header } from "@/components/layout/Header";
-import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Card, CardContent, Badge } from "@/components/ui";
 import prisma from "@/lib/prisma";
 
@@ -159,14 +154,10 @@ function getTypeBadge(type: string) {
 
 export default async function BillingPage() {
   const session = await getServerSession(authOptions);
+  const userId = (session?.user as { id?: string })?.id;
 
-  if (!session?.user) {
-    redirect("/login");
-  }
-
-  const userId = (session.user as { id?: string }).id;
   if (!userId) {
-    redirect("/login");
+    return null; // Layout handles redirect
   }
 
   const transactions = await getTransactionHistory(userId);
@@ -178,23 +169,12 @@ export default async function BillingPage() {
   const tipCount = transactions.filter((t) => t.type === "tip").length;
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <Header />
+    <div className="p-6 lg:p-8">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-2xl font-bold text-gray-900 mb-8">Billing & Payments</h1>
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="max-w-4xl mx-auto">
-          <Link
-            href="/dashboard"
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Dashboard
-          </Link>
-
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">Billing & Payments</h1>
-
-          {/* Summary Cards */}
-          <div className="grid sm:grid-cols-2 gap-4 mb-8">
+        {/* Summary Cards */}
+        <div className="grid sm:grid-cols-2 gap-4 mb-8">
             <Card>
               <CardContent>
                 <div className="flex items-center gap-4">
@@ -317,11 +297,7 @@ export default async function BillingPage() {
               </div>
             </CardContent>
           </Card>
-        </div>
       </div>
-
-      {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
-    </main>
+    </div>
   );
 }
