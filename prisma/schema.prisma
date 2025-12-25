@@ -124,6 +124,8 @@ model CreatorProfile {
   digitalProducts DigitalProduct[]
   conversations   Conversation[]
   dmPayments      DMPayment[]
+  payouts         Payout[]
+  payoutMethods   PayoutMethod[]
 }
 
 model SubscriptionTier {
@@ -426,4 +428,54 @@ model Refund {
   @@index([paymentId])
   @@index([status, createdAt])
 }
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  REJECTED
+}
+
+enum PayoutMethodType {
+  BANK_TRANSFER
+  UPI
+}
+
+model PayoutMethod {
+  id          String           @id @default(cuid())
+  creatorId   String
+  type        PayoutMethodType
+  details     Json             // Bank details or UPI ID encrypted/stored securely
+  isDefault   Boolean          @default(false)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  // Relations
+  creator CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  payouts Payout[]
+
+  @@index([creatorId])
+}
+
+model Payout {
+  id             String        @id @default(cuid())
+  creatorId      String
+  amount         Int           // Amount in paise
+  currency       String        @default("INR")
+  status         PayoutStatus  @default(PENDING)
+  payoutMethodId String?
+  processedAt    DateTime?
+  notes          String?       @db.Text
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  // Relations
+  creator      CreatorProfile  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  payoutMethod PayoutMethod?   @relation(fields: [payoutMethodId], references: [id])
+
+  @@index([creatorId, status])
+  @@index([createdAt])
+}
+
 

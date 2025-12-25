@@ -18,6 +18,7 @@ import {
   TrendingUp,
   Menu,
   X,
+  Wallet,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Avatar } from "@/components/ui";
@@ -69,6 +70,7 @@ const navSections: NavSection[] = [
     title: "Account",
     items: [
       { href: "/dashboard/creator/earnings", label: "Earnings", icon: DollarSign },
+      { href: "/dashboard/payouts", label: "Payouts", icon: Wallet },
       { href: "/dashboard/creator/tiers", label: "Tiers", icon: TrendingUp },
       { href: "/messages", label: "Messages", icon: MessageCircle },
       { href: "/dashboard/creator/settings", label: "Settings", icon: Settings },
