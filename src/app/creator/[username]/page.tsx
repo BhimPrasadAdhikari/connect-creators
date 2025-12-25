@@ -135,6 +135,14 @@ export default function CreatorProfilePage({ params }: PageProps) {
   const [tipAmountRupees, setTipAmountRupees] = useState("50");
   const [tipMessage, setTipMessage] = useState("");
   const [tipLoading, setTipLoading] = useState(false);
+  const [tipPaymentMethod, setTipPaymentMethod] = useState<"razorpay" | "stripe" | "esewa" | "khalti">("razorpay");
+
+  const paymentMethods = [
+    { id: "razorpay", name: "Razorpay", description: "UPI, Cards, Netbanking", icon: "💳" },
+    { id: "stripe", name: "Stripe", description: "International Cards", icon: "💳" },
+    { id: "esewa", name: "eSewa", description: "Nepal Digital Wallet", icon: "📱" },
+    { id: "khalti", name: "Khalti", description: "Nepal Digital Wallet", icon: "📱" },
+  ] as const;
 
   const handleSendTip = async () => {
     if (!creator) return;
@@ -146,13 +154,15 @@ export default function CreatorProfilePage({ params }: PageProps) {
 
     setTipLoading(true);
     try {
-      // Create Order
-      const res = await fetch("/api/payments/razorpay/tip", {
+      // Create Order based on selected payment method
+      const endpoint = `/api/payments/${tipPaymentMethod}/tip`;
+      
+      const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: amountPaise,
-          creatorId: creator!.id,
+          creatorId: creator.id,
           message: tipMessage,
         }),
       });
@@ -160,33 +170,39 @@ export default function CreatorProfilePage({ params }: PageProps) {
       const data = await res.json();
       if (!res.ok) throw new Error(data.message || data.error || "Failed to initiate tip");
 
-      // Load Razorpay
-      const loadRazorpay = () => {
+      // Handle different payment providers
+      if (tipPaymentMethod === "razorpay") {
+        // Load and open Razorpay checkout
+        const loadRazorpay = () => {
           return new Promise((resolve) => {
+            if ((window as any).Razorpay) {
+              resolve(true);
+              return;
+            }
             const script = document.createElement("script");
             script.src = "https://checkout.razorpay.com/v1/checkout.js";
             script.onload = () => resolve(true);
             script.onerror = () => resolve(false);
             document.body.appendChild(script);
           });
-      };
-      
-      const scriptLoaded = await loadRazorpay();
-      if (!scriptLoaded) {
+        };
+        
+        const scriptLoaded = await loadRazorpay();
+        if (!scriptLoaded) {
           alert("Razorpay SDK failed to load");
           setTipLoading(false);
           return;
-      }
+        }
 
-      const options = {
-        key: data.key,
-        amount: data.amount,
-        currency: data.currency,
-        name: "Tip " + (creator!.displayName || creator!.username),
-        description: `Tip of ₹${tipAmountRupees}`,
-        order_id: data.orderId,
-        handler: async function (response: any) {
-             const verifyRes = await fetch("/api/payments/razorpay/verify", {
+        const options = {
+          key: data.key,
+          amount: data.amount,
+          currency: data.currency,
+          name: "Tip " + (creator.displayName || creator.username),
+          description: `Tip of ₹${tipAmountRupees}`,
+          order_id: data.orderId,
+          handler: async function (response: any) {
+            const verifyRes = await fetch("/api/payments/razorpay/verify", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -198,24 +214,56 @@ export default function CreatorProfilePage({ params }: PageProps) {
             });
             
             if (verifyRes.ok) {
-                alert("Tip sent successfully! Thank you for your support.");
-                setTipModalOpen(false);
-                setTipMessage("");
+              alert("Tip sent successfully! Thank you for your support.");
+              setTipModalOpen(false);
+              setTipMessage("");
             } else {
-                alert("Tip verification failed.");
+              alert("Tip verification failed.");
             }
-        },
-        theme: { color: "#9333ea" }
-      };
-      
-      const rzp = new (window as any).Razorpay(options);
-      rzp.open();
+          },
+          theme: { color: "#9333ea" }
+        };
+        
+        const rzp = new (window as any).Razorpay(options);
+        rzp.open();
+        
+      } else if (tipPaymentMethod === "stripe") {
+        // Stripe uses redirect URL
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+        } else {
+          throw new Error("Stripe checkout URL not received");
+        }
+        
+      } else if (tipPaymentMethod === "esewa" || tipPaymentMethod === "khalti") {
+        // eSewa and Khalti use form submission or redirect
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+        } else if (data.formData) {
+          // Create and submit form for eSewa
+          const form = document.createElement("form");
+          form.method = "POST";
+          form.action = data.redirectUrl || "https://uat.esewa.com.np/epay/main";
+          
+          Object.entries(data.formData).forEach(([key, value]) => {
+            const input = document.createElement("input");
+            input.type = "hidden";
+            input.name = key;
+            input.value = String(value);
+            form.appendChild(input);
+          });
+          
+          document.body.appendChild(form);
+          form.submit();
+        } else {
+          throw new Error(`${tipPaymentMethod} payment details not received`);
+        }
+      }
       
     } catch (error: any) {
       console.error("Tip failed:", error);
       alert(error.message);
-    } finally {
-        setTipLoading(false);
+      setTipLoading(false);
     }
   };
 
@@ -635,6 +683,31 @@ export default function CreatorProfilePage({ params }: PageProps) {
                             }`}
                         >
                             ₹{amt}
+                        </button>
+                    ))}
+                </div>
+            </div>
+            
+            {/* Payment Method Selection */}
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                <div className="grid grid-cols-2 gap-2">
+                    {paymentMethods.map((method) => (
+                        <button
+                            key={method.id}
+                            type="button"
+                            onClick={() => setTipPaymentMethod(method.id)}
+                            className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-all text-left ${
+                                tipPaymentMethod === method.id
+                                    ? "border-pink-500 bg-pink-50"
+                                    : "border-gray-200 hover:border-gray-300 bg-white"
+                            }`}
+                        >
+                            <span className="text-xl">{method.icon}</span>
+                            <div>
+                                <div className="font-medium text-sm text-gray-900">{method.name}</div>
+                                <div className="text-xs text-gray-500">{method.description}</div>
+                            </div>
                         </button>
                     ))}
                 </div>
