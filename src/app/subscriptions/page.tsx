@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import { ArrowLeft, Users, Calendar, CreditCard } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { Header } from "@/components/layout/Header";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Card, CardContent, Avatar, Button } from "@/components/ui";
 import prisma from "@/lib/prisma";
 
@@ -192,6 +193,9 @@ export default async function SubscriptionsPage() {
           )}
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </main>
   );
 }

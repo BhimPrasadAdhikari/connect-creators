@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Send, MessageCircle } from "lucide-react";
 import { Header } from "@/components/layout/Header";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Button, Card, CardContent, Avatar } from "@/components/ui";
 import { Skeleton, MessageSkeleton } from "@/components/ui/Skeleton";
 
@@ -390,6 +391,9 @@ export default function MessagesPage() {
           </div>
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </main>
   );
 }

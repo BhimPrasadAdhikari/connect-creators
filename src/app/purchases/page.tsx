@@ -19,6 +19,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { Card, CardContent, Button, Avatar, Badge, Skeleton, Modal, Textarea } from "@/components/ui";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 
 interface Purchase {
   id: string;
@@ -456,6 +457,9 @@ export default function PurchasesPage() {
           </div>
         </div>
       </Modal>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </div>
   );
 }

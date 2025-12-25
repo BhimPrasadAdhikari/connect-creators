@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { Header } from "@/components/layout/Header";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Card, CardContent, Badge } from "@/components/ui";
 import prisma from "@/lib/prisma";
 
@@ -241,6 +242,9 @@ export default async function BillingPage() {
           </Card>
         </div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      <MobileBottomNav />
     </main>
   );
 }
