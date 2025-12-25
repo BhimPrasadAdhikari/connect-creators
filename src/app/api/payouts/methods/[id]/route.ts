@@ -3,10 +3,12 @@ import { getServerSession } from "next-auth";
 import { prisma } from "@/lib/prisma";
 import { authOptions } from "@/lib/auth";
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const { id } = await params;
 
     const creator = await prisma.creatorProfile.findUnique({
       where: { userId: session.user.id },
@@ -15,7 +17,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     if (!creator) return NextResponse.json({ error: "Creator not found" }, { status: 404 });
 
     const method = await prisma.payoutMethod.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!method || method.creatorId !== creator.id) {
@@ -23,7 +25,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
     }
 
     await prisma.payoutMethod.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
