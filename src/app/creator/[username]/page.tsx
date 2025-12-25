@@ -235,28 +235,34 @@ export default function CreatorProfilePage({ params }: PageProps) {
           throw new Error("Stripe checkout URL not received");
         }
         
-      } else if (tipPaymentMethod === "esewa" || tipPaymentMethod === "khalti") {
-        // eSewa and Khalti use form submission or redirect
-        if (data.redirectUrl) {
-          window.location.href = data.redirectUrl;
-        } else if (data.formData) {
-          // Create and submit form for eSewa
+      } else if (tipPaymentMethod === "esewa") {
+        // eSewa requires form submission with POST
+        if (data.formData && data.redirectUrl) {
           const form = document.createElement("form");
           form.method = "POST";
-          form.action = data.redirectUrl || "https://uat.esewa.com.np/epay/main";
+          form.action = data.redirectUrl;
           
-          Object.entries(data.formData).forEach(([key, value]) => {
+          Object.entries(data.formData as Record<string, string>).forEach(([key, value]) => {
             const input = document.createElement("input");
             input.type = "hidden";
             input.name = key;
-            input.value = String(value);
+            input.value = value;
             form.appendChild(input);
           });
           
           document.body.appendChild(form);
           form.submit();
+          return; // Form will redirect to eSewa
         } else {
-          throw new Error(`${tipPaymentMethod} payment details not received`);
+          throw new Error("eSewa payment details not received");
+        }
+        
+      } else if (tipPaymentMethod === "khalti") {
+        // Khalti uses direct redirect
+        if (data.redirectUrl) {
+          window.location.href = data.redirectUrl;
+        } else {
+          throw new Error("Khalti payment URL not received");
         }
       }
       
