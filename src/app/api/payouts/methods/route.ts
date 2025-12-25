@@ -6,7 +6,7 @@ import { z } from "zod";
 
 const payoutMethodSchema = z.object({
   type: z.enum(["BANK_TRANSFER", "UPI"]),
-  details: z.record(z.string()), // Flexible JSON for details
+  details: z.any(), // Flexible JSON for details
   isDefault: z.boolean().optional(),
 });
 
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ method });
   } catch (error) {
     if (error instanceof z.ZodError) {
-      return NextResponse.json({ error: error.errors }, { status: 400 });
+      return NextResponse.json({ error: error.issues }, { status: 400 });
     }
     return NextResponse.json({ error: "Failed to create payout method" }, { status: 500 });
   }
