@@ -84,27 +84,59 @@ function StripeSuccessContent() {
   }
 
   const isProduct = type === "product";
+  const isTip = type === "tip";
+  
+  // Dynamic content based on payment type
+  const getTitle = () => {
+    if (isTip) return "Tip Sent Successfully!";
+    if (isProduct) return "Purchase Complete!";
+    return "Subscription Activated!";
+  };
+
+  const getMessage = () => {
+    if (isTip) return "Thank you for supporting the creator with your generous tip!";
+    if (isProduct) return "Your purchase was successful. Check your email for the download link!";
+    return "Welcome! Your subscription is now active. Enjoy exclusive content!";
+  };
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center p-4">
       <Card className="max-w-md w-full">
         <CardContent className="p-8 text-center">
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-12 h-12 text-green-600" />
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
+            isTip ? "bg-pink-100" : "bg-green-100"
+          }`}>
+            {isTip ? (
+              <Heart className="w-12 h-12 text-pink-600 fill-pink-600" />
+            ) : (
+              <CheckCircle className="w-12 h-12 text-green-600" />
+            )}
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {isProduct ? "Purchase Complete!" : "Subscription Activated!"}
+            {getTitle()}
           </h1>
           
           <p className="text-gray-600 mb-6">
-            {isProduct
-              ? "Your purchase was successful. Check your email for the download link!"
-              : "Welcome! Your subscription is now active. Enjoy exclusive content!"}
+            {getMessage()}
           </p>
 
           <div className="space-y-3">
-            {isProduct ? (
+            {isTip ? (
+              <>
+                <Link href="/explore" className="block">
+                  <Button variant="primary" className="w-full bg-pink-600 hover:bg-pink-700">
+                    <Heart className="w-4 h-4 mr-2" />
+                    Explore More Creators
+                  </Button>
+                </Link>
+                <Link href="/dashboard" className="block">
+                  <Button variant="outline" className="w-full">
+                    Go to Dashboard
+                  </Button>
+                </Link>
+              </>
+            ) : isProduct ? (
               <>
                 <Link href="/dashboard/purchases" className="block">
                   <Button variant="primary" className="w-full">
@@ -135,7 +167,9 @@ function StripeSuccessContent() {
           </div>
 
           <p className="text-sm text-gray-500 mt-6">
-            A confirmation email has been sent to your registered email address.
+            {isTip 
+              ? "The creator has been notified of your tip."
+              : "A confirmation email has been sent to your registered email address."}
           </p>
         </CardContent>
       </Card>

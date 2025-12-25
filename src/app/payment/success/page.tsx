@@ -11,30 +11,63 @@ function PaymentSuccessContent() {
   const type = searchParams.get("type");
   
   const isProduct = type === "product";
+  const isTip = type === "tip";
+  const isSubscription = !isProduct && !isTip;
+
+  // Dynamic content based on payment type
+  const getTitle = () => {
+    if (isTip) return "Tip Sent Successfully!";
+    if (isProduct) return "Purchase Complete!";
+    return "Subscription Activated!";
+  };
+
+  const getMessage = () => {
+    if (isTip) return "Thank you for supporting the creator with your generous tip!";
+    if (isProduct) return "Your purchase was successful. Check your email for the download link!";
+    return "Welcome! Your subscription is now active. Enjoy exclusive content!";
+  };
 
   return (
     <div className="flex-1 flex items-center justify-center px-4 py-12">
       <Card className="max-w-md w-full text-center">
         <CardContent className="py-12">
           {/* Success Icon */}
-          <div className="w-20 h-20 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-            <CheckCircle className="w-12 h-12 text-green-600" />
+          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
+            isTip ? "bg-pink-100" : "bg-green-100"
+          }`}>
+            {isTip ? (
+              <Heart className="w-12 h-12 text-pink-600 fill-pink-600" />
+            ) : (
+              <CheckCircle className="w-12 h-12 text-green-600" />
+            )}
           </div>
 
           {/* Title */}
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {isProduct ? "Purchase Complete!" : "Subscription Activated!"}
+            {getTitle()}
           </h1>
           
           <p className="text-gray-600 mb-8">
-            {isProduct 
-              ? "Your purchase was successful. Check your email for the download link!"
-              : "Welcome! Your subscription is now active. Enjoy exclusive content!"}
+            {getMessage()}
           </p>
 
           {/* CTAs */}
           <div className="space-y-3">
-            {isProduct ? (
+            {isTip ? (
+              <>
+                <Link href="/explore" className="block">
+                  <Button className="w-full bg-pink-600 hover:bg-pink-700" size="lg">
+                    <Heart className="w-5 h-5 mr-2" />
+                    Explore More Creators
+                  </Button>
+                </Link>
+                <Link href="/dashboard" className="block">
+                  <Button variant="outline" className="w-full">
+                    Go to Dashboard
+                  </Button>
+                </Link>
+              </>
+            ) : isProduct ? (
               <>
                 <Link href="/purchases" className="block">
                   <Button className="w-full" size="lg">
@@ -65,7 +98,9 @@ function PaymentSuccessContent() {
           </div>
 
           <p className="text-sm text-gray-500 mt-6">
-            A confirmation email has been sent to your registered email address.
+            {isTip 
+              ? "The creator has been notified of your tip."
+              : "A confirmation email has been sent to your registered email address."}
           </p>
         </CardContent>
       </Card>

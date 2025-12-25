@@ -12,6 +12,7 @@ function SuccessContent() {
   const [verifying, setVerifying] = useState(true);
   const [verified, setVerified] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [paymentType, setPaymentType] = useState<"subscription" | "product" | "tip">("subscription");
 
   useEffect(() => {
     // eSewa returns base64-encoded response as 'data' parameter
@@ -39,6 +40,10 @@ function SuccessContent() {
 
       if (result.success) {
         setVerified(true);
+        // Detect payment type from response
+        if (result.type) {
+          setPaymentType(result.type);
+        }
       } else {
         setError(result.error || "Payment verification failed");
       }
@@ -48,6 +53,19 @@ function SuccessContent() {
       setVerifying(false);
     }
   }
+
+  // Dynamic content based on payment type
+  const getTitle = () => {
+    if (paymentType === "tip") return "Tip Sent Successfully!";
+    if (paymentType === "product") return "Purchase Complete!";
+    return "Subscription Activated!";
+  };
+
+  const getMessage = () => {
+    if (paymentType === "tip") return "Thank you for supporting the creator with your generous tip!";
+    if (paymentType === "product") return "Your purchase was successful. Check your purchases to download.";
+    return "Thank you for your payment. Your subscription is now active.";
+  };
 
   if (verifying) {
     return (
@@ -82,22 +100,50 @@ function SuccessContent() {
 
   return (
     <div className="text-center">
-      <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
-        <CheckCircle className="w-10 h-10 text-green-600" />
+      <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
+        paymentType === "tip" ? "bg-pink-100" : "bg-green-100"
+      }`}>
+        {paymentType === "tip" ? (
+          <Heart className="w-10 h-10 text-pink-600 fill-pink-600" />
+        ) : (
+          <CheckCircle className="w-10 h-10 text-green-600" />
+        )}
       </div>
       <h2 className="text-2xl font-bold text-gray-900 mb-2">
-        Payment Successful!
+        {getTitle()}
       </h2>
       <p className="text-gray-600 mb-6">
-        Thank you for your payment. Your subscription is now active.
+        {getMessage()}
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
-        <Button onClick={() => router.push("/dashboard")}>
-          Go to Dashboard
-        </Button>
-        <Button variant="outline" onClick={() => router.push("/subscriptions")}>
-          View Subscriptions
-        </Button>
+        {paymentType === "tip" ? (
+          <>
+            <Button onClick={() => router.push("/explore")} className="bg-pink-600 hover:bg-pink-700">
+              Explore More Creators
+            </Button>
+            <Button variant="outline" onClick={() => router.push("/dashboard")}>
+              Go to Dashboard
+            </Button>
+          </>
+        ) : paymentType === "product" ? (
+          <>
+            <Button onClick={() => router.push("/purchases")}>
+              View My Purchases
+            </Button>
+            <Button variant="outline" onClick={() => router.push("/explore")}>
+              Continue Browsing
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button onClick={() => router.push("/dashboard")}>
+              Go to Dashboard
+            </Button>
+            <Button variant="outline" onClick={() => router.push("/subscriptions")}>
+              View Subscriptions
+            </Button>
+          </>
+        )}
       </div>
     </div>
   );
