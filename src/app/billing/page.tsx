@@ -8,6 +8,7 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  Heart,
 } from "lucide-react";
 import { authOptions } from "@/lib/auth";
 import { Header } from "@/components/layout/Header";
@@ -15,7 +16,21 @@ import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { Card, CardContent, Badge } from "@/components/ui";
 import prisma from "@/lib/prisma";
 
-async function getPaymentHistory(userId: string) {
+// Unified transaction type for display
+type Transaction = {
+  id: string;
+  type: "subscription" | "product" | "tip";
+  amount: number;
+  currency: string;
+  status: string;
+  provider?: string;
+  createdAt: Date;
+  description: string;
+  recipientName?: string;
+};
+
+async function getTransactionHistory(userId: string): Promise<Transaction[]> {
+  // Fetch subscription/product payments
   const payments = await prisma.payment.findMany({
     where: { userId },
     include: {
@@ -36,20 +51,72 @@ async function getPaymentHistory(userId: string) {
     take: 50,
   });
 
-  return payments;
+  // Fetch tips sent by this user
+  const tips = await prisma.tip.findMany({
+    where: { fromUserId: userId },
+    include: {
+      toCreator: {
+        include: {
+          user: {
+            select: { name: true },
+          },
+        },
+      },
+    },
+    orderBy: { createdAt: "desc" },
+    take: 50,
+  });
+
+  // Convert payments to unified transaction format
+  const paymentTransactions: Transaction[] = payments.map((p) => ({
+    id: p.id,
+    type: "subscription" as const,
+    amount: p.amount,
+    currency: p.currency,
+    status: p.status,
+    provider: p.provider,
+    createdAt: p.createdAt,
+    description: p.subscription
+      ? `Subscription: ${p.subscription.tier.name}`
+      : "Payment",
+    recipientName: p.subscription
+      ? p.subscription.creator.displayName || p.subscription.creator.user.name || undefined
+      : undefined,
+  }));
+
+  // Convert tips to unified transaction format
+  const tipTransactions: Transaction[] = tips.map((t) => ({
+    id: t.id,
+    type: "tip" as const,
+    amount: t.amount,
+    currency: t.currency,
+    status: "COMPLETED", // Tips are recorded only after successful payment
+    createdAt: t.createdAt,
+    description: "Tip",
+    recipientName: t.toCreator.displayName || t.toCreator.user.name || undefined,
+  }));
+
+  // Combine and sort by date
+  const allTransactions = [...paymentTransactions, ...tipTransactions];
+  allTransactions.sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+
+  return allTransactions;
 }
 
-function formatPrice(amountInPaise: number): string {
+function formatPrice(amountInPaise: number, currency: string = "INR"): string {
   const amount = amountInPaise / 100;
-  return new Intl.NumberFormat("en-IN", {
+  return new Intl.NumberFormat(currency === "INR" ? "en-IN" : "en-US", {
     style: "currency",
-    currency: "INR",
+    currency,
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
 }
 
-function getStatusIcon(status: string) {
+function getStatusIcon(status: string, type: string) {
+  if (type === "tip") {
+    return <Heart className="w-4 h-4 text-pink-500 fill-pink-500" />;
+  }
   switch (status) {
     case "COMPLETED":
       return <CheckCircle className="w-4 h-4 text-green-500" />;
@@ -77,6 +144,19 @@ function getStatusBadge(status: string) {
   }
 }
 
+function getTypeBadge(type: string) {
+  switch (type) {
+    case "tip":
+      return <Badge className="bg-pink-100 text-pink-700">Tip</Badge>;
+    case "subscription":
+      return <Badge className="bg-blue-100 text-blue-700">Subscription</Badge>;
+    case "product":
+      return <Badge className="bg-purple-100 text-purple-700">Product</Badge>;
+    default:
+      return <Badge>{type}</Badge>;
+  }
+}
+
 export default async function BillingPage() {
   const session = await getServerSession(authOptions);
 
@@ -89,11 +169,13 @@ export default async function BillingPage() {
     redirect("/login");
   }
 
-  const payments = await getPaymentHistory(userId);
+  const transactions = await getTransactionHistory(userId);
 
-  const totalSpent = payments
-    .filter((p) => p.status === "COMPLETED")
-    .reduce((sum, p) => sum + p.amount, 0);
+  const totalSpent = transactions
+    .filter((t) => t.status === "COMPLETED")
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  const tipCount = transactions.filter((t) => t.type === "tip").length;
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -137,7 +219,7 @@ export default async function BillingPage() {
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Transactions</p>
-                    <p className="text-2xl font-bold text-gray-900">{payments.length}</p>
+                    <p className="text-2xl font-bold text-gray-900">{transactions.length}</p>
                   </div>
                 </div>
               </CardContent>
@@ -148,17 +230,17 @@ export default async function BillingPage() {
           <Card>
             <CardContent>
               <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                Payment History
+                Transaction History
               </h2>
 
-              {payments.length === 0 ? (
+              {transactions.length === 0 ? (
                 <div className="text-center py-12">
                   <CreditCard className="w-12 h-12 mx-auto text-gray-300 mb-4" />
                   <h3 className="text-lg font-medium text-gray-900 mb-2">
-                    No Payments Yet
+                    No Transactions Yet
                   </h3>
                   <p className="text-gray-500">
-                    Your payment history will appear here after you make a purchase.
+                    Your transaction history will appear here after you make a purchase or tip.
                   </p>
                 </div>
               ) : (
@@ -167,35 +249,35 @@ export default async function BillingPage() {
                     <thead>
                       <tr className="text-left border-b border-gray-200">
                         <th className="pb-3 text-sm font-medium text-gray-500">Date</th>
+                        <th className="pb-3 text-sm font-medium text-gray-500">Type</th>
                         <th className="pb-3 text-sm font-medium text-gray-500">Description</th>
                         <th className="pb-3 text-sm font-medium text-gray-500">Amount</th>
                         <th className="pb-3 text-sm font-medium text-gray-500">Status</th>
-                        <th className="pb-3 text-sm font-medium text-gray-500"></th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
-                      {payments.map((payment) => (
-                        <tr key={payment.id} className="hover:bg-gray-50">
+                      {transactions.map((transaction) => (
+                        <tr key={transaction.id} className="hover:bg-gray-50">
                           <td className="py-4 text-sm text-gray-600">
-                            {new Date(payment.createdAt).toLocaleDateString("en-IN", {
+                            {new Date(transaction.createdAt).toLocaleDateString("en-IN", {
                               day: "numeric",
                               month: "short",
                               year: "numeric",
                             })}
                           </td>
                           <td className="py-4">
+                            {getTypeBadge(transaction.type)}
+                          </td>
+                          <td className="py-4">
                             <div className="flex items-center gap-2">
-                              {getStatusIcon(payment.status)}
+                              {getStatusIcon(transaction.status, transaction.type)}
                               <div>
                                 <p className="text-sm font-medium text-gray-900">
-                                  {payment.subscription
-                                    ? `Subscription: ${payment.subscription.tier.name}`
-                                    : "Payment"}
+                                  {transaction.description}
                                 </p>
-                                {payment.subscription && (
+                                {transaction.recipientName && (
                                   <p className="text-xs text-gray-500">
-                                    {payment.subscription.creator.displayName ||
-                                      payment.subscription.creator.user.name}
+                                    to {transaction.recipientName}
                                   </p>
                                 )}
                               </div>
@@ -203,20 +285,15 @@ export default async function BillingPage() {
                           </td>
                           <td className="py-4">
                             <p className="text-sm font-medium text-gray-900">
-                              {formatPrice(payment.amount)}
+                              {formatPrice(transaction.amount, transaction.currency)}
                             </p>
-                            <p className="text-xs text-gray-500">
-                              via {payment.provider.toLowerCase().replace("_", " ")}
-                            </p>
-                          </td>
-                          <td className="py-4">{getStatusBadge(payment.status)}</td>
-                          <td className="py-4">
-                            {payment.status === "COMPLETED" && (
-                              <button className="p-2 text-gray-400 hover:text-gray-600 transition-colors">
-                                <Download className="w-4 h-4" />
-                              </button>
+                            {transaction.provider && (
+                              <p className="text-xs text-gray-500">
+                                via {transaction.provider.toLowerCase().replace("_", " ")}
+                              </p>
                             )}
                           </td>
+                          <td className="py-4">{getStatusBadge(transaction.status)}</td>
                         </tr>
                       ))}
                     </tbody>
