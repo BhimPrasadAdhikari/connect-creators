@@ -69,7 +69,7 @@ export function PayoutMethodList({ methods, onAdd, onDelete }: PayoutMethodListP
         {methods.length === 0 && (
             <div className="col-span-full text-center py-8 text-gray-500 bg-gray-50 border border-dashed border-gray-200 rounded-xl">
                 <p className="mb-2">No payout methods added yet.</p>
-                <Button variant="link" onClick={onAdd}>Add your first method</Button>
+                <Button variant="primary" onClick={onAdd}>Add your first method</Button>
             </div>
         )}
       </div>

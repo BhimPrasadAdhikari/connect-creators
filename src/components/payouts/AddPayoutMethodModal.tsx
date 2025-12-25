@@ -103,7 +103,7 @@ export function AddPayoutMethodModal({ isOpen, onClose, onSuccess }: AddPayoutMe
 
         <div className="flex justify-end gap-3 mt-6">
             <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
-            <Button type="submit" isLoading={loading}>Save Method</Button>
+            <Button type="submit" loading={loading}>Save Method</Button>
         </div>
       </form>
     </Modal>

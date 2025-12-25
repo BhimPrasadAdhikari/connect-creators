@@ -93,7 +93,7 @@ export function RequestPayoutModal({ isOpen, onClose, onSuccess, maxAmount, meth
 
             <div className="flex justify-end gap-3 mt-6">
                 <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
-                <Button type="submit" isLoading={loading} disabled={methods.length === 0 || maxAmount <= 0}>
+                <Button type="submit" loading={loading} disabled={methods.length === 0 || maxAmount <= 0}>
                     Request Withdrawal
                 </Button>
             </div>
