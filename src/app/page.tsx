@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { ParticleBackground } from "@/components/ui/ParticleBackground";
 
 export default function HomePage() {
   return (
@@ -44,13 +45,24 @@ export default function HomePage() {
 function HeroSection() {
   return (
     <section className="relative py-20 sm:py-28 lg:py-32 overflow-hidden">
-      {/* Background gradient */}
-      <div className="absolute inset-0 bg-gradient-to-b from-blue-50 to-transparent" />
+      {/* Particle Background - wrapped for full coverage */}
+      <div className="absolute inset-0 w-full h-full">
+        <ParticleBackground
+          particleCount={600}
+          particleColor="59, 130, 246"
+          lineColor="59, 130, 246"
+          connectionDistance={120}
+          mouseRadius={180}
+          speed={0.8}
+        />
+      </div>
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-blue-50/80 via-white/50 to-white pointer-events-none" />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 relative pointer-events-none">
         <div className="max-w-3xl mx-auto text-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-medium mb-6">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100 text-blue-600 text-sm font-medium mb-6 pointer-events-auto">
             <Zap className="w-4 h-4" />
             For creators in Nepal &amp; India
           </div>
@@ -71,14 +83,14 @@ function HeroSection() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
               href="/explore"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-medium text-white bg-blue-600 rounded-xl hover:bg-blue-700 transition-colors w-full sm:w-auto pointer-events-auto"
             >
               Explore Creators
               <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               href="/signup?role=creator"
-              className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-medium text-blue-600 bg-transparent border-2 border-blue-600 rounded-xl hover:bg-blue-50 transition-colors w-full sm:w-auto"
+              className="inline-flex items-center justify-center gap-2 px-8 py-4 text-lg font-medium text-blue-600 bg-transparent border-2 border-blue-600 rounded-xl hover:bg-blue-50 transition-colors w-full sm:w-auto pointer-events-auto"
             >
               Become a Creator
             </Link>
