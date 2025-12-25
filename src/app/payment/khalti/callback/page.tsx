@@ -19,6 +19,9 @@ function KhaltiCallbackContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Reset body overflow in case it was left from a modal
+    document.body.style.overflow = "";
+    
     if (!pidx) {
       setError("No payment identifier provided");
       setVerifying(false);

@@ -15,6 +15,9 @@ function SuccessContent() {
   const [paymentType, setPaymentType] = useState<"subscription" | "product" | "tip">("subscription");
 
   useEffect(() => {
+    // Reset body overflow in case it was left from a modal
+    document.body.style.overflow = "";
+    
     // eSewa returns base64-encoded response as 'data' parameter
     const data = searchParams.get("data");
     

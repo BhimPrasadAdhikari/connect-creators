@@ -18,14 +18,21 @@ export function Modal({ isOpen, onClose, title, children }: ModalProps) {
       if (e.key === "Escape") onClose();
     };
 
+    // Reset overflow on navigation/page unload
+    const handleBeforeUnload = () => {
+      document.body.style.overflow = "";
+    };
+
     if (isOpen) {
       document.addEventListener("keydown", handleEscape);
+      window.addEventListener("beforeunload", handleBeforeUnload);
       document.body.style.overflow = "hidden";
     }
 
     return () => {
       document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "unset";
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+      document.body.style.overflow = "";
     };
   }, [isOpen, onClose]);
 

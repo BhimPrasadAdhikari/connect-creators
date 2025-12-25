@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Heart, CheckCircle, Loader2, Download } from "lucide-react";
@@ -9,6 +9,11 @@ import { Button, Card, CardContent } from "@/components/ui";
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
   const type = searchParams.get("type");
+  
+  // Reset body overflow in case it was left from a modal
+  useEffect(() => {
+    document.body.style.overflow = "";
+  }, []);
   
   const isProduct = type === "product";
   const isTip = type === "tip";

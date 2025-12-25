@@ -230,6 +230,9 @@ export default function CreatorProfilePage({ params }: PageProps) {
       } else if (tipPaymentMethod === "stripe") {
         // Stripe uses redirect URL
         if (data.redirectUrl) {
+          // Close modal and reset body overflow before redirect to prevent black overlay
+          setTipModalOpen(false);
+          document.body.style.overflow = "";
           window.location.href = data.redirectUrl;
         } else {
           throw new Error("Stripe checkout URL not received");
@@ -238,6 +241,10 @@ export default function CreatorProfilePage({ params }: PageProps) {
       } else if (tipPaymentMethod === "esewa") {
         // eSewa requires form submission with POST
         if (data.formData && data.redirectUrl) {
+          // Close modal and reset body overflow before redirect to prevent black overlay
+          setTipModalOpen(false);
+          document.body.style.overflow = "";
+          
           const form = document.createElement("form");
           form.method = "POST";
           form.action = data.redirectUrl;
@@ -260,6 +267,9 @@ export default function CreatorProfilePage({ params }: PageProps) {
       } else if (tipPaymentMethod === "khalti") {
         // Khalti uses direct redirect
         if (data.redirectUrl) {
+          // Close modal and reset body overflow before redirect to prevent black overlay
+          setTipModalOpen(false);
+          document.body.style.overflow = "";
           window.location.href = data.redirectUrl;
         } else {
           throw new Error("Khalti payment URL not received");

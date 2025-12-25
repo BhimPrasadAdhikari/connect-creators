@@ -16,6 +16,9 @@ function StripeSuccessContent() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Reset body overflow in case it was left from a modal
+    document.body.style.overflow = "";
+    
     if (!sessionId) {
       setError("No session ID provided");
       setVerifying(false);
