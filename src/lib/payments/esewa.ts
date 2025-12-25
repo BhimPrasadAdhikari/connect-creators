@@ -12,12 +12,8 @@ const ESEWA_CONFIG = {
   merchantId: process.env.ESEWA_MERCHANT_ID || "EPAYTEST",
   // For UAT: 8gBm/:&EnhH.1/q
   secretKey: process.env.ESEWA_SECRET_KEY || "8gBm/:&EnhH.1/q",
-  baseUrl: process.env.NODE_ENV === "production" 
-    ? "https://epay.esewa.com.np" 
-    : "https://rc-epay.esewa.com.np",
-  statusUrl: process.env.NODE_ENV === "production"
-    ? "https://esewa.com.np"
-    : "https://rc.esewa.com.np",
+  baseUrl: process.env.ESEWA_BASE_URL || "https://rc-epay.esewa.com.np",
+  statusUrl: process.env.ESEWA_STATUS_URL || "https://rc.esewa.com.np",
 };
 
 /**

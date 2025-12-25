@@ -8,9 +8,7 @@ import type { PaymentConfig, PaymentResult, PaymentVerification, PaymentProvider
 const KHALTI_CONFIG = {
   secretKey: process.env.KHALTI_SECRET_KEY || "",
   publicKey: process.env.KHALTI_PUBLIC_KEY || "",
-  baseUrl: process.env.NODE_ENV === "production"
-    ? "https://khalti.com/api/v2"
-    : "https://dev.khalti.com/api/v2",
+  baseUrl: process.env.KHALTI_BASE_URL || "https://dev.khalti.com/api/v2",
 };
 
 export const khaltiProvider: PaymentProviderInterface = {
