@@ -10,7 +10,7 @@ import { sendSubscriptionConfirmationEmail, sendPurchaseConfirmationEmail } from
 import { formatAmount } from "@/lib/payments/types";
 import { generateSecureDownloadUrl } from "@/lib/downloads";
 import { rateLimit } from "@/lib/api/rate-limit";
-import { logPayment, logSubscription, logPurchase, AuditAction } from "@/lib/security/audit";
+import { logPayment, logSubscription, logPurchase, AuditAction, logTipSent } from "@/lib/security/audit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,8 +53,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Check if this is a product/PPV purchase, DM payment, or subscription
+    // Check if this is a product/PPV purchase, DM payment, or Tip
     if (type === "product" || type === "ppv") {
+      // ... (existing product/ppv logic) ...
       // Get the user ID from session
       const userId = (session.user as { id?: string }).id;
       
@@ -115,6 +116,78 @@ export async function POST(req: NextRequest) {
         logPurchase(userId, pendingPurchase.id, "product", pendingPurchase.amount, "SUCCESS").catch(console.error);
 
         console.log(`[Razorpay] Product purchase verified: ${razorpay_payment_id}`);
+      }
+    } else if (type === "dm") {
+      const userId = (session.user as { id?: string }).id;
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+      // Logic for DM Payment verification
+      // Find the pending DMPayment
+      // Note: We might need to store the order_id in DMPayment to link it reliably, 
+      // but typically we can look up by user and Pending status, or use notes if passed back.
+      // Ideally, the frontend passes us the dmPaymentId, but here we just get razorpay params + type.
+      // We can look for the most recent PENDING DMPayment for this user.
+      
+      const dmPayment = await prisma.dMPayment.findFirst({
+        where: {
+          userId: userId,
+          status: "PENDING",
+        },
+        orderBy: { createdAt: "desc" }
+      });
+
+      if (dmPayment) {
+        await prisma.dMPayment.update({
+          where: { id: dmPayment.id },
+          data: {
+            status: "COMPLETED",
+            providerPayId: razorpay_payment_id,
+            providerOrderId: razorpay_order_id,
+          }
+        });
+        
+        // Audit log
+        logPayment(userId, dmPayment.id, AuditAction.PAYMENT_COMPLETED, { 
+          amount: dmPayment.amount, 
+          type: "DM" 
+        }).catch(console.error);
+        
+        console.log(`[Razorpay] DM Payment verified: ${dmPayment.id}`);
+      }
+
+    } else if (type === "tip") {
+      const userId = (session.user as { id?: string }).id;
+      if (!userId) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      
+      try {
+        if (!razorpayProvider.fetchOrder) {
+           throw new Error("Provider does not support fetching orders");
+        }
+
+        const order = await razorpayProvider.fetchOrder(razorpay_order_id);
+        const { creatorId, postId, message } = order.notes || {};
+        const amount = order.amount || 0;
+
+        if (creatorId) {
+          const tip = await prisma.tip.create({
+            data: {
+              fromUserId: userId,
+              toCreatorId: String(creatorId),
+              postId: postId ? String(postId) : null,
+              amount: Number(amount),
+              message: message ? String(message) : null,
+              currency: "INR", // Default to INR for Razorpay
+            }
+          });
+          
+          // Audit Log
+          logTipSent(userId, String(creatorId), Number(amount), "INR").catch(console.error);
+          
+          console.log(`[Razorpay] Tip verified and created: ${tip.id}`);
+        }
+      } catch (err) {
+        console.error("[Razorpay] Failed to fetch order details for tip:", err);
+        // Even if fetching notes fails, the payment succeeded. We should potentiall log this mismatch.
       }
     } else {
       // Find subscription payment

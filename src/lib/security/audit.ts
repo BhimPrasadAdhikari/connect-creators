@@ -28,6 +28,7 @@ export enum AuditAction {
   SUBSCRIPTION_CANCELLED = "SUBSCRIPTION_CANCELLED",
   TIP_SENT = "TIP_SENT",
   PAYOUT_REQUESTED = "PAYOUT_REQUESTED",
+  REFUND_PROCESSED = "REFUND_PROCESSED",
   
   // Content
   POST_CREATED = "POST_CREATED",
@@ -312,6 +313,22 @@ export async function logProfileUpdate(
     resource: profileType === "creator" ? "creator_profile" : "user",
     resourceId: userId,
     metadata: changes,
+  });
+}
+
+// Log refund action (Admin)
+export async function logRefundAction(
+  userId: string,
+  refundId: string,
+  action: "APPROVED" | "REJECTED",
+  note?: string
+): Promise<void> {
+  await logAudit({
+    userId,
+    action: AuditAction.REFUND_PROCESSED,
+    resource: "refund",
+    resourceId: refundId,
+    metadata: { action, note },
   });
 }
 

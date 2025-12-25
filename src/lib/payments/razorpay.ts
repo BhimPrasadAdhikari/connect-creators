@@ -116,6 +116,34 @@ export const razorpayProvider: PaymentProviderInterface = {
         break;
     }
   },
+
+
+  async fetchOrder(orderId: string) {
+    try {
+      return await getRazorpay().orders.fetch(orderId);
+    } catch (error) {
+      console.error("Failed to fetch Razorpay order:", error);
+      throw error;
+    }
+  },
+
+  async refundPayment(paymentId: string, amount?: number) {
+    try {
+      const options: any = {
+        speed: "normal",
+      };
+      if (amount) {
+          options.amount = amount; // Razorpay expects amount in paise if partial refund
+          options.receipt = "Refund for " + paymentId;
+      }
+
+      const refund = await getRazorpay().payments.refund(paymentId, options);
+      return { success: true, refundId: refund.id };
+    } catch (error: any) {
+      console.error("Razorpay refund failed:", error);
+      return { success: false, error: error.description || error.message || "Refund failed" };
+    }
+  },
 };
 
 /**

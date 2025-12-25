@@ -15,8 +15,10 @@ import {
   ShoppingBag,
   Users,
   CreditCard,
+  RotateCcw,
+  AlertCircle
 } from "lucide-react";
-import { Card, CardContent, Button, Avatar, Badge, Skeleton } from "@/components/ui";
+import { Card, CardContent, Button, Avatar, Badge, Skeleton, Modal, Textarea } from "@/components/ui";
 
 interface Purchase {
   id: string;
@@ -86,6 +88,13 @@ export default function PurchasesPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Refund State
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
+  const [selectedPurchase, setSelectedPurchase] = useState<Purchase | null>(null);
+  const [refundReason, setRefundReason] = useState("");
+  const [refundLoading, setRefundLoading] = useState(false);
+  const [refundError, setRefundError] = useState<string | null>(null);
+
   useEffect(() => {
     if (status === "unauthenticated") {
       router.push("/login?callbackUrl=/purchases");
@@ -117,6 +126,57 @@ export default function PurchasesPage() {
     { icon: CreditCard, label: "Billing", href: "/billing" },
     { icon: Settings, label: "Settings", href: "/settings" },
   ];
+
+  const handleOpenRefund = (purchase: Purchase) => {
+    setSelectedPurchase(purchase);
+    setRefundReason("");
+    setRefundError(null);
+    setRefundModalOpen(true);
+  };
+
+  const handleSubmitRefund = async () => {
+    if (!selectedPurchase) return;
+    if (refundReason.trim().length < 10) {
+      setRefundError("Please provide a more detailed reason (at least 10 characters)");
+      return;
+    }
+
+    setRefundLoading(true);
+    setRefundError(null);
+
+    try {
+      const res = await fetch("/api/refunds", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          purchaseId: selectedPurchase.id,
+          reason: refundReason,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || "Failed to submit refund request");
+      }
+
+      setRefundModalOpen(false);
+      alert("Refund request submitted successfully! We will review it shortly.");
+    } catch (err: any) {
+      setRefundError(err.message);
+    } finally {
+      setRefundLoading(false);
+    }
+  };
+
+  // Check if purchase is eligible for refund (within 7 days)
+  const isRefundable = (createdAt: string) => {
+    const purchaseDate = new Date(createdAt);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - purchaseDate.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); 
+    return diffDays <= 7;
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -300,17 +360,28 @@ export default function PurchasesPage() {
                         </div>
                       </div>
 
-                      {/* Download Button */}
+                      {/* Actions */}
                       <div className="flex-shrink-0 flex sm:flex-col items-center gap-2">
                         <a
                           href={purchase.product.fileUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors shadow-sm"
+                          className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors shadow-sm w-full sm:w-auto justify-center"
                         >
                           <Download className="w-5 h-5" />
                           Download
                         </a>
+                        
+                        {isRefundable(purchase.purchasedAt) && (
+                          <Button 
+                            variant="ghost" 
+                            className="text-gray-500 hover:text-red-600 w-full sm:w-auto"
+                            onClick={() => handleOpenRefund(purchase)}
+                          >
+                            <RotateCcw className="w-4 h-4 mr-2" />
+                            Refund
+                          </Button>
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -320,6 +391,71 @@ export default function PurchasesPage() {
           )}
         </div>
       </main>
+
+      {/* Refund Modal */}
+      <Modal
+        isOpen={refundModalOpen}
+        onClose={() => setRefundModalOpen(false)}
+        title="Request Refund"
+      >
+        <div className="space-y-4">
+          <div className="bg-yellow-50 p-4 rounded-lg flex gap-3 text-sm text-yellow-800">
+            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+            <p>
+              Refund requests are reviewed manually. Please allow up to 48 hours for a response.
+              Refunds are generally only approved for technical issues or accidental purchases within 7 days.
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Product
+            </label>
+            <div className="p-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-900">
+              {selectedPurchase?.product.title}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Reason for Refund
+            </label>
+            <Textarea
+              placeholder="Please explain why you are requesting a refund..."
+              value={refundReason}
+              onChange={(e) => setRefundReason(e.target.value)}
+              className="min-h-[100px]"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Minimum 10 characters required.
+            </p>
+          </div>
+
+          {refundError && (
+            <div className="text-sm text-red-600">
+              {refundError}
+            </div>
+          )}
+
+          <div className="flex gap-3 justify-end pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setRefundModalOpen(false)}
+              disabled={refundLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="primary" // Assuming primary assumes destructiveness if colored red, but here we keep it standard
+              className="bg-red-600 hover:bg-red-700 text-white"
+              onClick={handleSubmitRefund}
+              disabled={refundLoading || refundReason.trim().length < 10}
+            >
+              {refundLoading ? "Submitting..." : "Submit Request"}
+            </Button>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }

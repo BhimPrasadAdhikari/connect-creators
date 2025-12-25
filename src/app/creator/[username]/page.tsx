@@ -21,7 +21,7 @@ import {
   ChevronRight,
   ShieldCheck,
 } from "lucide-react";
-import { Card, CardContent, Badge, Breadcrumbs, Button } from "@/components/ui";
+import { Card, CardContent, Badge, Breadcrumbs, Button, Modal, Input, Textarea } from "@/components/ui";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 
@@ -129,6 +129,95 @@ export default function CreatorProfilePage({ params }: PageProps) {
   const [purchasedProductIds, setPurchasedProductIds] = useState<Set<string>>(new Set());
   const [isOwner, setIsOwner] = useState(false);
   const [activeTab, setActiveTab] = useState("posts");
+  
+  // Tip State
+  const [tipModalOpen, setTipModalOpen] = useState(false);
+  const [tipAmountRupees, setTipAmountRupees] = useState("50");
+  const [tipMessage, setTipMessage] = useState("");
+  const [tipLoading, setTipLoading] = useState(false);
+
+  const handleSendTip = async () => {
+    if (!creator) return;
+    const amountPaise = parseFloat(tipAmountRupees) * 100;
+    if (isNaN(amountPaise) || amountPaise < 100) {
+      alert("Minimum tip amount is ₹1");
+      return;
+    }
+
+    setTipLoading(true);
+    try {
+      // Create Order
+      const res = await fetch("/api/payments/razorpay/tip", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: amountPaise,
+          creatorId: creator!.id,
+          message: tipMessage,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || data.error || "Failed to initiate tip");
+
+      // Load Razorpay
+      const loadRazorpay = () => {
+          return new Promise((resolve) => {
+            const script = document.createElement("script");
+            script.src = "https://checkout.razorpay.com/v1/checkout.js";
+            script.onload = () => resolve(true);
+            script.onerror = () => resolve(false);
+            document.body.appendChild(script);
+          });
+      };
+      
+      const scriptLoaded = await loadRazorpay();
+      if (!scriptLoaded) {
+          alert("Razorpay SDK failed to load");
+          setTipLoading(false);
+          return;
+      }
+
+      const options = {
+        key: data.key,
+        amount: data.amount,
+        currency: data.currency,
+        name: "Tip " + (creator!.displayName || creator!.username),
+        description: `Tip of ₹${tipAmountRupees}`,
+        order_id: data.orderId,
+        handler: async function (response: any) {
+             const verifyRes = await fetch("/api/payments/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                type: "tip",
+              }),
+            });
+            
+            if (verifyRes.ok) {
+                alert("Tip sent successfully! Thank you for your support.");
+                setTipModalOpen(false);
+                setTipMessage("");
+            } else {
+                alert("Tip verification failed.");
+            }
+        },
+        theme: { color: "#9333ea" }
+      };
+      
+      const rzp = new (window as any).Razorpay(options);
+      rzp.open();
+      
+    } catch (error: any) {
+      console.error("Tip failed:", error);
+      alert(error.message);
+    } finally {
+        setTipLoading(false);
+    }
+  };
 
   useEffect(() => {
     async function loadData() {
@@ -192,6 +281,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
   ];
 
   return (
+    <div>
     <main className="min-h-screen bg-white text-text-primary font-sans">
       <Header />
 
@@ -486,23 +576,97 @@ export default function CreatorProfilePage({ params }: PageProps) {
                  </div>
               )}
 
+              {/* Sidebar Actions */}
               {!isOwner && (
-                 <Link
-                   href={`/messages?creator=${creator.id}`}
-                   className="flex items-center justify-center gap-2 w-full py-2.5 bg-gray-50 rounded text-text-secondary font-medium hover:bg-gray-100 hover:text-text-primary transition-colors"
-                 >
-                   <MessageCircle className="w-4 h-4" />
-                   Message
-                 </Link>
+                 <div className="space-y-3 pt-6 border-t border-gray-100">
+                   <Link
+                     href={`/messages?creator=${creator.id}`}
+                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-gray-50 rounded text-text-secondary font-medium hover:bg-gray-100 hover:text-text-primary transition-colors"
+                   >
+                     <MessageCircle className="w-4 h-4" />
+                     Message
+                   </Link>
+                   
+                   <button
+                     onClick={() => setTipModalOpen(true)}
+                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-pink-50 text-pink-600 rounded font-medium hover:bg-pink-100 transition-colors"
+                   >
+                     <Heart className="w-4 h-4 fill-current" />
+                     Send a Tip
+                   </button>
+                 </div>
               )}
             </div>
           </div>
         </div>
       </div>
-      <Footer />
     </main>
+
+      {/* Tip Modal */}
+      <Modal
+        isOpen={tipModalOpen}
+        onClose={() => setTipModalOpen(false)}
+        title={`Send a Tip to ${creator ? (creator.displayName || creator.username) : "Creator"}`}
+      >
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500">₹</span>
+                    </div>
+                    <Input 
+                        type="number" 
+                        min="1" 
+                        value={tipAmountRupees} 
+                        onChange={(e) => setTipAmountRupees(e.target.value)}
+                        className="pl-7"
+                    />
+                </div>
+                <div className="flex gap-2 mt-2">
+                    {["50", "100", "500", "1000"].map(amt => (
+                        <button 
+                            key={amt}
+                            onClick={() => setTipAmountRupees(amt)}
+                            className={`px-3 py-1 text-xs rounded-full border ${
+                                tipAmountRupees === amt 
+                                ? "bg-pink-50 border-pink-200 text-pink-700 font-medium" 
+                                : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                            }`}
+                        >
+                            ₹{amt}
+                        </button>
+                    ))}
+                </div>
+            </div>
+            
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Message (Optional)</label>
+                <Textarea 
+                    placeholder="Say something nice..." 
+                    value={tipMessage}
+                    onChange={(e) => setTipMessage(e.target.value)}
+                    rows={3}
+                />
+            </div>
+            
+            <div className="flex justify-end gap-3 pt-2">
+                <Button variant="outline" onClick={() => setTipModalOpen(false)}>Cancel</Button>
+                <Button 
+                    variant="primary" 
+                    className="bg-pink-600 hover:bg-pink-700 text-white"
+                    onClick={handleSendTip}
+                    disabled={tipLoading}
+                >
+                    {tipLoading ? "Processing..." : `Pay ₹${tipAmountRupees}`}
+                </Button>
+            </div>
+        </div>
+      </Modal>
+    </div>
   );
 }
+
 
 // Minimal Post Card - Borderless
 function PostCard({

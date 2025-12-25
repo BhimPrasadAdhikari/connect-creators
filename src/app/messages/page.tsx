@@ -87,6 +87,19 @@ export default function MessagesPage() {
     }
   }
 
+  // ... inside MessagesPage component ...
+
+  // Helper to load Razorpay script
+  const loadRazorpay = () => {
+    return new Promise((resolve) => {
+      const script = document.createElement("script");
+      script.src = "https://checkout.razorpay.com/v1/checkout.js";
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+  };
+
   async function sendMessage(e: React.FormEvent) {
     e.preventDefault();
     if (!newMessage.trim() || !selectedConv) return;
@@ -99,17 +112,105 @@ export default function MessagesPage() {
         body: JSON.stringify({ content: newMessage }),
       });
 
+      if (res.status === 402) {
+        // Payment Required
+        const data = await res.json();
+        const success = await loadRazorpay();
+        if (!success) {
+          alert("Razorpay SDK failed to load. Are you online?");
+          setSending(false);
+          return;
+        }
+
+        // Create Payment Order
+        const orderRes = await fetch(data.paymentUrl || "/api/payments/razorpay/dm", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount: data.dmPrice, // Amount in paise
+            userId: session?.user?.id,
+            creatorId: data.creatorId,
+            conversationId: selectedConv
+          }),
+        });
+
+        const orderData = await orderRes.json();
+        if (!orderRes.ok) {
+          throw new Error(orderData.error || "Failed to create payment order");
+        }
+
+        // Open Razorpay Checkout
+        const options = {
+          key: orderData.key,
+          amount: orderData.amount,
+          currency: orderData.currency,
+          name: "CreatorConnect",
+          description: `Unlock DMs with ${data.creatorName}`,
+          order_id: orderData.orderId,
+          handler: async function (response: any) {
+            // Verify Payment
+            const verifyRes = await fetch("/api/payments/razorpay/verify", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                razorpay_payment_id: response.razorpay_payment_id,
+                razorpay_order_id: response.razorpay_order_id,
+                razorpay_signature: response.razorpay_signature,
+                type: "dm",
+              }),
+            });
+
+            const verifyData = await verifyRes.json();
+            if (verifyData.success) {
+              // Retry sending the message
+              const retryRes = await fetch(`/api/messages/${selectedConv}`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ content: newMessage }),
+              });
+
+              if (retryRes.ok) {
+                const retryData = await retryRes.json();
+                setNewMessage("");
+                setMessages((prev) => [...prev, retryData.message]);
+              } else {
+                alert("Payment successful but message failed to send. Please try again.");
+              }
+            } else {
+              alert("Payment verification failed. Please contact support.");
+            }
+          },
+          prefill: {
+            name: session?.user?.name,
+            email: session?.user?.email,
+          },
+          theme: {
+            color: "#9333ea",
+          },
+        };
+
+        const paymentObject = new (window as any).Razorpay(options);
+        paymentObject.open();
+        setSending(false); // Reset sending state as we wait for user payment
+        return;
+      }
+
       if (res.ok) {
         const data = await res.json();
-        setMessages((prev) => [...prev, data.message]);
         setNewMessage("");
+        setMessages((prev) => [...prev, data.message]);
+      } else {
+        console.error("Failed to send message");
       }
-    } catch (error) {
-      console.error("Failed to send message:", error);
+    } catch (error: any) {
+      console.error("Error sending message:", error);
+      alert(error.message || "Something went wrong.");
     } finally {
-      setSending(false);
+      if (!sending) setSending(false); // Only set if not pending payment
     }
   }
+
+
 
   if (status === "loading" || loading) {
     return (

@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Plus, Trash2, Package } from "lucide-react";
-import { Button, Input, useToastActions } from "@/components/ui";
+import { Plus, Trash2, Package, AlertTriangle } from "lucide-react";
+import { Button, Input, useToastActions, Modal } from "@/components/ui";
 import { Skeleton, ProductCardSkeleton } from "@/components/ui/Skeleton";
 
 interface Product {
@@ -109,16 +109,37 @@ export default function ProductsManagementPage() {
     }
   };
 
-  const handleDelete = async (productId: string) => {
-    if (!confirm("Are you sure you want to delete this product?")) return;
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean; productId: string | null }>({
+    isOpen: false,
+    productId: null,
+  });
 
+  const handleDeleteClick = (productId: string) => {
+    setDeleteConfirmation({ isOpen: true, productId });
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteConfirmation.productId) return;
+    
     try {
-      const res = await fetch(`/api/products/${productId}`, { method: "DELETE" });
+      const res = await fetch(`/api/products/${deleteConfirmation.productId}`, { method: "DELETE" });
+      const data = await res.json();
+      
       if (res.ok) {
+        if (data.message && data.message.includes("deactivated")) {
+             toast.info("Product Deactivated", "This product has existing purchases, so it was deactivated instead of deleted to preserve history.");
+        } else {
+             toast.success("Product Deleted", "The product has been permanently removed.");
+        }
         fetchProducts();
+      } else {
+        toast.error("Error", data.error || "Failed to delete product");
       }
     } catch (error) {
       console.error("Error deleting product:", error);
+      toast.error("Error", "Something went wrong sending the request");
+    } finally {
+        setDeleteConfirmation({ isOpen: false, productId: null });
     }
   };
 
@@ -257,7 +278,7 @@ export default function ProductsManagementPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(product.id)}
+                        onClick={() => handleDeleteClick(product.id)}
                         className="text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg p-2"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -284,6 +305,36 @@ export default function ProductsManagementPage() {
             ))}
           </div>
         )}
+        {/* Delete Confirmation Modal */}
+        <Modal
+            isOpen={deleteConfirmation.isOpen}
+            onClose={() => setDeleteConfirmation({ isOpen: false, productId: null })}
+            title="Delete Product"
+        >
+            <div className="space-y-4">
+                <div className="flex items-center gap-3 text-amber-600 bg-amber-50 p-3 rounded-lg">
+                    <AlertTriangle className="w-5 h-5 shrink-0" />
+                    <p className="text-sm font-medium">This action cannot be undone.</p>
+                </div>
+                <p className="text-gray-600">
+                    Are you sure you want to delete this product? If users have already purchased it, it will be deactivated instead of deleted to preserve their access.
+                </p>
+                <div className="flex justify-end gap-3 mt-6">
+                    <Button 
+                        variant="ghost" 
+                        onClick={() => setDeleteConfirmation({ isOpen: false, productId: null })}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        onClick={confirmDelete}
+                        className="bg-red-600 hover:bg-red-700 text-white"
+                    >
+                        Delete Product
+                    </Button>
+                </div>
+            </div>
+        </Modal>
     </div>
   );
 }

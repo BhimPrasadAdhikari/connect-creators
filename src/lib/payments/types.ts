@@ -47,6 +47,8 @@ export interface PaymentProviderInterface {
   verifyPayment(orderId: string, paymentId: string, signature?: string): Promise<PaymentVerification>;
   processWebhook(payload: WebhookPayload): Promise<void>;
   checkStatus?(transactionId: string, amount: number): Promise<PaymentVerification>; // Optional status check
+  fetchOrder?(orderId: string): Promise<any>; // Optional fetch order details
+  refundPayment?(paymentId: string, amount?: number, currency?: string): Promise<{ success: boolean; refundId?: string; error?: string }>;
 }
 
 /**

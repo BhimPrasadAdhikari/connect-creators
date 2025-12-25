@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { generateSecureDownloadUrl } from "@/lib/downloads";
 
 export async function GET(req: NextRequest) {
   try {
@@ -57,7 +58,12 @@ export async function GET(req: NextRequest) {
           id: purchase.product!.id,
           title: purchase.product!.title,
           description: purchase.product!.description,
-          fileUrl: purchase.product!.fileUrl,
+          // Use secure download URL
+          fileUrl: generateSecureDownloadUrl(
+            purchase.id,
+            purchase.product!.id,
+            userId
+          ),
           fileType: purchase.product!.fileType,
           thumbnailUrl: purchase.product!.thumbnailUrl,
           creator: {
