@@ -47,10 +47,10 @@ export default function NewPostPage() {
 
   if (status === "loading") {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
-          <p>Loading...</p>
+          <p className="text-foreground">Loading...</p>
         </div>
       </main>
     );
@@ -88,23 +88,14 @@ export default function NewPostPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       <Header />
       
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-2xl mx-auto">
-          {/* Back Link */}
-          <Link
-            href="/dashboard/creator"
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6"
-          >
-            <ArrowLeft className="w-4 h-4 mr-1" />
-            Back to Dashboard
-          </Link>
-
           <Card>
             <CardContent className="p-6 sm:p-8">
-              <h1 className="text-2xl font-bold text-gray-900 mb-6">Create New Post</h1>
+              <h1 className="text-2xl font-bold text-foreground mb-6">Create New Post</h1>
 
               <form onSubmit={handleSubmit} className="space-y-6">
                 {/* Title */}
@@ -118,7 +109,7 @@ export default function NewPostPage() {
 
                 {/* Content */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Content
                   </label>
                   <textarea
@@ -127,13 +118,13 @@ export default function NewPostPage() {
                     value={formData.content}
                     onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                     required
-                    className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                    className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none placeholder:text-muted-foreground"
                   />
                 </div>
 
                 {/* Media URL */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Media URL (Optional)
                   </label>
                   <div className="flex gap-3">
@@ -142,12 +133,12 @@ export default function NewPostPage() {
                       placeholder="https://example.com/image.jpg"
                       value={formData.mediaUrl}
                       onChange={(e) => setFormData({ ...formData, mediaUrl: e.target.value })}
-                      className="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      className="flex-1 px-4 py-3 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground"
                     />
                     <select
                       value={formData.mediaType}
                       onChange={(e) => setFormData({ ...formData, mediaType: e.target.value })}
-                      className="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="px-4 py-3 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 [&>option]:bg-card [&>option]:text-foreground"
                     >
                       <option value="">Type</option>
                       <option value="image">Image</option>
@@ -155,13 +146,13 @@ export default function NewPostPage() {
                       <option value="audio">Audio</option>
                     </select>
                   </div>
-                  <p className="text-sm text-gray-500 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     Paste a URL to an image, video, or audio file
                   </p>
                 </div>
 
                 {/* Paid Toggle */}
-                <div className="border rounded-lg p-4">
+                <div className="border border-border rounded-lg p-4">
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
                       type="checkbox"
@@ -171,14 +162,14 @@ export default function NewPostPage() {
                         isPaid: e.target.checked,
                         requiredTierId: e.target.checked ? formData.requiredTierId : ""
                       })}
-                      className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                      className="w-5 h-5 rounded border-border text-primary focus:ring-primary/20"
                     />
                     <div>
-                      <span className="font-medium text-gray-900 flex items-center gap-2">
+                      <span className="font-medium text-foreground flex items-center gap-2">
                         <Lock className="w-4 h-4" />
                         Paid Content
                       </span>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-muted-foreground">
                         Only subscribers can view this post
                       </p>
                     </div>
@@ -187,13 +178,13 @@ export default function NewPostPage() {
                   {/* Tier Selection */}
                   {formData.isPaid && (
                     <div className="mt-4 ml-8">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         Required Tier
                       </label>
                       <select
                         value={formData.requiredTierId}
                         onChange={(e) => setFormData({ ...formData, requiredTierId: e.target.value })}
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 [&>option]:bg-card [&>option]:text-foreground"
                         required={formData.isPaid}
                       >
                         <option value="">Select a tier...</option>
@@ -216,20 +207,20 @@ export default function NewPostPage() {
                 </div>
 
                 {/* Preview */}
-                <div className="border rounded-lg p-4 bg-gray-50">
-                  <div className="flex items-center gap-2 text-gray-600 mb-2">
+                <div className="border border-border rounded-lg p-4 bg-muted">
+                  <div className="flex items-center gap-2 text-muted-foreground mb-2">
                     <Eye className="w-4 h-4" />
                     <span className="text-sm font-medium">Post Preview</span>
                   </div>
-                  <div className="bg-white rounded-lg p-4 border">
-                    <h3 className="font-semibold text-gray-900 mb-2">
+                  <div className="bg-card rounded-lg p-4 border border-border">
+                    <h3 className="font-semibold text-foreground mb-2">
                       {formData.title || "Your post title"}
                     </h3>
-                    <p className="text-gray-600 text-sm line-clamp-3">
+                    <p className="text-muted-foreground text-sm line-clamp-3">
                       {formData.content || "Your post content will appear here..."}
                     </p>
                     {formData.isPaid && (
-                      <div className="mt-3 pt-3 border-t flex items-center gap-2 text-amber-600">
+                      <div className="mt-3 pt-3 border-t border-border flex items-center gap-2 text-amber-500">
                         <Lock className="w-4 h-4" />
                         <span className="text-sm">Paid content - subscribers only</span>
                       </div>

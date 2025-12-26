@@ -239,25 +239,25 @@ export default function MessagesPage() {
   return (
     <div className="p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Messages</h1>
+        <h1 className="text-2xl font-bold text-foreground mb-8">Messages</h1>
 
         <div className="grid md:grid-cols-3 gap-4 h-[600px]">
           {/* Conversations List */}
           <Card className="md:col-span-1 overflow-hidden">
             <CardContent className="p-0">
-              <div className="divide-y overflow-y-auto max-h-[600px]">
+              <div className="divide-y divide-border overflow-y-auto max-h-[600px]">
                 {conversations.length === 0 ? (
-                  <div className="p-6 text-center text-gray-500">
-                    <MessageCircle className="w-12 h-12 mx-auto mb-3 text-gray-300" />
+                  <div className="p-6 text-center text-muted-foreground">
+                    <MessageCircle className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
                     <p>No conversations yet</p>
                   </div>
                 ) : (
                   conversations.map((conv) => (
-                    <button
+        <button
                       key={conv.id}
                       onClick={() => setSelectedConv(conv.id)}
-                      className={`w-full p-4 text-left hover:bg-gray-50 transition-colors ${
-                        selectedConv === conv.id ? "bg-blue-50" : ""
+                      className={`w-full p-4 text-left hover:bg-muted transition-colors ${
+                        selectedConv === conv.id ? "bg-primary/10" : ""
                       }`}
                     >
                       <div className="flex items-center gap-3">
@@ -267,11 +267,11 @@ export default function MessagesPage() {
                           size="sm"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-medium text-gray-900 truncate">
+                          <p className="font-medium text-foreground truncate">
                             {conv.otherUser.name || "Unknown"}
                           </p>
                           {conv.lastMessage && (
-                            <p className="text-sm text-gray-500 truncate">
+                            <p className="text-sm text-muted-foreground truncate">
                               {conv.lastMessage}
                             </p>
                           )}
@@ -289,18 +289,18 @@ export default function MessagesPage() {
             {selectedConv ? (
               <>
                 {/* Header */}
-                <div className="p-4 border-b flex items-center gap-3">
+                <div className="p-4 border-b border-border flex items-center gap-3">
                   <Avatar
                     src={selectedConversation?.otherUser.image}
                     name={selectedConversation?.otherUser.name || "User"}
                     size="sm"
                   />
                   <div>
-                    <p className="font-medium">
+                    <p className="font-medium text-foreground">
                       {selectedConversation?.otherUser.name}
                     </p>
                     {selectedConversation?.dmPrice && !selectedConversation.isCreator && (
-                      <p className="text-xs text-orange-600">
+                      <p className="text-xs text-amber-500">
                         ₹{selectedConversation.dmPrice / 100} per message
                       </p>
                     )}
@@ -319,14 +319,14 @@ export default function MessagesPage() {
                         <div
                           className={`max-w-[70%] rounded-lg px-4 py-2 ${
                             isMe
-                              ? "bg-blue-600 text-white"
-                              : "bg-gray-100 text-gray-900"
+                              ? "bg-primary text-white"
+                              : "bg-muted text-foreground"
                           }`}
                         >
                           <p>{msg.content}</p>
                           <p
                             className={`text-xs mt-1 ${
-                              isMe ? "text-blue-200" : "text-gray-400"
+                              isMe ? "text-white/70" : "text-muted-foreground"
                             }`}
                           >
                             {new Date(msg.createdAt).toLocaleTimeString([], {
@@ -343,13 +343,13 @@ export default function MessagesPage() {
                 </div>
 
                 {/* Input */}
-                <form onSubmit={sendMessage} className="p-4 border-t flex gap-2">
+                <form onSubmit={sendMessage} className="p-4 border-t border-border flex gap-2">
                   <input
                     type="text"
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
                     placeholder="Type a message..."
-                    className="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                   />
                   <Button type="submit" disabled={sending || !newMessage.trim()}>
                     <Send className="w-4 h-4" />
@@ -357,9 +357,9 @@ export default function MessagesPage() {
                 </form>
               </>
             ) : (
-              <div className="flex-1 flex items-center justify-center text-gray-500">
+              <div className="flex-1 flex items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  <MessageCircle className="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                  <MessageCircle className="w-16 h-16 mx-auto mb-4 text-muted-foreground" />
                   <p>Select a conversation to start messaging</p>
                 </div>
               </div>
