@@ -5,6 +5,8 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Heart, Loader2, Download, Package } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 function StripeSuccessContent() {
   const searchParams = useSearchParams();
@@ -50,39 +52,35 @@ function StripeSuccessContent() {
 
   if (verifying) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto mb-4" />
-          <p className="text-gray-600">Verifying your payment...</p>
-        </div>
-      </main>
+      <div className="text-center py-12">
+        <Loader2 className="w-12 h-12 animate-spin text-accent-green mx-auto mb-4" />
+        <p className="text-muted-foreground">Verifying your payment...</p>
+      </div>
     );
   }
 
   if (error || !success) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-red-50 to-white flex items-center justify-center p-4">
-        <Card className="max-w-md w-full">
-          <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-              <Heart className="w-8 h-8 text-red-600" />
-            </div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">
-              Payment Issue
-            </h1>
-            <p className="text-gray-600 mb-6">
-              {error || "There was an issue with your payment. Please try again."}
-            </p>
-            <div className="space-y-3">
-              <Link href="/explore" className="block">
-                <Button variant="primary" className="w-full">
-                  Back to Explore
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      </main>
+      <Card className="max-w-md w-full mx-auto">
+        <CardContent className="p-8 text-center">
+          <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center mx-auto mb-4">
+            <Heart className="w-8 h-8 text-accent-red" />
+          </div>
+          <h1 className="text-2xl font-bold text-foreground mb-2">
+            Payment Issue
+          </h1>
+          <p className="text-muted-foreground mb-6">
+            {error || "There was an issue with your payment. Please try again."}
+          </p>
+          <div className="space-y-3">
+            <Link href="/explore" className="block">
+              <Button variant="primary" className="w-full">
+                Back to Explore
+              </Button>
+            </Link>
+          </div>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -103,94 +101,98 @@ function StripeSuccessContent() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center p-4">
-      <Card className="max-w-md w-full">
-        <CardContent className="p-8 text-center">
-          <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
-            isTip ? "bg-pink-100" : "bg-green-100"
-          }`}>
-            {isTip ? (
-              <Heart className="w-12 h-12 text-pink-600 fill-pink-600" />
-            ) : (
-              <CheckCircle className="w-12 h-12 text-green-600" />
-            )}
-          </div>
-          
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            {getTitle()}
-          </h1>
-          
-          <p className="text-gray-600 mb-6">
-            {getMessage()}
-          </p>
+    <Card className="max-w-md w-full mx-auto">
+      <CardContent className="p-8 text-center">
+        <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
+          isTip ? "bg-pink-500/20" : "bg-accent-green/20"
+        }`}>
+          {isTip ? (
+            <Heart className="w-12 h-12 text-pink-500 fill-pink-500" />
+          ) : (
+            <CheckCircle className="w-12 h-12 text-accent-green" />
+          )}
+        </div>
+        
+        <h1 className="text-2xl font-bold text-foreground mb-2">
+          {getTitle()}
+        </h1>
+        
+        <p className="text-muted-foreground mb-6">
+          {getMessage()}
+        </p>
 
-          <div className="space-y-3">
-            {isTip ? (
-              <>
-                <Link href="/explore" className="block">
-                  <Button variant="primary" className="w-full bg-pink-600 hover:bg-pink-700">
-                    <Heart className="w-4 h-4 mr-2" />
-                    Explore More Creators
-                  </Button>
-                </Link>
-                <Link href="/dashboard" className="block">
-                  <Button variant="outline" className="w-full">
-                    Go to Dashboard
-                  </Button>
-                </Link>
-              </>
-            ) : isProduct ? (
-              <>
-                <Link href="/dashboard/purchases" className="block">
-                  <Button variant="primary" className="w-full">
-                    <Download className="w-4 h-4 mr-2" />
-                    View My Purchases
-                  </Button>
-                </Link>
-                <Link href="/explore" className="block">
-                  <Button variant="outline" className="w-full">
-                    Continue Browsing
-                  </Button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link href="/dashboard" className="block">
-                  <Button variant="primary" className="w-full">
-                    Go to Dashboard
-                  </Button>
-                </Link>
-                <Link href="/explore" className="block">
-                  <Button variant="outline" className="w-full">
-                    Explore More Creators
-                  </Button>
-                </Link>
-              </>
-            )}
-          </div>
+        <div className="space-y-3">
+          {isTip ? (
+            <>
+              <Link href="/explore" className="block">
+                <Button variant="primary" className="w-full bg-pink-600 hover:bg-pink-700">
+                  <Heart className="w-4 h-4 mr-2" />
+                  Explore More Creators
+                </Button>
+              </Link>
+              <Link href="/dashboard" className="block">
+                <Button variant="outline" className="w-full">
+                  Go to Dashboard
+                </Button>
+              </Link>
+            </>
+          ) : isProduct ? (
+            <>
+              <Link href="/dashboard/purchases" className="block">
+                <Button variant="primary" className="w-full">
+                  <Download className="w-4 h-4 mr-2" />
+                  View My Purchases
+                </Button>
+              </Link>
+              <Link href="/explore" className="block">
+                <Button variant="outline" className="w-full">
+                  Continue Browsing
+                </Button>
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/dashboard" className="block">
+                <Button variant="primary" className="w-full">
+                  Go to Dashboard
+                </Button>
+              </Link>
+              <Link href="/explore" className="block">
+                <Button variant="outline" className="w-full">
+                  Explore More Creators
+                </Button>
+              </Link>
+            </>
+          )}
+        </div>
 
-          <p className="text-sm text-gray-500 mt-6">
-            {isTip 
-              ? "The creator has been notified of your tip."
-              : "A confirmation email has been sent to your registered email address."}
-          </p>
-        </CardContent>
-      </Card>
-    </main>
+        <p className="text-sm text-muted-foreground mt-6">
+          {isTip 
+            ? "The creator has been notified of your tip."
+            : "A confirmation email has been sent to your registered email address."}
+        </p>
+      </CardContent>
+    </Card>
   );
 }
 
 export default function StripeSuccessPage() {
   return (
-    <Suspense fallback={
-      <main className="min-h-screen bg-gradient-to-b from-green-50 to-white flex items-center justify-center">
-        <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-green-600 mx-auto mb-4" />
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </main>
-    }>
-      <StripeSuccessContent />
-    </Suspense>
+    <main className="min-h-screen bg-background flex flex-col">
+      <Header />
+      
+      <div className="flex-1 flex items-center justify-center p-4">
+        <Suspense fallback={
+          <div className="text-center">
+            <Loader2 className="w-12 h-12 animate-spin text-accent-green mx-auto mb-4" />
+            <p className="text-muted-foreground">Loading...</p>
+          </div>
+        }>
+          <StripeSuccessContent />
+        </Suspense>
+      </div>
+      
+      <Footer />
+    </main>
   );
 }

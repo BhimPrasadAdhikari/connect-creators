@@ -5,6 +5,8 @@ import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Heart, CheckCircle, Loader2 } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -73,11 +75,11 @@ function SuccessContent() {
   if (verifying) {
     return (
       <div className="text-center">
-        <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-foreground mb-2">
           Verifying Payment...
         </h2>
-        <p className="text-gray-600">
+        <p className="text-muted-foreground">
           Please wait while we confirm your payment with eSewa.
         </p>
       </div>
@@ -87,13 +89,13 @@ function SuccessContent() {
   if (error) {
     return (
       <div className="text-center">
-        <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-          <span className="text-red-600 text-2xl">✕</span>
+        <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center mx-auto mb-4">
+          <span className="text-accent-red text-2xl">✕</span>
         </div>
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold text-foreground mb-2">
           Payment Verification Failed
         </h2>
-        <p className="text-gray-600 mb-6">{error}</p>
+        <p className="text-muted-foreground mb-6">{error}</p>
         <Button onClick={() => router.push("/dashboard")}>
           Go to Dashboard
         </Button>
@@ -104,18 +106,18 @@ function SuccessContent() {
   return (
     <div className="text-center">
       <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-        paymentType === "tip" ? "bg-pink-100" : "bg-green-100"
+        paymentType === "tip" ? "bg-pink-500/20" : "bg-accent-green/20"
       }`}>
         {paymentType === "tip" ? (
-          <Heart className="w-10 h-10 text-pink-600 fill-pink-600" />
+          <Heart className="w-10 h-10 text-pink-500 fill-pink-500" />
         ) : (
-          <CheckCircle className="w-10 h-10 text-green-600" />
+          <CheckCircle className="w-10 h-10 text-accent-green" />
         )}
       </div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-2">
+      <h2 className="text-2xl font-bold text-foreground mb-2">
         {getTitle()}
       </h2>
-      <p className="text-gray-600 mb-6">
+      <p className="text-muted-foreground mb-6">
         {getMessage()}
       </p>
       <div className="flex flex-col sm:flex-row gap-3 justify-center">
@@ -154,20 +156,8 @@ function SuccessContent() {
 
 export default function EsewaSuccessPage() {
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
-      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-gray-200 bg-white">
-        <div className="container mx-auto">
-          <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-gray-900">
-              CreatorConnect
-            </span>
-          </Link>
-        </div>
-      </header>
+    <main className="min-h-screen bg-background flex flex-col">
+      <Header />
 
       {/* Content */}
       <div className="flex-1 flex items-center justify-center p-4">
@@ -175,7 +165,7 @@ export default function EsewaSuccessPage() {
           <CardContent className="p-8">
             <Suspense fallback={
               <div className="text-center">
-                <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto" />
+                <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
               </div>
             }>
               <SuccessContent />
@@ -183,6 +173,8 @@ export default function EsewaSuccessPage() {
           </CardContent>
         </Card>
       </div>
+      
+      <Footer />
     </main>
   );
 }
