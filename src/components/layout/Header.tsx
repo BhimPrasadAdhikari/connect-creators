@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
-import { Heart, Menu, X, Search } from "lucide-react";
+import { Heart, Menu, X, Search, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import { Avatar, NotificationDropdown, Notification } from "@/components/ui";
 import { useRouter } from "next/navigation";
+import { useTheme } from "@/components/providers/ThemeProvider";
 
 interface HeaderProps {
   transparent?: boolean;
@@ -16,6 +17,7 @@ export function Header({ transparent = false }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const router = useRouter();
+  const { resolvedTheme, toggleTheme } = useTheme();
 
   const isLoggedIn = status === "authenticated" && session?.user;
   const userRole = (session?.user as { role?: string })?.role;
@@ -63,20 +65,20 @@ export function Header({ transparent = false }: HeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b border-gray-200 ${
+      className={`sticky top-0 z-40 border-b border-border ${
         transparent
-          ? "bg-white/80 backdrop-blur-md"
-          : "bg-white"
+          ? "bg-background/80 backdrop-blur-md"
+          : "bg-card"
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900 hidden sm:inline">
+            <span className="text-xl font-semibold text-foreground hidden sm:inline">
               CreatorConnect
             </span>
           </Link>
@@ -84,13 +86,13 @@ export function Header({ transparent = false }: HeaderProps) {
           {/* Search Bar - Desktop */}
           <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-md mx-4">
             <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search creators..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-gray-200 rounded-lg bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-white transition-colors"
+                className="w-full pl-10 pr-4 py-2 text-sm border border-border rounded-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-card text-foreground placeholder:text-muted-foreground transition-colors"
               />
             </div>
           </form>
@@ -99,19 +101,19 @@ export function Header({ transparent = false }: HeaderProps) {
           <nav className="hidden md:flex items-center gap-6">
             <Link
               href="/explore"
-              className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
+              className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
             >
               Explore
             </Link>
             <Link
               href="/how-it-works"
-              className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
+              className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
             >
               How It Works
             </Link>
             <Link
               href="/pricing"
-              className="text-gray-600 hover:text-blue-600 transition-colors text-sm font-medium"
+              className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
             >
               Pricing
             </Link>
@@ -119,8 +121,21 @@ export function Header({ transparent = false }: HeaderProps) {
 
           {/* Auth Section */}
           <div className="flex items-center gap-2">
+            {/* Theme Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              aria-label={`Switch to ${resolvedTheme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {resolvedTheme === 'light' ? (
+                <Moon className="w-5 h-5" />
+              ) : (
+                <Sun className="w-5 h-5" />
+              )}
+            </button>
+
             {status === "loading" ? (
-              <div className="w-8 h-8 rounded-full bg-gray-200 animate-pulse" />
+              <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
             ) : isLoggedIn ? (
               <>
                 {/* Notifications */}
@@ -132,7 +147,7 @@ export function Header({ transparent = false }: HeaderProps) {
                 
                 <Link
                   href={userRole === "CREATOR" ? "/dashboard/creator" : "/dashboard"}
-                  className="hidden sm:inline-flex text-gray-600 hover:text-blue-600 transition-colors px-3 py-2 text-sm font-medium"
+                  className="hidden sm:inline-flex text-muted-foreground hover:text-primary transition-colors px-3 py-2 text-sm font-medium"
                 >
                   Dashboard
                 </Link>
@@ -145,7 +160,7 @@ export function Header({ transparent = false }: HeaderProps) {
                     name={session.user?.name || "User"}
                     size="sm"
                   />
-                  <span className="hidden sm:inline text-sm font-medium text-gray-700">
+                  <span className="hidden sm:inline text-sm font-medium text-foreground">
                     {session.user?.name?.split(" ")[0]}
                   </span>
                 </Link>
@@ -154,13 +169,13 @@ export function Header({ transparent = false }: HeaderProps) {
               <>
                 <Link
                   href="/login"
-                  className="hidden sm:inline-flex text-gray-600 hover:text-blue-600 transition-colors px-4 py-2"
+                  className="hidden sm:inline-flex text-muted-foreground hover:text-primary transition-colors px-4 py-2"
                 >
                   Log In
                 </Link>
                 <Link
                   href="/signup"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   Get Started
                 </Link>
@@ -169,7 +184,7 @@ export function Header({ transparent = false }: HeaderProps) {
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 text-gray-600"
+              className="md:hidden p-2 text-muted-foreground hover:text-foreground"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (
@@ -183,18 +198,18 @@ export function Header({ transparent = false }: HeaderProps) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-gray-100">
+          <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col gap-2">
               <Link
                 href="/explore"
-                className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Explore Creators
               </Link>
               <Link
                 href="/how-it-works"
-                className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 How It Works
@@ -203,14 +218,14 @@ export function Header({ transparent = false }: HeaderProps) {
                 <>
                   <Link
                     href={userRole === "CREATOR" ? "/dashboard/creator" : "/dashboard"}
-                    className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                    className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
                   <Link
                     href="/api/auth/signout"
-                    className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg"
+                    className="px-4 py-2 text-accent-red hover:bg-accent-red/10 rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Sign Out
@@ -220,14 +235,14 @@ export function Header({ transparent = false }: HeaderProps) {
                 <>
                   <Link
                     href="/login"
-                    className="px-4 py-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+                    className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Log In
                   </Link>
                   <Link
                     href="/signup"
-                    className="px-4 py-2 text-blue-600 hover:bg-blue-50 rounded-lg font-medium"
+                    className="px-4 py-2 text-primary hover:bg-primary/10 rounded-lg font-medium"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Get Started
@@ -241,3 +256,4 @@ export function Header({ transparent = false }: HeaderProps) {
     </header>
   );
 }
+
