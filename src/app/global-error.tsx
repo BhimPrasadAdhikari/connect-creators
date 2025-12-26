@@ -20,15 +20,15 @@ export default function GlobalError({
   return (
     <html>
       <body>
-        <main className="min-h-screen bg-gray-50 flex flex-col">
+        <main className="min-h-screen bg-background flex flex-col">
           {/* Header */}
-          <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-gray-200 bg-white">
+          <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-border bg-card">
             <div className="container mx-auto">
               <Link href="/" className="flex items-center gap-2 w-fit">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                   <Heart className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-xl font-semibold text-gray-900">
+                <span className="text-xl font-semibold text-foreground">
                   CreatorConnect
                 </span>
               </Link>
@@ -38,14 +38,14 @@ export default function GlobalError({
           {/* Error Content */}
           <div className="flex-1 flex items-center justify-center px-4 py-16">
             <div className="text-center max-w-md">
-              <div className="w-20 h-20 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-6">
-                <AlertTriangle className="w-10 h-10 text-red-600" />
+              <div className="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-6">
+                <AlertTriangle className="w-10 h-10 text-red-500" />
               </div>
               
-              <h1 className="text-2xl font-bold text-gray-900 mb-3">
+              <h1 className="text-2xl font-bold text-foreground mb-3">
                 Something went wrong
               </h1>
-              <p className="text-gray-600 mb-8">
+              <p className="text-muted-foreground mb-8">
                 We encountered an unexpected error. Please try again or return to the homepage.
               </p>
 
@@ -63,7 +63,7 @@ export default function GlobalError({
               </div>
 
               {error.digest && (
-                <p className="text-xs text-gray-400 mt-8">
+                <p className="text-xs text-muted-foreground mt-8">
                   Error ID: {error.digest}
                 </p>
               )}

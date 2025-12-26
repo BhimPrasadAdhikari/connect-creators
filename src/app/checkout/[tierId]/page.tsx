@@ -291,13 +291,13 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen bg-background">
       {/* Header */}
-      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-border bg-white">
+      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-border bg-card">
         <div className="container mx-auto">
           <Link href="/" className="flex items-center gap-2 w-fit">
             <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-text-primary">
+            <span className="text-xl font-semibold text-foreground">
               CreatorConnect
             </span>
           </Link>
@@ -348,7 +348,7 @@ export default function CheckoutPage() {
                             "w-full flex items-center gap-4 p-4 rounded-xl text-left transition-all border-0 ring-1",
                             paymentMethod === method.id
                               ? "ring-primary bg-primary/5 shadow-sm"
-                              : "ring-gray-200 hover:ring-gray-300 hover:bg-gray-50"
+                              : "ring-border bg-card hover:ring-muted-foreground hover:bg-muted"
                           )}
                         >
                           <method.icon
@@ -372,7 +372,7 @@ export default function CheckoutPage() {
                               {method.description}
                             </p>
                           </div>
-                          <span className="text-xs text-text-secondary px-2 py-1 bg-background rounded">
+                          <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
                             {method.region}
                           </span>
                         </button>
@@ -388,15 +388,15 @@ export default function CheckoutPage() {
                         <input
                           type="text"
                           placeholder="yourname@upi"
-                          className="w-full px-4 py-3 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                          className="w-full px-4 py-3 border border-border bg-card text-foreground rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary placeholder:text-muted-foreground"
                         />
                       </div>
                     )}
 
                     {/* Bank Transfer Info */}
                     {paymentMethod === "bank" && (
-                      <div className="mb-6 p-4 bg-background rounded-lg">
-                        <p className="text-sm text-text-secondary">
+                      <div className="mb-6 p-4 bg-muted rounded-lg">
+                        <p className="text-sm text-muted-foreground">
                           After checkout, you'll receive bank details to
                           complete the transfer. Your subscription will activate
                           once payment is verified (usually within 24 hours).
@@ -443,8 +443,8 @@ export default function CheckoutPage() {
                           key={index}
                           className="flex items-start gap-3 text-sm text-text-secondary"
                         >
-                          <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                            <Check className="w-3 h-3 text-secondary" />
+                          <div className="w-5 h-5 rounded-full bg-accent-green/20 flex items-center justify-center flex-shrink-0">
+                            <Check className="w-3 h-3 text-accent-green" />
                           </div>
                           <span>{benefit}</span>
                         </li>
@@ -453,7 +453,7 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Price Breakdown */}
-                  <div className="space-y-3 pb-6 mb-6 bg-gray-50 rounded-xl p-4">
+                  <div className="space-y-3 pb-6 mb-6 bg-muted rounded-xl p-4">
                     <div className="flex items-center justify-between text-sm">
                       <span className="text-text-secondary">Subscription</span>
                       <span className="text-text-primary">

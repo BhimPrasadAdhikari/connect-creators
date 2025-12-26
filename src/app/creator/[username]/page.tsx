@@ -325,18 +325,18 @@ export default function CreatorProfilePage({ params }: PageProps) {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-12 max-w-5xl">
           <div className="animate-pulse space-y-8">
             <div className="flex gap-6 items-center">
-              <div className="w-24 h-24 bg-gray-100 rounded-full" />
+              <div className="w-24 h-24 bg-muted rounded-full" />
               <div className="space-y-4 flex-1">
-                <div className="h-6 bg-gray-100 rounded w-1/4" />
-                <div className="h-4 bg-gray-100 rounded w-1/3" />
+                <div className="h-6 bg-muted rounded w-1/4" />
+                <div className="h-4 bg-muted rounded w-1/3" />
               </div>
             </div>
-            <div className="h-8 bg-gray-100 rounded w-full" />
+            <div className="h-8 bg-muted rounded w-full" />
           </div>
         </div>
       </main>
@@ -359,7 +359,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
 
   return (
     <div>
-    <main className="min-h-screen bg-white text-text-primary font-sans">
+    <main className="min-h-screen bg-background text-foreground font-sans">
       <Header />
 
       {/* Breadcrumbs */}
@@ -381,7 +381,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
             <div className="mb-10">
               <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 mb-6">
                 <div className="relative flex-shrink-0">
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border border-border overflow-hidden bg-gray-50">
+                  <div className="w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border border-border overflow-hidden bg-muted">
                     {creator.user.image ? (
                       <img
                         src={creator.user.image}
@@ -389,7 +389,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center text-gray-400 text-3xl font-medium">
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground text-3xl font-medium">
                         {displayName.charAt(0).toUpperCase()}
                       </div>
                     )}
@@ -406,7 +406,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
                     )}
                   </div>
                   <p className="text-text-secondary font-medium mb-3">@{creator.username}</p>
-                  <p className="text-gray-700 leading-relaxed max-w-2xl mb-4">
+                  <p className="text-muted-foreground leading-relaxed max-w-2xl mb-4">
                     {creator.bio || "Digital creator."}
                   </p>
                   
@@ -425,7 +425,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
                         </a>
                       );
                     })}
-                    {Object.keys(socialLinks).length > 0 && <span className="text-gray-300">|</span>}
+                    {Object.keys(socialLinks).length > 0 && <span className="text-muted-foreground">|</span>}
                     <button
                       onClick={() => shareProfile(creator.username, displayName)}
                       className="text-sm font-medium text-text-secondary hover:text-primary transition-colors flex items-center gap-1"
@@ -451,11 +451,11 @@ export default function CreatorProfilePage({ params }: PageProps) {
 
               {/* Mobile Subscribe CTA - Only shows on mobile */}
               {creator.tiers.length > 0 && (
-                <div className="lg:hidden mb-6 p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl">
-                  <p className="text-sm text-gray-600 mb-3 text-center">Get exclusive access to posts and content</p>
+                <div className="lg:hidden mb-6 p-4 bg-gradient-to-r from-primary/10 to-purple-500/10 rounded-2xl">
+                  <p className="text-sm text-muted-foreground mb-3 text-center">Get exclusive access to posts and content</p>
                   <Link
                     href={`/checkout/${creator.tiers[0].id}`}
-                    className="block w-full text-center py-3 bg-blue-600 text-white rounded-xl font-medium hover:bg-blue-700 transition-colors shadow-sm"
+                    className="block w-full text-center py-3 bg-primary text-white rounded-xl font-medium hover:bg-primary-700 transition-colors shadow-sm"
                   >
                     Join for {formatPrice(creator.tiers[0].price)}/month
                   </Link>
@@ -490,8 +490,8 @@ export default function CreatorProfilePage({ params }: PageProps) {
               {activeTab === "posts" && (
                 <div className="space-y-6">
                   {creator.posts.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-50 rounded-lg border border-border">
-                      <p className="text-text-secondary">No posts yet.</p>
+                    <div className="text-center py-12 bg-muted rounded-lg border border-border">
+                      <p className="text-muted-foreground">No posts yet.</p>
                     </div>
                   ) : (
                     creator.posts.map((post) => (
@@ -510,8 +510,8 @@ export default function CreatorProfilePage({ params }: PageProps) {
               {activeTab === "products" && (
                 <div className="grid sm:grid-cols-2 gap-4">
                   {creator.digitalProducts.length === 0 ? (
-                    <div className="col-span-full text-center py-12 bg-gray-50 rounded-lg border border-border">
-                      <p className="text-text-secondary">No products available.</p>
+                    <div className="col-span-full text-center py-12 bg-muted rounded-lg border border-border">
+                      <p className="text-muted-foreground">No products available.</p>
                     </div>
                   ) : (
                     creator.digitalProducts.map((product) => (
@@ -529,25 +529,25 @@ export default function CreatorProfilePage({ params }: PageProps) {
               {activeTab === "tiers" && (
                  <div className="space-y-4">
                   {creator.tiers.length === 0 ? (
-                    <div className="text-center py-12 bg-gray-50 rounded-lg border border-border">
-                      <p className="text-text-secondary">No membership tiers.</p>
+                    <div className="text-center py-12 bg-muted rounded-lg border border-border">
+                      <p className="text-muted-foreground">No membership tiers.</p>
                     </div>
                   ) : (
                     creator.tiers.map((tier) => (
-                      <div key={tier.id} className="bg-gray-50 rounded-xl p-8 hover:bg-gray-100 transition-colors">
+                      <div key={tier.id} className="bg-muted rounded-xl p-8 hover:bg-muted/80 transition-colors">
                         <div className="flex justify-between items-start mb-4">
                           <div>
-                            <h3 className="font-bold text-lg text-text-primary">{tier.name}</h3>
-                            <p className="text-text-secondary mt-1">{tier.description}</p>
+                            <h3 className="font-bold text-lg text-foreground">{tier.name}</h3>
+                            <p className="text-muted-foreground mt-1">{tier.description}</p>
                           </div>
                           <div className="text-right">
                             <span className="block font-bold text-xl text-primary">{formatPrice(tier.price)}</span>
-                            <span className="text-sm text-text-secondary">/month</span>
+                            <span className="text-sm text-muted-foreground">/month</span>
                           </div>
                         </div>
                         <ul className="mb-6 space-y-2">
                           {tier.benefits.map((benefit, i) => (
-                            <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                            <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                               <CheckCircle className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
                               <span>{benefit}</span>
                             </li>
@@ -576,9 +576,9 @@ export default function CreatorProfilePage({ params }: PageProps) {
 
               {activeTab === "about" && (
                 <div className="max-w-2xl">
-                  <h3 className="text-lg font-bold text-text-primary mb-4">About</h3>
-                  <div className="prose prose-gray">
-                    <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                  <h3 className="text-lg font-bold text-foreground mb-4">About</h3>
+                  <div className="prose prose-gray dark:prose-invert">
+                    <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
                       {creator.bio || "No bio available."}
                     </p>
                   </div>
@@ -609,12 +609,12 @@ export default function CreatorProfilePage({ params }: PageProps) {
               
               {/* Membership CTA */}
               <div>
-                <h3 className="font-bold text-text-primary mb-4 flex items-center gap-2">
+                <h3 className="font-bold text-foreground mb-4 flex items-center gap-2">
                   Support {displayName.split(" ")[0]}
                 </h3>
                 {creator.tiers.length > 0 ? (
-                  <div className="bg-gray-50 rounded-xl p-6">
-                    <p className="text-sm text-text-secondary mb-4">
+                  <div className="bg-muted rounded-xl p-6">
+                    <p className="text-sm text-muted-foreground mb-4">
                       Get exclusive access to posts and content.
                     </p>
                     <Link
@@ -625,28 +625,28 @@ export default function CreatorProfilePage({ params }: PageProps) {
                     </Link>
                      <button
                         onClick={() => setActiveTab("tiers")}
-                        className="block w-full text-center text-sm text-text-secondary hover:text-primary transition-colors"
+                        className="block w-full text-center text-sm text-muted-foreground hover:text-primary transition-colors"
                      >
                         View all options
                      </button>
                   </div>
                 ) : (
-                  <p className="text-text-secondary text-sm">No memberships available yet.</p>
+                  <p className="text-muted-foreground text-sm">No memberships available yet.</p>
                 )}
               </div>
               
               {/* Products CTA */}
               {creator.digitalProducts.length > 0 && (
                  <div>
-                    <h3 className="font-bold text-text-primary mb-4">Latest Products</h3>
+                    <h3 className="font-bold text-foreground mb-4">Latest Products</h3>
                     <div className="space-y-3">
                        {creator.digitalProducts.slice(0, 3).map(product => (
-                          <Link key={product.id} href={`/products/${product.id}`} className="block bg-gray-50 rounded-lg p-3 hover:bg-gray-100 transition-colors">
+                          <Link key={product.id} href={`/products/${product.id}`} className="block bg-muted rounded-lg p-3 hover:bg-muted/80 transition-colors">
                              <div className="flex justify-between items-start">
-                                <span className="font-medium text-text-primary line-clamp-1">{product.title}</span>
+                                <span className="font-medium text-foreground line-clamp-1">{product.title}</span>
                                 <span className="text-sm font-semibold text-primary">{formatPrice(product.price)}</span>
                              </div>
-                             <span className="text-xs text-text-secondary mt-1 block">Digital Download</span>
+                             <span className="text-xs text-muted-foreground mt-1 block">Digital Download</span>
                           </Link>
                        ))}
                     </div>
@@ -655,10 +655,10 @@ export default function CreatorProfilePage({ params }: PageProps) {
 
               {/* Sidebar Actions */}
               {!isOwner && (
-                 <div className="space-y-3 pt-6 border-t border-gray-100">
+                 <div className="space-y-3 pt-6 border-t border-border">
                    <Link
                      href={`/messages?creator=${creator.id}`}
-                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-gray-50 rounded text-text-secondary font-medium hover:bg-gray-100 hover:text-text-primary transition-colors"
+                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-muted rounded text-muted-foreground font-medium hover:bg-muted/80 hover:text-foreground transition-colors"
                    >
                      <MessageCircle className="w-4 h-4" />
                      Message
@@ -666,7 +666,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
                    
                    <button
                      onClick={() => setTipModalOpen(true)}
-                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-pink-50 text-pink-600 rounded font-medium hover:bg-pink-100 transition-colors"
+                     className="flex items-center justify-center gap-2 w-full py-2.5 bg-pink-500/10 text-pink-500 rounded font-medium hover:bg-pink-500/20 transition-colors"
                    >
                      <Heart className="w-4 h-4 fill-current" />
                      Send a Tip
@@ -687,10 +687,10 @@ export default function CreatorProfilePage({ params }: PageProps) {
       >
         <div className="space-y-4">
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Amount (₹)</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Amount (₹)</label>
                 <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <span className="text-gray-500">₹</span>
+                        <span className="text-muted-foreground">₹</span>
                     </div>
                     <Input 
                         type="number" 
@@ -707,8 +707,8 @@ export default function CreatorProfilePage({ params }: PageProps) {
                             onClick={() => setTipAmountRupees(amt)}
                             className={`px-3 py-1 text-xs rounded-full border ${
                                 tipAmountRupees === amt 
-                                ? "bg-pink-50 border-pink-200 text-pink-700 font-medium" 
-                                : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
+                                ? "bg-pink-500/10 border-pink-500/30 text-pink-500 font-medium" 
+                                : "bg-card border-border text-muted-foreground hover:bg-muted"
                             }`}
                         >
                             ₹{amt}
@@ -719,7 +719,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
             
             {/* Payment Method Selection */}
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Payment Method</label>
                 <div className="grid grid-cols-2 gap-2">
                     {paymentMethods.map((method) => (
                         <button
@@ -728,14 +728,14 @@ export default function CreatorProfilePage({ params }: PageProps) {
                             onClick={() => setTipPaymentMethod(method.id)}
                             className={`flex items-center gap-2 p-3 rounded-lg border-2 transition-all text-left ${
                                 tipPaymentMethod === method.id
-                                    ? "border-pink-500 bg-pink-50"
-                                    : "border-gray-200 hover:border-gray-300 bg-white"
+                                    ? "border-pink-500 bg-pink-500/10"
+                                    : "border-border hover:border-muted-foreground bg-card"
                             }`}
                         >
                             <span className="text-xl">{method.icon}</span>
                             <div>
-                                <div className="font-medium text-sm text-gray-900">{method.name}</div>
-                                <div className="text-xs text-gray-500">{method.description}</div>
+                                <div className="font-medium text-sm text-foreground">{method.name}</div>
+                                <div className="text-xs text-muted-foreground">{method.description}</div>
                             </div>
                         </button>
                     ))}
@@ -743,7 +743,7 @@ export default function CreatorProfilePage({ params }: PageProps) {
             </div>
             
             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Message (Optional)</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Message (Optional)</label>
                 <Textarea 
                     placeholder="Say something nice..." 
                     value={tipMessage}
@@ -783,7 +783,7 @@ function PostCard({
   formatPrice: (price: number) => string;
 }) {
   return (
-    <article className="group bg-white rounded-lg transition-colors hover:bg-gray-50/50">
+    <article className="group bg-card rounded-lg transition-colors hover:bg-muted/50">
       <div className="py-6 border-gray-100 last:border-0 border-b-0">
         <div className="flex items-center justify-between mb-3 text-sm">
           <div className="flex items-center gap-2 text-text-secondary">
@@ -806,12 +806,12 @@ function PostCard({
         </Link>
         
         {post.isPaid ? (
-          <div className="mt-4 bg-gray-50 rounded-xl p-8 text-center">
-            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-               <Lock className="w-5 h-5 text-text-tertiary" />
+          <div className="mt-4 bg-muted rounded-xl p-8 text-center">
+            <div className="w-12 h-12 bg-muted/50 rounded-full flex items-center justify-center mx-auto mb-4">
+               <Lock className="w-5 h-5 text-muted-foreground" />
             </div>
-            <p className="text-text-primary font-bold mb-1">Locked Content</p>
-            <p className="text-text-secondary text-sm mb-5">Join membership to view this post.</p>
+            <p className="text-foreground font-bold mb-1">Locked Content</p>
+            <p className="text-muted-foreground text-sm mb-5">Join membership to view this post.</p>
              {creator.tiers[0] && (
                <Link
                  href={`/checkout/${creator.tiers[0].id}`}
@@ -822,13 +822,13 @@ function PostCard({
              )}
           </div>
         ) : (
-          <div className="mt-2 text-gray-700 leading-relaxed max-w-none prose prose-gray">
+          <div className="mt-2 text-muted-foreground leading-relaxed max-w-none prose prose-gray dark:prose-invert">
              <p className="line-clamp-3">{post.content}</p>
           </div>
         )}
         
         {post.mediaUrl && !post.isPaid && (
-          <div className="mt-4 rounded-xl overflow-hidden bg-gray-100">
+          <div className="mt-4 rounded-xl overflow-hidden bg-muted">
              <div className="aspect-video w-full flex items-center justify-center">
                {post.mediaType === "image" ? (
                  <img src={post.mediaUrl} alt="Post media" className="w-full h-full object-cover" />
@@ -868,13 +868,13 @@ function ProductCard({
   return (
     <Link
       href={`/products/${product.id}`}
-      className="group block rounded-xl p-4 hover:bg-gray-50 transition-colors"
+      className="group block rounded-xl p-4 hover:bg-muted transition-colors"
     >
-      <div className="mb-4 aspect-[4/3] bg-gray-50 rounded-lg flex items-center justify-center overflow-hidden">
+      <div className="mb-4 aspect-[4/3] bg-muted rounded-lg flex items-center justify-center overflow-hidden">
         {product.coverImage ? (
            <img src={product.coverImage} alt={product.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
         ) : (
-           <Package className="w-10 h-10 text-gray-200" />
+           <Package className="w-10 h-10 text-muted-foreground" />
         )}
       </div>
       <div>
