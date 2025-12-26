@@ -9,7 +9,7 @@ import { AddPayoutMethodModal } from "@/components/payouts/AddPayoutMethodModal"
 import { RequestPayoutModal } from "@/components/payouts/RequestPayoutModal";
 
 export default function PayoutsPage() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [data, setData] = useState<any>({
       balance: 0,
       totalEarnings: 0,
