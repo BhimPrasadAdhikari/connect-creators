@@ -4,10 +4,98 @@
 @source "../components/**/*.{js,ts,jsx,tsx}";
 @source "./**/*.{js,ts,jsx,tsx}";
 
-/* Custom Theme Extensions */
+/* ========================================
+   Light Theme (Default)
+   ======================================== */
+:root {
+  /* Backgrounds */
+  --background: 250 250 250;         /* gray-50 */
+  --background-alt: 255 255 255;     /* white */
+  --card: 255 255 255;               /* white */
+  --muted: 243 244 246;              /* gray-100 */
+  --overlay: 0 0 0;                  /* for overlays */
+  
+  /* Foregrounds */
+  --foreground: 17 24 39;            /* gray-900 */
+  --foreground-secondary: 75 85 99;  /* gray-600 */
+  --card-foreground: 17 24 39;       /* gray-900 */
+  --muted-foreground: 107 114 128;   /* gray-500 */
+  
+  /* Borders */
+  --border: 229 231 235;             /* gray-200 */
+  --border-light: 243 244 246;       /* gray-100 */
+  --input: 229 231 235;              /* gray-200 */
+  
+  /* Interactive states */
+  --ring: 59 130 246;                /* blue-500 */
+  --hover: 243 244 246;              /* gray-100 */
+  
+  /* Accent colors stay consistent */
+  --accent-blue: 37 99 235;          /* blue-600 */
+  --accent-blue-light: 239 246 255;  /* blue-50 */
+  --accent-green: 34 197 94;         /* green-500 */
+  --accent-red: 239 68 68;           /* red-500 */
+}
+
+/* ========================================
+   Dark Theme
+   ======================================== */
+.dark {
+  /* Backgrounds */
+  --background: 10 10 10;            /* near black */
+  --background-alt: 23 23 23;        /* neutral-900 */
+  --card: 23 23 23;                  /* neutral-900 */
+  --muted: 38 38 38;                 /* neutral-800 */
+  --overlay: 0 0 0;
+  
+  /* Foregrounds */
+  --foreground: 250 250 250;         /* gray-50 */
+  --foreground-secondary: 163 163 163; /* neutral-400 */
+  --card-foreground: 250 250 250;    /* gray-50 */
+  --muted-foreground: 163 163 163;   /* neutral-400 */
+  
+  /* Borders */
+  --border: 38 38 38;                /* neutral-800 */
+  --border-light: 38 38 38;          /* neutral-800 */
+  --input: 38 38 38;                 /* neutral-800 */
+  
+  /* Interactive states */
+  --ring: 59 130 246;                /* blue-500 */
+  --hover: 38 38 38;                 /* neutral-800 */
+  
+  /* Accent colors - slightly adjusted for dark mode */
+  --accent-blue: 59 130 246;         /* blue-500 */
+  --accent-blue-light: 30 58 138;    /* blue-900 */
+  --accent-green: 34 197 94;         /* green-500 */
+  --accent-red: 239 68 68;           /* red-500 */
+}
+
+/* Custom Theme Extensions for Tailwind v4 */
 @theme {
   /* Font Family */
   --font-sans: var(--font-sans), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  
+  /* Semantic Colors using CSS variables */
+  --color-background: rgb(var(--background));
+  --color-background-alt: rgb(var(--background-alt));
+  --color-foreground: rgb(var(--foreground));
+  --color-foreground-secondary: rgb(var(--foreground-secondary));
+  --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
+  --color-muted: rgb(var(--muted));
+  --color-muted-foreground: rgb(var(--muted-foreground));
+  --color-border: rgb(var(--border));
+  --color-border-light: rgb(var(--border-light));
+  --color-input: rgb(var(--input));
+  --color-ring: rgb(var(--ring));
+  --color-hover: rgb(var(--hover));
+  --color-overlay: rgb(var(--overlay));
+  
+  /* Accent Colors */
+  --color-accent-blue: rgb(var(--accent-blue));
+  --color-accent-blue-light: rgb(var(--accent-blue-light));
+  --color-accent-green: rgb(var(--accent-green));
+  --color-accent-red: rgb(var(--accent-red));
   
   /* Custom Colors - Primary Blue */
   --color-primary: #2563EB;
@@ -32,6 +120,12 @@
   --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
+/* Dark mode shadow adjustments */
+.dark {
+  --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-card-hover: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+}
+
 /* Base Styles */
 html {
   scroll-behavior: smooth;
@@ -41,6 +135,9 @@ body {
   font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background-color: rgb(var(--background));
+  color: rgb(var(--foreground));
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Link reset for navigation */
@@ -50,7 +147,7 @@ a {
 
 /* Focus States for Accessibility */
 :focus-visible {
-  outline: 2px solid #2563EB;
+  outline: 2px solid rgb(var(--ring));
   outline-offset: 2px;
 }
 
@@ -106,6 +203,10 @@ a {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
+}
+
+.dark .glass {
+  background: rgba(23, 23, 23, 0.7);
 }
 
 /* Hide scrollbar but allow scrolling */
