@@ -54,10 +54,10 @@ export default async function SubscriptionsPage() {
     <div className="p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">My Subscriptions</h1>
+          <h1 className="text-2xl font-bold text-foreground">My Subscriptions</h1>
           <Link
             href="/explore"
-            className="inline-flex items-center justify-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+            className="inline-flex items-center justify-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-700 transition-colors text-sm font-medium"
           >
             Explore Creators
           </Link>
@@ -66,16 +66,16 @@ export default async function SubscriptionsPage() {
         {subscriptions.length === 0 ? (
           <Card>
             <CardContent className="text-center py-12">
-              <Users className="w-12 h-12 mx-auto text-gray-300 mb-4" />
-              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+              <Users className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
+              <h2 className="text-lg font-semibold text-foreground mb-2">
                 No Active Subscriptions
               </h2>
-              <p className="text-gray-500 mb-6">
+              <p className="text-muted-foreground mb-6">
                 You haven&apos;t subscribed to any creators yet. Explore and find creators you love!
               </p>
               <Link
                 href="/explore"
-                className="inline-flex items-center justify-center px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                className="inline-flex items-center justify-center px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-700 transition-colors font-medium"
               >
                 Explore Creators
               </Link>
@@ -100,27 +100,27 @@ export default async function SubscriptionsPage() {
                         href={`/creator/${sub.creator.username}`}
                         className="block"
                       >
-                        <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors">
+                        <h3 className="font-semibold text-foreground hover:text-primary transition-colors">
                           {sub.creator.displayName || sub.creator.user.name}
                         </h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-muted-foreground">
                           @{sub.creator.username}
                         </p>
                       </Link>
 
                       <div className="flex items-center gap-4 mt-3 text-sm">
-                        <div className="flex items-center gap-1.5 text-gray-600">
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
                           <CreditCard className="w-4 h-4" />
-                          <span className="font-medium text-blue-600">
+                          <span className="font-medium text-primary">
                             {formatPrice(sub.tier.price)}/mo
                           </span>
-                          <span className="text-gray-400">•</span>
+                          <span className="text-muted-foreground/50">•</span>
                           <span>{sub.tier.name}</span>
                         </div>
                       </div>
 
                       {sub.endDate && (
-                        <div className="flex items-center gap-1.5 mt-2 text-sm text-gray-500">
+                        <div className="flex items-center gap-1.5 mt-2 text-sm text-muted-foreground">
                           <Calendar className="w-4 h-4" />
                           Renews on{" "}
                           {new Date(sub.endDate).toLocaleDateString("en-IN", {
@@ -141,7 +141,7 @@ export default async function SubscriptionsPage() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
+                        className="text-accent-red hover:text-accent-red hover:bg-accent-red/10"
                       >
                         Cancel
                       </Button>
@@ -151,22 +151,22 @@ export default async function SubscriptionsPage() {
               </Card>
             ))}
 
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-primary/5 border-primary/20">
               <CardContent>
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="font-medium text-gray-900">
+                    <p className="font-medium text-foreground">
                       Total Monthly Spend
                     </p>
-                    <p className="text-sm text-gray-500">
+                    <p className="text-sm text-muted-foreground">
                       {subscriptions.length} active subscription{subscriptions.length !== 1 ? "s" : ""}
                     </p>
                   </div>
-                  <p className="text-2xl font-bold text-blue-600">
+                  <p className="text-2xl font-bold text-primary">
                     {formatPrice(
                       subscriptions.reduce((total, sub) => total + sub.tier.price, 0)
                     )}
-                    <span className="text-sm font-normal text-gray-500">/mo</span>
+                    <span className="text-sm font-normal text-muted-foreground">/mo</span>
                   </p>
                 </div>
               </CardContent>

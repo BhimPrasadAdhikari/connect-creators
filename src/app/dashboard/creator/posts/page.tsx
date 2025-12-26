@@ -44,14 +44,14 @@ export default async function CreatorPostsPage() {
     <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto">
         <div className="flex items-end justify-between mb-12">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">My Posts</h1>
-            <p className="text-gray-500 text-lg">
+            <h1 className="text-3xl font-bold text-foreground mb-2">My Posts</h1>
+            <p className="text-muted-foreground text-lg">
               Manage your exclusive content and community updates.
             </p>
           </div>
           <Link
             href="/dashboard/creator/posts/new"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all shadow-lg shadow-gray-900/10 font-medium"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-foreground text-background rounded-2xl hover:opacity-90 transition-all shadow-lg font-medium"
           >
             <Plus className="w-5 h-5" />
             New Post
@@ -59,17 +59,17 @@ export default async function CreatorPostsPage() {
         </div>
 
         {posts.length === 0 ? (
-          <div className="py-20 text-center bg-white rounded-3xl border border-gray-100 border-dashed">
-            <div className="w-16 h-16 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-6 text-gray-400">
+          <div className="py-20 text-center bg-card rounded-3xl border border-border border-dashed">
+            <div className="w-16 h-16 bg-muted rounded-2xl flex items-center justify-center mx-auto mb-6 text-muted-foreground">
               <Edit className="w-8 h-8" />
             </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2">No posts yet</h3>
-            <p className="text-gray-500 mb-8 max-w-sm mx-auto">
+            <h3 className="text-xl font-bold text-foreground mb-2">No posts yet</h3>
+            <p className="text-muted-foreground mb-8 max-w-sm mx-auto">
               Start engaging with your audience by creating your first post.
             </p>
             <Link
               href="/dashboard/creator/posts/new"
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 font-medium"
+              className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white rounded-xl hover:bg-primary-700 font-medium"
             >
               <Plus className="w-4 h-4" />
               Create Post
@@ -80,20 +80,20 @@ export default async function CreatorPostsPage() {
             {posts.map((post) => (
               <div
                 key={post.id}
-                className="group bg-white rounded-2xl p-6 border border-gray-100 hover:border-gray-200 hover:shadow-lg transition-all duration-300"
+                className="group bg-card rounded-2xl p-6 border border-border hover:border-primary/20 hover:shadow-lg transition-all duration-300"
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
                         post.isPaid
-                          ? "bg-amber-50 text-amber-600"
-                          : "bg-green-50 text-green-600"
+                          ? "bg-amber-500/10 text-amber-500"
+                          : "bg-accent-green/10 text-accent-green"
                       }`}
                     >
                       {post.isPaid ? "Premium" : "Public"}
                     </span>
-                    <span className="text-sm text-gray-400">
+                    <span className="text-sm text-muted-foreground">
                       {new Date(post.createdAt).toLocaleDateString("en-IN", {
                         month: "short",
                         day: "numeric",
@@ -103,47 +103,47 @@ export default async function CreatorPostsPage() {
                   </div>
                   <div className="flex gap-2">
                     <Link href={`/post/${post.id}`}>
-                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-gray-900">
+                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                         <Eye className="w-4 h-4" />
                       </Button>
                     </Link>
                     <Link href={`/dashboard/creator/posts/${post.id}/edit`}>
-                      <Button variant="ghost" size="sm" className="text-gray-400 hover:text-blue-600">
+                      <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-primary">
                         <Edit className="w-4 h-4" />
                       </Button>
                     </Link>
                   </div>
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+                <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors">
                   {post.title}
                 </h3>
 
-                <p className="text-gray-600 line-clamp-2 mb-6 leading-relaxed">
+                <p className="text-muted-foreground line-clamp-2 mb-6 leading-relaxed">
                   {post.content}
                 </p>
 
-                <div className="flex items-center gap-6 pt-6 border-t border-gray-50">
-                  <div className="flex items-center gap-2 text-sm text-gray-500 font-medium">
+                <div className="flex items-center gap-6 pt-6 border-t border-border">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground font-medium">
                     {!post.isPublished ? (
-                      <span className="flex items-center gap-2 text-amber-600">
+                      <span className="flex items-center gap-2 text-amber-500">
                         <span className="w-2 h-2 rounded-full bg-amber-500"></span>
                         Draft
                       </span>
                     ) : (
-                      <span className="flex items-center gap-2 text-green-600">
-                        <span className="w-2 h-2 rounded-full bg-green-500"></span>
+                      <span className="flex items-center gap-2 text-accent-green">
+                        <span className="w-2 h-2 rounded-full bg-accent-green"></span>
                         Published
                       </span>
                     )}
                   </div>
-                  <div className="flex gap-4 text-sm text-gray-400">
+                  <div className="flex gap-4 text-sm text-muted-foreground">
                     <span>{post._count.comments} comments</span>
                     <span>{post._count.tips} tips</span>
                   </div>
                   {post.requiredTier && (
-                    <div className="text-sm text-gray-500 ml-auto">
-                      For: <span className="font-semibold text-gray-900">{post.requiredTier.name}</span>
+                    <div className="text-sm text-muted-foreground ml-auto">
+                      For: <span className="font-semibold text-foreground">{post.requiredTier.name}</span>
                     </div>
                   )}
                 </div>

@@ -158,11 +158,11 @@ export default function TiersManagementPage() {
     <div className="p-4 sm:p-6 lg:p-12 max-w-4xl mx-auto">
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Subscription Tiers</h1>
-            <p className="text-gray-600">Set up pricing for your subscribers</p>
+            <h1 className="text-3xl font-bold text-foreground mb-2">Subscription Tiers</h1>
+            <p className="text-muted-foreground">Set up pricing for your subscribers</p>
           </div>
           {!showForm && (
-            <Button onClick={() => setShowForm(true)} className="rounded-2xl bg-gray-900 hover:bg-black px-6 py-3 shadow-lg">
+            <Button onClick={() => setShowForm(true)} className="rounded-2xl bg-foreground text-background hover:opacity-90 px-6 py-3 shadow-lg">
               <Plus className="w-4 h-4 mr-2" />
               Add Tier
             </Button>
@@ -170,12 +170,12 @@ export default function TiersManagementPage() {
         </div>
 
         {/* Pricing Tips */}
-        <div className="mb-8 p-6 bg-blue-50 rounded-3xl border border-blue-100">
+        <div className="mb-8 p-6 bg-primary/10 rounded-3xl border border-primary/20">
           <div className="flex items-start gap-3">
-            <Info className="w-5 h-5 text-blue-600 mt-0.5" />
+            <Info className="w-5 h-5 text-primary mt-0.5" />
             <div className="text-sm">
-              <p className="font-medium text-blue-900 mb-1">Pricing Tips</p>
-              <ul className="text-blue-800 space-y-1">
+              <p className="font-medium text-foreground mb-1">Pricing Tips</p>
+              <ul className="text-muted-foreground space-y-1">
                 <li>• Entry-level tiers around ₹99-149 have the highest conversion rates</li>
                 <li>• Offer clear value differences between tiers</li>
                 <li>• Most creators succeed with 2-3 tiers</li>
@@ -186,8 +186,8 @@ export default function TiersManagementPage() {
 
         {/* Form */}
         {showForm && (
-          <div className="mb-8 bg-white rounded-3xl border border-gray-100 p-8">
-            <h2 className="text-xl font-bold mb-6">{editingTier ? "Edit Tier" : "Create New Tier"}</h2>
+          <div className="mb-8 bg-card rounded-3xl border border-border p-8">
+            <h2 className="text-xl font-bold text-foreground mb-6">{editingTier ? "Edit Tier" : "Create New Tier"}</h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <Input
@@ -209,18 +209,18 @@ export default function TiersManagementPage() {
               />
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Description (Optional)</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Description (Optional)</label>
                 <textarea
                   rows={2}
                   placeholder="What subscribers get at this tier..."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                  className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Benefits</label>
+                <label className="block text-sm font-medium text-foreground mb-2">Benefits</label>
                 {formData.benefits.map((benefit, index) => (
                   <div key={index} className="flex gap-2 mb-2">
                     <input
@@ -228,7 +228,7 @@ export default function TiersManagementPage() {
                       placeholder="e.g., Access to exclusive posts"
                       value={benefit}
                       onChange={(e) => updateBenefit(index, e.target.value)}
-                      className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                      className="flex-1 px-4 py-3 rounded-xl border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
                     />
                     {formData.benefits.length > 1 && (
                       <Button type="button" variant="outline" size="sm" onClick={() => removeBenefit(index)}>
@@ -264,18 +264,18 @@ export default function TiersManagementPage() {
         {/* Suggested Tiers */}
         {tiers.length === 0 && !showForm && (
           <div className="mb-8">
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Suggested Tiers</h3>
+            <h3 className="text-lg font-bold text-foreground mb-4">Suggested Tiers</h3>
             <div className="grid gap-4">
               {SUGGESTED_TIERS.map((tier) => (
-                <div key={tier.name} className="bg-white rounded-2xl border border-gray-100 p-6 hover:border-blue-300 transition-colors">
+                <div key={tier.name} className="bg-card rounded-2xl border border-border p-6 hover:border-primary/50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-medium text-gray-900">{tier.name}</h4>
-                      <p className="text-lg font-bold text-blue-600">₹{tier.price / 100}/month</p>
-                      <ul className="text-sm text-gray-600 mt-2 space-y-1">
+                      <h4 className="font-medium text-foreground">{tier.name}</h4>
+                      <p className="text-lg font-bold text-primary">₹{tier.price / 100}/month</p>
+                      <ul className="text-sm text-muted-foreground mt-2 space-y-1">
                         {tier.benefits.map((b) => (
                           <li key={b} className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
+                            <Check className="w-4 h-4 text-accent-green" />
                             {b}
                           </li>
                         ))}
@@ -294,25 +294,25 @@ export default function TiersManagementPage() {
         {/* Existing Tiers */}
         {tiers.length > 0 && (
           <div className="space-y-4">
-            <h3 className="text-lg font-bold text-gray-900">Your Tiers</h3>
+            <h3 className="text-lg font-bold text-foreground">Your Tiers</h3>
             {tiers.map((tier) => (
-              <div key={tier.id} className="bg-white rounded-2xl border border-gray-100 p-6">
+              <div key={tier.id} className="bg-card rounded-2xl border border-border p-6">
                 <div className="flex items-start justify-between">
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <h4 className="font-bold text-gray-900">{tier.name}</h4>
+                      <h4 className="font-bold text-foreground">{tier.name}</h4>
                       {!tier.isActive && <Badge variant="warning">Inactive</Badge>}
                       {tier._count && tier._count.subscriptions > 0 && (
                         <Badge variant="success">{tier._count.subscriptions} subscribers</Badge>
                       )}
                     </div>
-                    <p className="text-2xl font-bold text-blue-600">₹{tier.price / 100}/month</p>
-                    {tier.description && <p className="text-sm text-gray-600 mt-1">{tier.description}</p>}
+                    <p className="text-2xl font-bold text-primary">₹{tier.price / 100}/month</p>
+                    {tier.description && <p className="text-sm text-muted-foreground mt-1">{tier.description}</p>}
                     {tier.benefits.length > 0 && (
-                      <ul className="text-sm text-gray-600 mt-3 space-y-1">
+                      <ul className="text-sm text-muted-foreground mt-3 space-y-1">
                         {tier.benefits.map((b, i) => (
                           <li key={i} className="flex items-center gap-2">
-                            <Check className="w-4 h-4 text-green-500" />
+                            <Check className="w-4 h-4 text-accent-green" />
                             {b}
                           </li>
                         ))}

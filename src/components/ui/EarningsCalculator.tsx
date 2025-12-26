@@ -65,13 +65,13 @@ export function EarningsCalculator({ className = "" }: EarningsCalculatorProps) 
     <Card className={className}>
       <CardContent className="p-6">
         <div className="flex items-center gap-2 mb-4">
-          <Calculator className="w-5 h-5 text-blue-600" />
-          <h3 className="text-lg font-semibold text-gray-900">Earnings Calculator</h3>
+          <Calculator className="w-5 h-5 text-primary" />
+          <h3 className="text-lg font-semibold text-foreground">Earnings Calculator</h3>
         </div>
 
         {/* Quick Amount Selection */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Subscription Price
           </label>
           <div className="grid grid-cols-4 gap-2">
@@ -81,8 +81,8 @@ export function EarningsCalculator({ className = "" }: EarningsCalculatorProps) 
                 onClick={() => setAmount(qa.value)}
                 className={`py-2 px-3 rounded-lg border text-sm font-medium transition-colors
                   ${amount === qa.value 
-                    ? "bg-blue-600 border-blue-600 text-white" 
-                    : "border-gray-200 text-gray-700 hover:border-blue-300"
+                    ? "bg-primary border-primary text-white" 
+                    : "border-border text-foreground hover:border-primary/50"
                   }`}
               >
                 {qa.label}
@@ -94,7 +94,7 @@ export function EarningsCalculator({ className = "" }: EarningsCalculatorProps) 
               type="number"
               value={amount / 100}
               onChange={(e) => setAmount(Math.round(parseFloat(e.target.value) * 100) || 0)}
-              className="w-full px-3 py-2 border rounded-lg text-sm"
+              className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
               placeholder="Custom amount (₹)"
             />
           </div>
@@ -102,16 +102,16 @@ export function EarningsCalculator({ className = "" }: EarningsCalculatorProps) 
 
         {/* Payment Method */}
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+          <label className="block text-sm font-medium text-foreground mb-2">
             Payment Method
           </label>
           <select
             value={provider}
             onChange={(e) => setProvider(e.target.value)}
-            className="w-full px-3 py-2 border rounded-lg text-sm"
+            className="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary [&>option]:bg-card [&>option]:text-foreground"
           >
             {PAYMENT_METHODS.map((pm) => (
-              <option key={pm.id} value={pm.id}>
+              <option key={pm.id} value={pm.id} className="bg-card text-foreground">
                 {pm.name} ({pm.fee})
               </option>
             ))}
@@ -120,31 +120,31 @@ export function EarningsCalculator({ className = "" }: EarningsCalculatorProps) 
 
         {/* Results */}
         {result && (
-          <div className="bg-gray-50 rounded-lg p-4 space-y-3">
+          <div className="bg-muted rounded-lg p-4 space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Subscriber pays</span>
-              <span className="font-medium text-gray-900">{result.gross}</span>
+              <span className="text-muted-foreground">Subscriber pays</span>
+              <span className="font-medium text-foreground">{result.gross}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Payment fee</span>
-              <span className="text-red-600">-{result.paymentFee}</span>
+              <span className="text-muted-foreground">Payment fee</span>
+              <span className="text-accent-red">-{result.paymentFee}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-gray-600">Platform fee (5%)</span>
-              <span className="text-red-600">-{result.platformFee}</span>
+              <span className="text-muted-foreground">Platform fee (5%)</span>
+              <span className="text-accent-red">-{result.platformFee}</span>
             </div>
-            <div className="border-t pt-3 flex justify-between">
-              <span className="font-semibold text-gray-900">You earn</span>
+            <div className="border-t border-border pt-3 flex justify-between">
+              <span className="font-semibold text-foreground">You earn</span>
               <div className="text-right">
-                <span className="font-bold text-green-600 text-lg">{result.youEarn}</span>
-                <span className="text-sm text-gray-500 ml-1">({result.creatorShare})</span>
+                <span className="font-bold text-accent-green text-lg">{result.youEarn}</span>
+                <span className="text-sm text-muted-foreground ml-1">({result.creatorShare})</span>
               </div>
             </div>
           </div>
         )}
 
         {/* Info */}
-        <div className="mt-4 flex items-start gap-2 text-sm text-gray-500">
+        <div className="mt-4 flex items-start gap-2 text-sm text-muted-foreground">
           <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
           <p>
             Platform fee is only 10%. Payment fees vary by method. 
