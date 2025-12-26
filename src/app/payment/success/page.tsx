@@ -6,6 +6,8 @@ import Link from "next/link";
 import { Heart, CheckCircle, Loader2, Download } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -117,19 +119,7 @@ function PaymentSuccessContent() {
 export default function PaymentSuccessPage() {
   return (
     <main className="min-h-screen bg-background flex flex-col">
-      {/* Header */}
-      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-border bg-card">
-        <div className="container mx-auto">
-          <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-foreground">
-              CreatorConnect
-            </span>
-          </Link>
-        </div>
-      </header>
+      <Header />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
         <Breadcrumbs />
@@ -142,6 +132,8 @@ export default function PaymentSuccessPage() {
       }>
         <PaymentSuccessContent />
       </Suspense>
+      
+      <Footer />
     </main>
   );
 }
