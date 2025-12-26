@@ -7,6 +7,8 @@ import { Send, MessageCircle } from "lucide-react";
 import { Button, Card, CardContent, Avatar } from "@/components/ui";
 import { Skeleton, MessageSkeleton } from "@/components/ui/Skeleton";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 
 interface Conversation {
   id: string;
@@ -209,25 +211,29 @@ export default function MessagesPage() {
 
   if (status === "loading" || loading) {
     return (
-      <div className="p-6 lg:p-8">
-        <div className="max-w-4xl mx-auto">
-          <Skeleton className="h-8 w-32 mb-8" />
-          <div className="grid md:grid-cols-3 gap-4 h-[600px]">
-            <Card className="md:col-span-1">
-              <CardContent className="p-0">
-                <MessageSkeleton />
-                <MessageSkeleton />
-                <MessageSkeleton />
-              </CardContent>
-            </Card>
-            <Card className="md:col-span-2">
-              <CardContent className="p-4">
-                <Skeleton className="h-full w-full min-h-[500px]" />
-              </CardContent>
-            </Card>
+      <main className="min-h-screen bg-background">
+        <Header />
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="max-w-4xl mx-auto">
+            <Skeleton className="h-8 w-32 mb-8" />
+            <div className="grid md:grid-cols-3 gap-4 h-[600px]">
+              <Card className="md:col-span-1">
+                <CardContent className="p-0">
+                  <MessageSkeleton />
+                  <MessageSkeleton />
+                  <MessageSkeleton />
+                </CardContent>
+              </Card>
+              <Card className="md:col-span-2">
+                <CardContent className="p-4">
+                  <Skeleton className="h-full w-full min-h-[500px]" />
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </div>
-      </div>
+        <Footer />
+      </main>
     );
   }
 
@@ -238,12 +244,14 @@ export default function MessagesPage() {
   const selectedConversation = conversations.find((c) => c.id === selectedConv);
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
-        <Breadcrumbs className="mb-4" />
-        <h1 className="text-2xl font-bold text-foreground mb-8">Messages</h1>
+    <main className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-4xl mx-auto">
+          <Breadcrumbs className="mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-8">Messages</h1>
 
-        <div className="grid md:grid-cols-3 gap-4 h-[600px]">
+          <div className="grid md:grid-cols-3 gap-4 h-[600px]">
           {/* Conversations List */}
           <Card className="md:col-span-1 overflow-hidden">
             <CardContent className="p-0">
@@ -368,7 +376,9 @@ export default function MessagesPage() {
             )}
           </Card>
         </div>
+        </div>
       </div>
-    </div>
+      <Footer />
+    </main>
   );
 }
