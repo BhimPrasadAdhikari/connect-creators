@@ -179,10 +179,10 @@ async function CreatorsContent({ filters }: { filters: { q?: string; category?: 
                   </div>
                   
                   <div className="flex-1 min-w-0 pt-1">
-                    <h3 className="font-bold text-gray-900 truncate text-lg group-hover:text-blue-600 transition-colors">
+                    <h3 className="font-bold text-foreground truncate text-lg group-hover:text-primary transition-colors">
                       {creator.name}
                     </h3>
-                    <p className="text-sm text-gray-500 font-medium">
+                    <p className="text-sm text-muted-foreground font-medium">
                       @{creator.username}
                     </p>
                   </div>
