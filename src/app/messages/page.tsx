@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Send, MessageCircle } from "lucide-react";
 import { Button, Card, CardContent, Avatar } from "@/components/ui";
 import { Skeleton, MessageSkeleton } from "@/components/ui/Skeleton";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 interface Conversation {
   id: string;
@@ -239,6 +240,7 @@ export default function MessagesPage() {
   return (
     <div className="p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
+        <Breadcrumbs className="mb-4" />
         <h1 className="text-2xl font-bold text-foreground mb-8">Messages</h1>
 
         <div className="grid md:grid-cols-3 gap-4 h-[600px]">

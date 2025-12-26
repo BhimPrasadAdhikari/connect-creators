@@ -2,6 +2,8 @@ import Link from "next/link";
 import { Users as UsersIcon } from "lucide-react";
 import { Avatar, Button, SkeletonCreatorCard, SkeletonGrid } from "@/components/ui";
 import { ExploreFilters } from "@/components/ui/ExploreFilters";
+import { Header } from "@/components/layout/Header";
+import { Footer } from "@/components/layout/Footer";
 import prisma from "@/lib/prisma";
 import { Suspense } from "react";
 
@@ -107,29 +109,33 @@ export default async function ExplorePage({ searchParams }: PageProps) {
   const params = await searchParams;
   
   return (
-    <div className="p-6 lg:p-8">
-      {/* Page Header */}
-      <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          Explore Creators
-        </h1>
-        <p className="text-muted-foreground max-w-xl mx-auto">
-          Support creators you love. Join their exclusive communities.
-          Starting at just ₹99/month.
-        </p>
+    <main className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Page Header */}
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            Explore Creators
+          </h1>
+          <p className="text-muted-foreground max-w-xl mx-auto">
+            Support creators you love. Join their exclusive communities.
+            Starting at just ₹99/month.
+          </p>
+        </div>
+
+        {/* Filters */}
+        <ExploreFilters categories={CATEGORIES} className="mb-8" />
+
+        {/* Creators Grid with Suspense */}
+        <Suspense 
+          key={JSON.stringify(params)} 
+          fallback={<SkeletonGrid count={9} component={SkeletonCreatorCard} />}
+        >
+          <CreatorsContent filters={params} />
+        </Suspense>
       </div>
-
-      {/* Filters */}
-      <ExploreFilters categories={CATEGORIES} className="mb-8" />
-
-      {/* Creators Grid with Suspense */}
-      <Suspense 
-        key={JSON.stringify(params)} 
-        fallback={<SkeletonGrid count={9} component={SkeletonCreatorCard} />}
-      >
-        <CreatorsContent filters={params} />
-      </Suspense>
-    </div>
+      <Footer />
+    </main>
   );
 }
 

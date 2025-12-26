@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Heart, Check, Shield, CreditCard, Smartphone, Building, Loader2 } from "lucide-react";
 import { Avatar, Badge, Button, Card, CardContent } from "@/components/ui";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { formatPrice, calculateFees } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -306,7 +307,8 @@ export default function CheckoutPage() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold text-text-primary mb-8">Checkout</h1>
+          <Breadcrumbs className="mb-4" />
+          <h1 className="text-2xl font-bold text-foreground mb-8">Checkout</h1>
 
           <div className="grid lg:grid-cols-5 gap-8">
             {/* Left - Payment Form */}

@@ -5,6 +5,7 @@ import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Heart, CheckCircle, Loader2, Download } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 
 function PaymentSuccessContent() {
   const searchParams = useSearchParams();
@@ -38,21 +39,21 @@ function PaymentSuccessContent() {
         <CardContent className="py-12">
           {/* Success Icon */}
           <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
-            isTip ? "bg-pink-100" : "bg-green-100"
+            isTip ? "bg-pink-500/20" : "bg-accent-green/20"
           }`}>
             {isTip ? (
-              <Heart className="w-12 h-12 text-pink-600 fill-pink-600" />
+              <Heart className="w-12 h-12 text-pink-500 fill-pink-500" />
             ) : (
-              <CheckCircle className="w-12 h-12 text-green-600" />
+              <CheckCircle className="w-12 h-12 text-accent-green" />
             )}
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+          <h1 className="text-2xl font-bold text-foreground mb-2">
             {getTitle()}
           </h1>
           
-          <p className="text-gray-600 mb-8">
+          <p className="text-muted-foreground mb-8">
             {getMessage()}
           </p>
 
@@ -102,7 +103,7 @@ function PaymentSuccessContent() {
             )}
           </div>
 
-          <p className="text-sm text-gray-500 mt-6">
+          <p className="text-sm text-muted-foreground mt-6">
             {isTip 
               ? "The creator has been notified of your tip."
               : "A confirmation email has been sent to your registered email address."}
@@ -115,24 +116,28 @@ function PaymentSuccessContent() {
 
 export default function PaymentSuccessPage() {
   return (
-    <main className="min-h-screen bg-gradient-to-b from-green-50 to-white flex flex-col">
+    <main className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-gray-200 bg-white">
+      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-border bg-card">
         <div className="container mx-auto">
           <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-semibold text-foreground">
               CreatorConnect
             </span>
           </Link>
         </div>
       </header>
 
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <Breadcrumbs />
+      </div>
+
       <Suspense fallback={
         <div className="flex-1 flex items-center justify-center">
-          <Loader2 className="w-8 h-8 animate-spin text-green-600" />
+          <Loader2 className="w-8 h-8 animate-spin text-accent-green" />
         </div>
       }>
         <PaymentSuccessContent />

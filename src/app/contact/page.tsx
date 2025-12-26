@@ -49,14 +49,14 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-700 text-white py-16">
+      <section className="bg-gradient-to-br from-primary to-primary-700 text-white py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl text-blue-100 max-w-xl mx-auto">
+          <p className="text-xl text-white/80 max-w-xl mx-auto">
             Have a question or feedback? We&apos;d love to hear from you.
           </p>
         </div>
@@ -66,38 +66,38 @@ export default function ContactPage() {
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Contact Info */}
           <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Get in Touch</h2>
+            <h2 className="text-2xl font-bold text-foreground mb-6">Get in Touch</h2>
             
             {contactInfo.map((item) => (
               <Card key={item.title}>
                 <CardContent className="flex items-start gap-4 py-4">
-                  <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <item.icon className="w-5 h-5 text-blue-600" />
+                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <item.icon className="w-5 h-5 text-primary" />
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">{item.title}</p>
+                    <p className="text-sm text-muted-foreground">{item.title}</p>
                     {item.href ? (
                       <a
                         href={item.href}
-                        className="font-medium text-gray-900 hover:text-blue-600 transition-colors"
+                        className="font-medium text-foreground hover:text-primary transition-colors"
                       >
                         {item.value}
                       </a>
                     ) : (
-                      <p className="font-medium text-gray-900">{item.value}</p>
+                      <p className="font-medium text-foreground">{item.value}</p>
                     )}
                   </div>
                 </CardContent>
               </Card>
             ))}
 
-            <Card className="bg-blue-50 border-blue-200">
+            <Card className="bg-primary/5 border-primary/20">
               <CardContent className="py-4">
                 <div className="flex items-center gap-3 mb-2">
-                  <MessageSquare className="w-5 h-5 text-blue-600" />
-                  <span className="font-medium text-gray-900">Response Time</span>
+                  <MessageSquare className="w-5 h-5 text-primary" />
+                  <span className="font-medium text-foreground">Response Time</span>
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-muted-foreground">
                   We typically respond within 24-48 hours during business days.
                 </p>
               </CardContent>
@@ -110,13 +110,13 @@ export default function ContactPage() {
               <CardContent className="p-6 sm:p-8">
                 {submitted ? (
                   <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Send className="w-8 h-8 text-green-600" />
+                    <div className="w-16 h-16 bg-accent-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <Send className="w-8 h-8 text-accent-green" />
                     </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
                       Message Sent!
                     </h3>
-                    <p className="text-gray-600 mb-6">
+                    <p className="text-muted-foreground mb-6">
                       Thank you for reaching out. We&apos;ll get back to you soon.
                     </p>
                     <Button onClick={() => setSubmitted(false)}>
@@ -150,7 +150,7 @@ export default function ContactPage() {
                       required
                     />
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                      <label className="block text-sm font-medium text-foreground mb-1">
                         Message
                       </label>
                       <textarea
@@ -159,7 +159,7 @@ export default function ContactPage() {
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         required
-                        className="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none placeholder:text-muted-foreground"
                       />
                     </div>
                     <Button type="submit" size="lg" disabled={isSubmitting} className="w-full sm:w-auto">

@@ -38,15 +38,15 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="py-4 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto">
           <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-semibold text-foreground">
               CreatorConnect
             </span>
           </Link>
@@ -59,21 +59,21 @@ export default function ForgotPasswordPage() {
           {success ? (
             // Success State
             <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-6">
-                <Check className="w-8 h-8 text-green-600" />
+              <div className="w-16 h-16 rounded-full bg-accent-green/20 flex items-center justify-center mx-auto mb-6">
+                <Check className="w-8 h-8 text-accent-green" />
               </div>
-              <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              <h1 className="text-2xl font-bold text-foreground mb-2">
                 Check your email
               </h1>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 If an account exists for <strong>{email}</strong>, we&apos;ve sent a password reset link.
               </p>
-              <p className="text-sm text-gray-500 mb-8">
+              <p className="text-sm text-muted-foreground mb-8">
                 The link will expire in 1 hour. Check your spam folder if you don&apos;t see it.
               </p>
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+                className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Back to login
@@ -83,20 +83,20 @@ export default function ForgotPasswordPage() {
             // Form State
             <>
               <div className="text-center mb-8">
-                <div className="w-16 h-16 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-6">
-                  <Mail className="w-8 h-8 text-blue-600" />
+                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
+                  <Mail className="w-8 h-8 text-primary" />
                 </div>
-                <h1 className="text-2xl font-bold text-gray-900 mb-2">
+                <h1 className="text-2xl font-bold text-foreground mb-2">
                   Forgot your password?
                 </h1>
-                <p className="text-gray-600">
+                <p className="text-muted-foreground">
                   Enter your email and we&apos;ll send you a link to reset your password.
                 </p>
               </div>
 
-              <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8">
+              <div className="bg-card rounded-xl border border-border shadow-sm p-6 sm:p-8">
                 {error && (
-                  <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+                  <div className="mb-4 p-3 rounded-lg bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm">
                     {error}
                   </div>
                 )}
@@ -124,10 +124,10 @@ export default function ForgotPasswordPage() {
                 </form>
               </div>
 
-              <p className="text-center text-gray-600 mt-6">
+              <p className="text-center text-muted-foreground mt-6">
                 <Link
                   href="/login"
-                  className="inline-flex items-center gap-2 text-blue-600 font-medium hover:underline"
+                  className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
                 >
                   <ArrowLeft className="w-4 h-4" />
                   Back to login

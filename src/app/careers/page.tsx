@@ -53,14 +53,14 @@ const benefits = [
 
 export default function CareersPage() {
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-700 text-white py-20">
+      <section className="bg-gradient-to-br from-primary to-primary-700 text-white py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Join Our Team</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-white/80 max-w-2xl mx-auto">
             Help us build the future of creator monetization in South Asia.
           </p>
         </div>
@@ -70,8 +70,8 @@ export default function CareersPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Join CreatorConnect?</h2>
-            <p className="text-gray-600">
+            <h2 className="text-3xl font-bold text-foreground mb-4">Why Join CreatorConnect?</h2>
+            <p className="text-muted-foreground">
               We&apos;re building something meaningful — empowering creators to earn a living doing what they love. 
               Join us and make a real impact.
             </p>
@@ -81,9 +81,9 @@ export default function CareersPage() {
             {benefits.map((benefit) => (
               <div
                 key={benefit}
-                className="bg-white rounded-lg border border-gray-200 px-4 py-3 text-center"
+                className="bg-card rounded-lg border border-border px-4 py-3 text-center"
               >
-                <span className="text-gray-700 font-medium">{benefit}</span>
+                <span className="text-foreground font-medium">{benefit}</span>
               </div>
             ))}
           </div>
@@ -91,9 +91,9 @@ export default function CareersPage() {
       </section>
 
       {/* Open Positions */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Open Positions</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-12">Open Positions</h2>
           
           <div className="max-w-3xl mx-auto space-y-4">
             {openPositions.map((position) => (
@@ -102,11 +102,11 @@ export default function CareersPage() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{position.title}</h3>
+                        <h3 className="text-lg font-semibold text-foreground">{position.title}</h3>
                         <Badge variant="accent">{position.department}</Badge>
                       </div>
-                      <p className="text-gray-600 text-sm mb-3">{position.description}</p>
-                      <div className="flex flex-wrap gap-4 text-sm text-gray-500">
+                      <p className="text-muted-foreground text-sm mb-3">{position.description}</p>
+                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
                         <span className="flex items-center gap-1">
                           <MapPin className="w-4 h-4" />
                           {position.location}
@@ -136,11 +136,11 @@ export default function CareersPage() {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <Card className="max-w-2xl mx-auto text-center">
             <CardContent className="py-12">
-              <Briefcase className="w-12 h-12 text-blue-600 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+              <Briefcase className="w-12 h-12 text-primary mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">
                 Don&apos;t see a role that fits?
               </h3>
-              <p className="text-gray-600 mb-6">
+              <p className="text-muted-foreground mb-6">
                 We&apos;re always looking for talented people. Send us your resume and tell us how you can contribute.
               </p>
               <Link href="mailto:careers@creatorconnect.com">

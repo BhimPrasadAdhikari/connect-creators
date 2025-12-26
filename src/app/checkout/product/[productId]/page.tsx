@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Heart, Check, Shield, Smartphone, Loader2, Package, ArrowLeft, CreditCard } from "lucide-react";
 import { Button, Card, CardContent, Badge } from "@/components/ui";
+import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
 import { formatPrice, calculateFees } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -256,8 +257,8 @@ export default function ProductCheckoutPage() {
   // Loading state
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-purple-600" />
+      <main className="min-h-screen bg-background flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </main>
     );
   }
@@ -265,9 +266,9 @@ export default function ProductCheckoutPage() {
   // Error state
   if (error || !product) {
     return (
-      <main className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <main className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl font-bold text-foreground mb-4">
             {error || "Product not found"}
           </h1>
           <Button onClick={() => router.back()}>Go Back</Button>
@@ -277,15 +278,15 @@ export default function ProductCheckoutPage() {
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       {/* Header */}
-      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-gray-200 bg-white">
+      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-border bg-card">
         <div className="container mx-auto">
           <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-purple-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-semibold text-foreground">
               CreatorConnect
             </span>
           </Link>
@@ -294,16 +295,19 @@ export default function ProductCheckoutPage() {
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Back link */}
-        <button
-          onClick={() => router.back()}
-          className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-6"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Back
-        </button>
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Back
+          </button>
+          <Breadcrumbs />
+        </div>
 
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold text-gray-900 mb-8">Complete Purchase</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-8">Complete Purchase</h1>
 
           <div className="grid lg:grid-cols-5 gap-8">
             {/* Left - Payment Form */}
@@ -311,15 +315,15 @@ export default function ProductCheckoutPage() {
               <Card>
                 <CardContent className="p-6">
                   {/* Product Info */}
-                  <div className="flex items-center gap-4 pb-6 border-b border-gray-200 mb-6">
-                    <div className="w-14 h-14 rounded-xl bg-purple-100 flex items-center justify-center">
-                      <Package className="w-7 h-7 text-purple-600" />
+                  <div className="flex items-center gap-4 pb-6 border-b border-border mb-6">
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
+                      <Package className="w-7 h-7 text-primary" />
                     </div>
                     <div>
-                      <p className="text-sm text-gray-500">Purchasing</p>
-                      <p className="font-semibold text-gray-900">{product.title}</p>
+                      <p className="text-sm text-muted-foreground">Purchasing</p>
+                      <p className="font-semibold text-foreground">{product.title}</p>
                       <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm text-muted-foreground">
                           by {product.creator.displayName || product.creator.username}
                         </span>
                         {product.fileType && (
@@ -331,7 +335,7 @@ export default function ProductCheckoutPage() {
 
                   {/* Payment Methods */}
                   <form onSubmit={handleSubmit}>
-                    <h3 className="font-semibold text-gray-900 mb-4">
+                    <h3 className="font-semibold text-foreground mb-4">
                       Select Payment Method
                     </h3>
 
@@ -344,27 +348,27 @@ export default function ProductCheckoutPage() {
                           className={cn(
                             "w-full flex items-center gap-4 p-4 rounded-lg border-2 text-left transition-all",
                             paymentMethod === method.id
-                              ? "border-purple-600 bg-purple-50"
-                              : "border-gray-200 hover:border-gray-300"
+                              ? "border-primary bg-primary/5"
+                              : "border-border bg-card hover:border-muted-foreground/30"
                           )}
                         >
                           <method.icon
                             className={cn(
                               "w-6 h-6",
                               paymentMethod === method.id
-                                ? "text-purple-600"
-                                : "text-gray-500"
+                                ? "text-primary"
+                                : "text-muted-foreground"
                             )}
                           />
                           <div className="flex-1">
-                            <span className="font-medium text-gray-900">
+                            <span className="font-medium text-foreground">
                               {method.name}
                             </span>
-                            <p className="text-sm text-gray-500">
+                            <p className="text-sm text-muted-foreground">
                               {method.description}
                             </p>
                           </div>
-                          <span className="text-xs text-gray-500 px-2 py-1 bg-gray-100 rounded">
+                          <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
                             {method.region}
                           </span>
                         </button>
@@ -374,7 +378,7 @@ export default function ProductCheckoutPage() {
                     {/* Submit */}
                     <Button
                       type="submit"
-                      className="w-full bg-purple-600 hover:bg-purple-700"
+                      className="w-full"
                       size="lg"
                       loading={isProcessing}
                     >
@@ -382,8 +386,8 @@ export default function ProductCheckoutPage() {
                     </Button>
 
                     {/* Security Note */}
-                    <div className="flex items-center justify-center gap-2 mt-4 text-sm text-gray-500">
-                      <Shield className="w-4 h-4 text-green-600" />
+                    <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground">
+                      <Shield className="w-4 h-4 text-accent-green" />
                       <span>Secure encrypted payment</span>
                     </div>
                   </form>
@@ -395,27 +399,27 @@ export default function ProductCheckoutPage() {
             <div className="lg:col-span-2">
               <Card className="sticky top-24">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-gray-900 mb-4">
+                  <h3 className="font-semibold text-foreground mb-4">
                     Order Summary
                   </h3>
 
                   {/* Product Details */}
-                  <div className="pb-4 border-b border-gray-200 mb-4">
-                    <p className="font-medium text-gray-900 mb-2">
+                  <div className="pb-4 border-b border-border mb-4">
+                    <p className="font-medium text-foreground mb-2">
                       {product.title}
                     </p>
                     {product.description && (
-                      <p className="text-sm text-gray-500 line-clamp-2">
+                      <p className="text-sm text-muted-foreground line-clamp-2">
                         {product.description}
                       </p>
                     )}
                   </div>
 
                   {/* Price */}
-                  <div className="space-y-3 pb-4 border-b border-gray-200 mb-4">
+                  <div className="space-y-3 pb-4 border-b border-border mb-4">
                     <div className="flex items-center justify-between text-sm">
-                      <span className="text-gray-500">Product price</span>
-                      <span className="text-gray-900">
+                      <span className="text-muted-foreground">Product price</span>
+                      <span className="text-foreground">
                         {formatPrice(product.price)}
                       </span>
                     </div>
@@ -423,14 +427,14 @@ export default function ProductCheckoutPage() {
 
                   {/* Total */}
                   <div className="flex items-center justify-between">
-                    <span className="font-semibold text-gray-900">Total</span>
-                    <span className="text-xl font-bold text-gray-900">
+                    <span className="font-semibold text-foreground">Total</span>
+                    <span className="text-xl font-bold text-foreground">
                       {formatPrice(product.price)}
                     </span>
                   </div>
 
-                  <div className="mt-4 p-3 bg-green-50 rounded-lg border border-green-200">
-                    <div className="flex items-center gap-2 text-sm text-green-800">
+                  <div className="mt-4 p-3 bg-accent-green/10 rounded-lg border border-accent-green/20">
+                    <div className="flex items-center gap-2 text-sm text-accent-green">
                       <Check className="w-4 h-4" />
                       <span>Instant download after payment</span>
                     </div>
