@@ -24,7 +24,7 @@ export function Skeleton({
   return (
     <div
       className={cn(
-        "bg-gray-200",
+        "bg-muted",
         animate && "animate-pulse",
         variantStyles[variant],
         className
@@ -83,7 +83,7 @@ export function SkeletonButton({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
 
 export function SkeletonCard({ className }: { className?: string }) {
   return (
-    <div className={cn("p-6 bg-white rounded-xl border border-gray-200", className)}>
+    <div className={cn("p-6 bg-card rounded-xl border border-border", className)}>
       <div className="flex items-start gap-4 mb-4">
         <SkeletonAvatar size="lg" />
         <div className="flex-1 space-y-2">
@@ -102,7 +102,7 @@ export function SkeletonCard({ className }: { className?: string }) {
 
 export function SkeletonCreatorCard() {
   return (
-    <div className="p-6 bg-white rounded-xl border border-gray-200">
+    <div className="p-6 bg-card rounded-xl border border-border">
       <div className="flex items-start gap-4 mb-4">
         <SkeletonAvatar size="lg" />
         <div className="flex-1 space-y-2">
@@ -115,7 +115,7 @@ export function SkeletonCreatorCard() {
         <Skeleton height={24} width={60} />
         <Skeleton height={20} width={80} />
       </div>
-      <div className="pt-4 border-t border-gray-100">
+      <div className="pt-4 border-t border-border">
         <Skeleton height={16} width="50%" />
       </div>
     </div>
@@ -124,7 +124,7 @@ export function SkeletonCreatorCard() {
 
 export function SkeletonPost() {
   return (
-    <div className="p-6 bg-white rounded-xl border border-gray-200">
+    <div className="p-6 bg-card rounded-xl border border-border">
       {/* Header */}
       <div className="flex items-center gap-3 mb-4">
         <SkeletonAvatar />
@@ -156,7 +156,7 @@ export function SkeletonPost() {
 
 export function SkeletonHeader() {
   return (
-    <div className="h-16 px-4 sm:px-6 lg:px-8 border-b border-gray-200 bg-white">
+    <div className="h-16 px-4 sm:px-6 lg:px-8 border-b border-border bg-card">
       <div className="flex items-center justify-between h-full container mx-auto">
         <div className="flex items-center gap-2">
           <Skeleton variant="rectangular" width={32} height={32} />
@@ -187,7 +187,7 @@ export function SkeletonDashboard() {
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="p-6 bg-white rounded-xl border border-gray-200">
+          <div key={i} className="p-6 bg-card rounded-xl border border-border">
             <Skeleton height={16} width="50%" className="mb-4" />
             <Skeleton height={36} width="40%" />
           </div>
@@ -207,9 +207,9 @@ export function SkeletonDashboard() {
 
 export function SkeletonTable({ rows = 5 }: { rows?: number }) {
   return (
-    <div className="border border-gray-200 rounded-lg overflow-hidden">
+    <div className="border border-border rounded-lg overflow-hidden">
       {/* Header */}
-      <div className="bg-gray-50 p-4 border-b border-gray-200">
+      <div className="bg-muted p-4 border-b border-border">
         <div className="flex items-center gap-4">
           <Skeleton height={16} width="20%" />
           <Skeleton height={16} width="30%" />
@@ -220,7 +220,7 @@ export function SkeletonTable({ rows = 5 }: { rows?: number }) {
 
       {/* Rows */}
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="p-4 border-b border-gray-100 last:border-b-0">
+        <div key={i} className="p-4 border-b border-border last:border-b-0">
           <div className="flex items-center gap-4">
             <SkeletonAvatar size="sm" />
             <Skeleton height={16} width="25%" />
@@ -257,7 +257,7 @@ export function SkeletonGrid({
 // Product card skeleton for products management page
 export function ProductCardSkeleton() {
   return (
-    <div className="p-4 bg-white rounded-xl border border-gray-200">
+    <div className="p-4 bg-card rounded-xl border border-border">
       <div className="flex items-start justify-between">
         <div className="flex-1 space-y-2">
           <div className="flex items-center gap-2">
@@ -289,12 +289,12 @@ export function TiersPageSkeleton() {
         </div>
         <Skeleton height={40} width={100} />
       </div>
-      <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
+      <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
         <Skeleton height={80} width="100%" />
       </div>
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
-          <div key={i} className="p-4 bg-white rounded-xl border border-gray-200">
+          <div key={i} className="p-4 bg-card rounded-xl border border-border">
             <div className="flex items-start justify-between">
               <div className="space-y-2 flex-1">
                 <Skeleton height={20} width="30%" />
@@ -343,7 +343,7 @@ export function SubscribersPageSkeleton() {
       {/* Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {[...Array(3)].map((_, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100">
+          <div key={i} className="bg-card p-6 rounded-3xl border border-border">
             <div className="flex items-center gap-4">
               <Skeleton height={48} width={48} className="rounded-xl" />
               <div className="flex-1">
@@ -359,7 +359,7 @@ export function SubscribersPageSkeleton() {
       <div className="space-y-4">
         <Skeleton height={24} width={150} className="mb-4" />
         {[...Array(5)].map((_, i) => (
-          <div key={i} className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center gap-4">
+          <div key={i} className="bg-card p-4 rounded-2xl border border-border flex items-center gap-4">
             <SkeletonAvatar size="md" />
             <div className="flex-1">
               <Skeleton height={18} width={120} className="mb-1" />
@@ -386,7 +386,7 @@ export function EarningsPageSkeleton() {
       {/* Stats Grid */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100">
+          <div key={i} className="bg-card p-6 rounded-3xl border border-border">
             <div className="flex items-center gap-3 mb-4">
               <Skeleton height={40} width={40} className="rounded-xl" />
               <Skeleton height={14} width={100} />
@@ -398,7 +398,7 @@ export function EarningsPageSkeleton() {
 
       {/* Breakdown Section */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded-3xl border border-gray-100">
+        <div className="bg-card p-6 rounded-3xl border border-border">
           <Skeleton height={24} width={150} className="mb-6" />
           <div className="space-y-4">
             {[...Array(4)].map((_, i) => (
@@ -409,7 +409,7 @@ export function EarningsPageSkeleton() {
             ))}
           </div>
         </div>
-        <div className="bg-white p-6 rounded-3xl border border-gray-100">
+        <div className="bg-card p-6 rounded-3xl border border-border">
           <Skeleton height={24} width={130} className="mb-6" />
           <div className="space-y-3">
             {[...Array(5)].map((_, i) => (
@@ -438,7 +438,7 @@ export function SettingsPageSkeleton() {
       <div className="grid md:grid-cols-4 gap-6">
         {/* Navigation */}
         <nav className="md:col-span-1">
-          <div className="bg-white rounded-2xl border border-gray-100 p-2">
+          <div className="bg-card rounded-2xl border border-border p-2">
             {[...Array(6)].map((_, i) => (
               <div key={i} className="flex items-center gap-3 px-4 py-3">
                 <Skeleton height={20} width={20} className="rounded" />
@@ -450,7 +450,7 @@ export function SettingsPageSkeleton() {
 
         {/* Content */}
         <div className="md:col-span-3">
-          <div className="bg-white rounded-2xl border border-gray-100 p-6">
+          <div className="bg-card rounded-2xl border border-border p-6">
             <Skeleton height={24} width={150} className="mb-6" />
             <div className="space-y-4">
               <div>
@@ -492,7 +492,7 @@ export function PostsPageSkeleton() {
       {/* Posts Grid */}
       <div className="space-y-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="bg-white p-6 rounded-3xl border border-gray-100">
+          <div key={i} className="bg-card p-6 rounded-3xl border border-border">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-2 mb-2">
