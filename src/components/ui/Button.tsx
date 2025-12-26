@@ -49,11 +49,11 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         hover:bg-primary/5 hover:border-primary-600
       `,
       ghost: `
-        text-text-secondary bg-transparent
-        hover:text-text-primary hover:bg-gray-100
+        text-muted-foreground bg-transparent
+        hover:text-foreground hover:bg-muted
       `,
       danger: `
-        bg-red-600 text-white
+        bg-accent-red text-white
         hover:bg-red-700
         active:bg-red-800
         shadow-sm hover:shadow-md

@@ -21,8 +21,8 @@ const Card = forwardRef<HTMLDivElement, CardProps>(
       `,
       outlined: "bg-card border-2 border-border shadow-none",
       glass: `
-        bg-white/70 backdrop-blur-md 
-        border border-white/20 
+        glass
+        border border-border/20 
         shadow-glass
       `,
     };
@@ -71,7 +71,7 @@ const CardTitle = forwardRef<HTMLHeadingElement, HTMLAttributes<HTMLHeadingEleme
   ({ className, ...props }, ref) => (
     <h3
       ref={ref}
-      className={cn("text-h3 font-semibold text-text-primary mb-2", className)}
+      className={cn("text-h3 font-semibold text-foreground mb-2", className)}
       {...props}
     />
   )
@@ -82,7 +82,7 @@ const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLPara
   ({ className, ...props }, ref) => (
     <p
       ref={ref}
-      className={cn("text-sm text-text-secondary", className)}
+      className={cn("text-sm text-muted-foreground", className)}
       {...props}
     />
   )
@@ -90,3 +90,4 @@ const CardDescription = forwardRef<HTMLParagraphElement, HTMLAttributes<HTMLPara
 CardDescription.displayName = "CardDescription";
 
 export { Card, CardHeader, CardContent, CardFooter, CardTitle, CardDescription };
+

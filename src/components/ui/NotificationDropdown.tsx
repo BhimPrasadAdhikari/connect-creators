@@ -69,8 +69,8 @@ function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
     <div
       className={cn(
         "flex items-start gap-3 p-3 rounded-lg transition-colors",
-        "hover:bg-gray-50",
-        !notification.read && "bg-blue-50/50"
+        "hover:bg-muted",
+        !notification.read && "bg-primary/5"
       )}
     >
       {notification.avatar ? (
@@ -81,11 +81,11 @@ function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
         </div>
       )}
       <div className="flex-1 min-w-0">
-        <p className={cn("text-sm", !notification.read && "font-medium")}>
+        <p className={cn("text-sm text-foreground", !notification.read && "font-medium")}>
           {notification.title}
         </p>
-        <p className="text-xs text-gray-500 truncate">{notification.message}</p>
-        <p className="text-xs text-gray-400 mt-1">{timeAgo}</p>
+        <p className="text-xs text-muted-foreground truncate">{notification.message}</p>
+        <p className="text-xs text-muted-foreground/70 mt-1">{timeAgo}</p>
       </div>
       {!notification.read && onMarkRead && (
         <button
@@ -94,10 +94,10 @@ function NotificationItem({ notification, onMarkRead }: NotificationItemProps) {
             e.stopPropagation();
             onMarkRead(notification.id);
           }}
-          className="p-1 rounded hover:bg-gray-200 opacity-0 group-hover:opacity-100 transition-opacity"
+          className="p-1 rounded hover:bg-muted opacity-0 group-hover:opacity-100 transition-opacity"
           aria-label="Mark as read"
         >
-          <Check className="w-4 h-4 text-gray-500" />
+          <Check className="w-4 h-4 text-muted-foreground" />
         </button>
       )}
     </div>
@@ -151,36 +151,36 @@ export function NotificationDropdown({
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
           "relative p-2 rounded-lg transition-colors min-w-touch min-h-touch flex items-center justify-center",
-          isOpen ? "bg-gray-100" : "hover:bg-gray-100"
+          isOpen ? "bg-muted" : "hover:bg-muted"
         )}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}
         aria-expanded={isOpen}
       >
-        <Bell className="w-5 h-5 text-gray-600" />
+        <Bell className="w-5 h-5 text-muted-foreground" />
         <NotificationBadge count={unreadCount} />
       </button>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden z-50">
+        <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-card rounded-xl shadow-lg border border-border overflow-hidden z-50">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-900">Notifications</h3>
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border">
+            <h3 className="font-semibold text-foreground">Notifications</h3>
             <div className="flex items-center gap-2">
               {unreadCount > 0 && onMarkAllRead && (
                 <button
                   onClick={onMarkAllRead}
-                  className="text-xs text-blue-600 hover:underline"
+                  className="text-xs text-primary hover:underline"
                 >
                   Mark all read
                 </button>
               )}
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1 rounded hover:bg-gray-100"
+                className="p-1 rounded hover:bg-muted"
                 aria-label="Close"
               >
-                <X className="w-4 h-4 text-gray-500" />
+                <X className="w-4 h-4 text-muted-foreground" />
               </button>
             </div>
           </div>
@@ -188,12 +188,12 @@ export function NotificationDropdown({
           {/* Notifications List */}
           <div className="max-h-[400px] overflow-y-auto">
             {notifications.length === 0 ? (
-              <div className="py-8 text-center text-gray-500">
+              <div className="py-8 text-center text-muted-foreground">
                 <Bell className="w-8 h-8 mx-auto mb-2 opacity-50" />
                 <p className="text-sm">No notifications yet</p>
               </div>
             ) : (
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-border">
                 {notifications.slice(0, 10).map((notification) => (
                   <NotificationItem
                     key={notification.id}
@@ -207,10 +207,10 @@ export function NotificationDropdown({
 
           {/* Footer */}
           {notifications.length > 0 && (
-            <div className="px-4 py-3 border-t border-gray-100 bg-gray-50">
+            <div className="px-4 py-3 border-t border-border bg-muted">
               <Link
                 href="/notifications"
-                className="text-sm text-blue-600 hover:underline"
+                className="text-sm text-primary hover:underline"
                 onClick={() => setIsOpen(false)}
               >
                 View all notifications
