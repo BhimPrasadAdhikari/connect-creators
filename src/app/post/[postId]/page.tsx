@@ -127,24 +127,25 @@ export default function PostDetailPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8">
           <div className="animate-pulse">
-            <div className="h-8 bg-gray-200 rounded w-1/2 mb-4" />
-            <div className="h-64 bg-gray-200 rounded" />
+            <div className="h-8 bg-muted rounded w-1/2 mb-4" />
+            <div className="h-64 bg-muted rounded" />
           </div>
         </div>
+        <Footer />
       </main>
     );
   }
 
   if (!post) {
     return (
-      <main className="min-h-screen bg-gray-50">
+      <main className="min-h-screen bg-background">
         <Header />
         <div className="container mx-auto px-4 py-8 text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Post Not Found</h1>
+          <h1 className="text-2xl font-bold text-foreground mb-4">Post Not Found</h1>
           <Link href="/explore">
             <Button>Explore Creators</Button>
           </Link>
@@ -157,7 +158,7 @@ export default function PostDetailPage() {
   const displayName = post.creator.displayName || post.creator.user.name;
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       <Header />
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -165,7 +166,7 @@ export default function PostDetailPage() {
           {/* Back Link */}
           <Link
             href={`/creator/${post.creator.username}`}
-            className="inline-flex items-center text-gray-600 hover:text-blue-600 mb-6"
+            className="inline-flex items-center text-muted-foreground hover:text-primary mb-6"
           >
             <ArrowLeft className="w-4 h-4 mr-1" />
             Back to {displayName}
@@ -182,11 +183,11 @@ export default function PostDetailPage() {
                 <div>
                   <Link
                     href={`/creator/${post.creator.username}`}
-                    className="font-medium text-gray-900 hover:text-blue-600"
+                    className="font-medium text-foreground hover:text-primary"
                   >
                     {displayName}
                   </Link>
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-muted-foreground">
                     {new Date(post.createdAt).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",
@@ -202,7 +203,7 @@ export default function PostDetailPage() {
               </div>
 
               {/* Title */}
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">{post.title}</h1>
+              <h1 className="text-2xl font-bold text-foreground mb-4">{post.title}</h1>
 
               {/* Media */}
               {post.mediaUrl && post.hasAccess && (
@@ -227,18 +228,18 @@ export default function PostDetailPage() {
 
               {/* Content */}
               {post.hasAccess ? (
-                <div className="prose prose-gray max-w-none">
-                  <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
+                <div className="prose prose-gray dark:prose-invert max-w-none">
+                  <p className="text-foreground-secondary whitespace-pre-wrap">{post.content}</p>
                 </div>
               ) : (
                 <div className="relative">
-                  <p className="text-gray-700 blur-sm select-none">{post.content}</p>
+                  <p className="text-muted-foreground blur-sm select-none">{post.content}</p>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <Card className="bg-white/95 shadow-lg">
+                    <Card className="bg-card/95 shadow-lg">
                       <CardContent className="p-6 text-center">
-                        <Lock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                        <h3 className="font-semibold text-gray-900 mb-2">Premium Content</h3>
-                        <p className="text-gray-600 text-sm mb-4">
+                        <Lock className="w-8 h-8 text-primary mx-auto mb-3" />
+                        <h3 className="font-semibold text-foreground mb-2">Premium Content</h3>
+                        <p className="text-muted-foreground text-sm mb-4">
                           Subscribe to {displayName}&apos;s {post.requiredTier?.name || "paid tier"} to unlock
                         </p>
                         <Link
@@ -255,8 +256,8 @@ export default function PostDetailPage() {
               )}
 
               {/* Actions */}
-              <div className="flex items-center gap-4 mt-6 pt-6 border-t">
-                <div className="flex items-center gap-2 text-gray-500">
+              <div className="flex items-center gap-4 mt-6 pt-6 border-t border-border">
+                <div className="flex items-center gap-2 text-muted-foreground">
                   <MessageCircle className="w-5 h-5" />
                   <span>{post._count.comments} comments</span>
                 </div>
@@ -279,7 +280,7 @@ export default function PostDetailPage() {
           {post.hasAccess && (
             <Card>
               <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-4">
+                <h2 className="text-lg font-semibold text-foreground mb-4">
                   Comments ({post._count.comments})
                 </h2>
 
@@ -294,7 +295,7 @@ export default function PostDetailPage() {
                           onChange={(e) => setComment(e.target.value)}
                           placeholder="Add a comment..."
                           rows={2}
-                          className="w-full px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none"
+                          className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none placeholder:text-muted-foreground"
                         />
                         <div className="flex justify-end mt-2">
                           <Button type="submit" disabled={submittingComment || !comment.trim()} size="sm">
@@ -306,8 +307,8 @@ export default function PostDetailPage() {
                     </div>
                   </form>
                 ) : (
-                  <div className="text-center py-4 mb-6 bg-gray-50 rounded-lg">
-                    <p className="text-gray-600 mb-2">Sign in to comment</p>
+                  <div className="text-center py-4 mb-6 bg-muted rounded-lg">
+                    <p className="text-muted-foreground mb-2">Sign in to comment</p>
                     <Link href="/login">
                       <Button size="sm">Sign In</Button>
                     </Link>
@@ -321,18 +322,18 @@ export default function PostDetailPage() {
                       <Avatar src={c.user.image} name={c.user.name} size="sm" />
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">{c.user.name}</span>
-                          <span className="text-sm text-gray-500">
+                          <span className="font-medium text-foreground">{c.user.name}</span>
+                          <span className="text-sm text-muted-foreground">
                             {new Date(c.createdAt).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-gray-700">{c.content}</p>
+                        <p className="text-foreground-secondary">{c.content}</p>
                       </div>
                     </div>
                   ))}
                   
                   {post.comments.length === 0 && (
-                    <p className="text-center text-gray-500 py-4">
+                    <p className="text-center text-muted-foreground py-4">
                       No comments yet. Be the first to comment!
                     </p>
                   )}
@@ -350,14 +351,14 @@ export default function PostDetailPage() {
             <CardContent className="p-6">
               {tipSent ? (
                 <div className="text-center py-4">
-                  <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Tip Sent!</h3>
-                  <p className="text-gray-600">Thank you for supporting {displayName}!</p>
+                  <CheckCircle className="w-12 h-12 text-accent-green mx-auto mb-3" />
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Tip Sent!</h3>
+                  <p className="text-muted-foreground">Thank you for supporting {displayName}!</p>
                 </div>
               ) : (
                 <>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">Send a Tip</h3>
-                  <p className="text-gray-600 mb-4">
+                  <h3 className="text-xl font-semibold text-foreground mb-2">Send a Tip</h3>
+                  <p className="text-muted-foreground mb-4">
                     Show your appreciation to {displayName}
                   </p>
                   <div className="grid grid-cols-3 gap-3 mb-4">
@@ -365,7 +366,7 @@ export default function PostDetailPage() {
                       <button
                         key={tip.value}
                         onClick={() => handleTip(tip.value)}
-                        className="py-3 px-4 rounded-lg border-2 border-gray-200 hover:border-blue-500 hover:bg-blue-50 font-semibold text-gray-900 transition-colors"
+                        className="py-3 px-4 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 font-semibold text-foreground transition-colors"
                       >
                         {tip.label}
                       </button>
