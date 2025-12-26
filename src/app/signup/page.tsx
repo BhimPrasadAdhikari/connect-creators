@@ -70,15 +70,15 @@ export default function SignupPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="py-4 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto">
           <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-semibold text-foreground">
               CreatorConnect
             </span>
           </Link>
@@ -89,25 +89,25 @@ export default function SignupPage() {
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Create your account
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Join CreatorConnect to support your favorite creators
             </p>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8">
+          <div className="bg-card rounded-xl border border-border shadow-sm p-6 sm:p-8">
             {/* Error Message */}
             {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+              <div className="mb-4 p-3 rounded-lg bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm">
                 {error}
               </div>
             )}
 
             {/* Role Selection */}
             <div className="mb-6">
-              <label className="block text-sm font-medium text-gray-900 mb-3">
+              <label className="block text-sm font-medium text-foreground mb-3">
                 I want to join as a
               </label>
               <div className="grid grid-cols-2 gap-3">
@@ -117,25 +117,25 @@ export default function SignupPage() {
                   className={cn(
                     "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
                     role === "fan"
-                      ? "border-blue-600 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-primary/50"
                   )}
                 >
                   <User
                     className={cn(
                       "w-6 h-6",
-                      role === "fan" ? "text-blue-600" : "text-gray-500"
+                      role === "fan" ? "text-primary" : "text-muted-foreground"
                     )}
                   />
                   <span
                     className={cn(
                       "font-medium",
-                      role === "fan" ? "text-blue-600" : "text-gray-600"
+                      role === "fan" ? "text-primary" : "text-muted-foreground"
                     )}
                   >
                     Fan
                   </span>
-                  <span className="text-xs text-gray-500 text-center">
+                  <span className="text-xs text-muted-foreground text-center">
                     Support creators
                   </span>
                 </button>
@@ -145,25 +145,25 @@ export default function SignupPage() {
                   className={cn(
                     "flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all",
                     role === "creator"
-                      ? "border-blue-600 bg-blue-50"
-                      : "border-gray-200 hover:border-gray-300"
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-primary/50"
                   )}
                 >
                   <Palette
                     className={cn(
                       "w-6 h-6",
-                      role === "creator" ? "text-blue-600" : "text-gray-500"
+                      role === "creator" ? "text-primary" : "text-muted-foreground"
                     )}
                   />
                   <span
                     className={cn(
                       "font-medium",
-                      role === "creator" ? "text-blue-600" : "text-gray-600"
+                      role === "creator" ? "text-primary" : "text-muted-foreground"
                     )}
                   >
                     Creator
                   </span>
-                  <span className="text-xs text-gray-500 text-center">
+                  <span className="text-xs text-muted-foreground text-center">
                     Share &amp; earn
                   </span>
                 </button>
@@ -175,7 +175,7 @@ export default function SignupPage() {
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg hover:bg-muted transition-colors"
               >
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
@@ -202,10 +202,10 @@ export default function SignupPage() {
             {/* Divider */}
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white text-gray-500">
+                <span className="px-3 bg-card text-muted-foreground">
                   or continue with email
                 </span>
               </div>
@@ -249,13 +249,13 @@ export default function SignupPage() {
                 />
               )}
 
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-muted-foreground">
                 By signing up, you agree to our{" "}
-                <Link href="/terms" className="text-blue-600 hover:underline">
+                <Link href="/terms" className="text-primary hover:underline">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-blue-600 hover:underline">
+                <Link href="/privacy" className="text-primary hover:underline">
                   Privacy Policy
                 </Link>
                 .
@@ -274,9 +274,9 @@ export default function SignupPage() {
             </form>
           </div>
 
-          <p className="text-center text-gray-600 mt-6">
+          <p className="text-center text-muted-foreground mt-6">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 font-medium hover:underline">
+            <Link href="/login" className="text-primary font-medium hover:underline">
               Sign in
             </Link>
           </p>

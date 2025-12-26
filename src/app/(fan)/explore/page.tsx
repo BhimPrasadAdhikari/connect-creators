@@ -110,10 +110,10 @@ export default async function ExplorePage({ searchParams }: PageProps) {
     <div className="p-6 lg:p-8">
       {/* Page Header */}
       <div className="text-center mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <h1 className="text-3xl font-bold text-foreground mb-2">
           Explore Creators
         </h1>
-        <p className="text-gray-600 max-w-xl mx-auto">
+        <p className="text-muted-foreground max-w-xl mx-auto">
           Support creators you love. Join their exclusive communities.
           Starting at just ₹99/month.
         </p>
@@ -141,15 +141,15 @@ async function CreatorsContent({ filters }: { filters: { q?: string; category?: 
     <>
       {creators.length === 0 ? (
         <div className="text-center py-12">
-          <p className="text-gray-500 mb-2">
+          <p className="text-muted-foreground mb-2">
             {filters.q ? `No creators found for "${filters.q}"` : "No creators found. Be the first to join!"}
           </p>
           {filters.q ? (
-            <Link href="/explore" className="text-blue-600 hover:underline">
+            <Link href="/explore" className="text-primary hover:underline">
               Clear search
             </Link>
           ) : (
-            <Link href="/signup?role=creator" className="text-blue-600 hover:underline">
+            <Link href="/signup?role=creator" className="text-primary hover:underline">
               Become a Creator
             </Link>
           )}
@@ -158,18 +158,18 @@ async function CreatorsContent({ filters }: { filters: { q?: string; category?: 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {creators.map((creator) => (
             <Link key={creator.username} href={`/creator/${creator.username}`} className="block group">
-              <div className="h-full p-5 rounded-3xl bg-white border border-transparent hover:border-gray-200 hover:shadow-lg transition-all duration-300">
+              <div className="h-full p-5 rounded-3xl bg-card border border-transparent hover:border-border hover:shadow-lg transition-all duration-300">
                 <div className="flex items-start gap-4 mb-4">
                   <div className="relative">
                     <Avatar
                       src={creator.image}
                       name={creator.name}
                       size="lg"
-                      className="w-16 h-16 ring-4 ring-gray-50 group-hover:ring-white transition-all"
+                      className="w-16 h-16 ring-4 ring-muted group-hover:ring-card transition-all"
                     />
                     {creator.isVerified && (
-                      <div className="absolute -bottom-1 -right-1 bg-white rounded-full p-0.5">
-                        <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
+                      <div className="absolute -bottom-1 -right-1 bg-card rounded-full p-0.5">
+                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
                           <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                           </svg>
@@ -188,17 +188,17 @@ async function CreatorsContent({ filters }: { filters: { q?: string; category?: 
                   </div>
                 </div>
 
-                <p className="text-gray-600 text-sm mb-6 line-clamp-2 leading-relaxed min-h-[40px]">
+                <p className="text-muted-foreground text-sm mb-6 line-clamp-2 leading-relaxed min-h-[40px]">
                   {creator.bio || "Creator on CreatorConnect. Join to see their exclusive content."}
                 </p>
 
-                <div className="flex items-center justify-between pt-4 border-t border-gray-50 group-hover:border-gray-100 transition-colors">
-                  <div className="flex items-center gap-2 text-sm text-gray-500">
+                <div className="flex items-center justify-between pt-4 border-t border-border-light group-hover:border-border transition-colors">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <UsersIcon className="w-4 h-4" />
-                    <span className="font-semibold text-gray-900">{creator.subscriberCount.toLocaleString()}</span>
+                    <span className="font-semibold text-foreground">{creator.subscriberCount.toLocaleString()}</span>
                   </div>
                   
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-full text-sm font-bold group-hover:bg-blue-600 group-hover:text-white transition-all">
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold group-hover:bg-primary group-hover:text-white transition-all">
                     <span>{formatPrice(creator.startingPrice)}</span>
                   </div>
                 </div>

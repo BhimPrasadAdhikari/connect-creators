@@ -44,15 +44,15 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50 flex flex-col">
+    <main className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="py-4 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto">
           <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-semibold text-gray-900">
+            <span className="text-xl font-semibold text-foreground">
               CreatorConnect
             </span>
           </Link>
@@ -63,18 +63,18 @@ export default function LoginPage() {
       <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-12">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl font-bold text-foreground mb-2">
               Welcome back
             </h1>
-            <p className="text-gray-600">
+            <p className="text-muted-foreground">
               Sign in to your account to continue
             </p>
           </div>
 
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 sm:p-8">
+          <div className="bg-card rounded-xl border border-border shadow-sm p-6 sm:p-8">
             {/* Error Message */}
             {error && (
-              <div className="mb-4 p-3 rounded-lg bg-red-50 border border-red-200 text-red-600 text-sm">
+              <div className="mb-4 p-3 rounded-lg bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm">
                 {error}
               </div>
             )}
@@ -84,8 +84,7 @@ export default function LoginPage() {
               <button
                 type="button"
                 onClick={handleGoogleSignIn}
-                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-              >
+                className="w-full flex items-center justify-center gap-3 px-4 py-3 border border-border rounded-lg hover:bg-muted transition-colors">
                 <svg className="w-5 h-5" viewBox="0 0 24 24">
                   <path
                     fill="#4285F4"
@@ -111,10 +110,10 @@ export default function LoginPage() {
             {/* Divider */}
             <div className="relative mb-6">
               <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-gray-200" />
+                <div className="w-full border-t border-border" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-3 bg-white text-gray-500">
+                <span className="px-3 bg-card text-muted-foreground">
                   or continue with email
                 </span>
               </div>
@@ -143,13 +142,13 @@ export default function LoginPage() {
                 <label className="flex items-center gap-2 cursor-pointer">
                   <input
                     type="checkbox"
-                    className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    className="w-4 h-4 rounded border-border text-primary focus:ring-primary"
                   />
-                  <span className="text-gray-600">Remember me</span>
+                  <span className="text-muted-foreground">Remember me</span>
                 </label>
                 <Link
                   href="/forgot-password"
-                  className="text-blue-600 hover:underline"
+                  className="text-primary hover:underline"
                 >
                   Forgot password?
                 </Link>
@@ -168,9 +167,9 @@ export default function LoginPage() {
             </form>
           </div>
 
-          <p className="text-center text-gray-600 mt-6">
+          <p className="text-center text-muted-foreground mt-6">
             Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-blue-600 font-medium hover:underline">
+            <Link href="/signup" className="text-primary font-medium hover:underline">
               Sign up
             </Link>
           </p>

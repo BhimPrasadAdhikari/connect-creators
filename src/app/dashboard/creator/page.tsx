@@ -114,16 +114,16 @@ export default async function CreatorDashboardPage() {
         {/* Welcome & Quick Actions */}
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 sm:mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">
               Welcome back, {profile.displayName || profile.user.name}
             </h1>
-            <p className="text-gray-500 text-base sm:text-lg">
+            <p className="text-muted-foreground text-base sm:text-lg">
               Here's what's happening with your content today.
             </p>
           </div>
           <Link
             href="/dashboard/creator/posts/new"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gray-900 text-white rounded-2xl hover:bg-black transition-all shadow-lg shadow-gray-900/10 font-medium"
+            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-foreground text-background rounded-2xl hover:opacity-90 transition-all shadow-lg font-medium"
           >
             <Plus className="w-5 h-5" />
             Create Post
@@ -132,50 +132,50 @@ export default async function CreatorDashboardPage() {
 
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 hover:border-gray-200 transition-colors">
-            <div className="flex items-center gap-3 mb-4 text-gray-500">
-              <div className="p-2 bg-blue-50 rounded-xl text-blue-600">
+          <div className="bg-card p-6 rounded-3xl border border-border hover:border-primary/20 transition-colors">
+            <div className="flex items-center gap-3 mb-4 text-muted-foreground">
+              <div className="p-2 bg-primary/10 rounded-xl text-primary">
                 <Users className="w-5 h-5" />
               </div>
               <span className="font-medium">Total Subscribers</span>
             </div>
-            <p className="text-4xl font-bold text-gray-900 tracking-tight">
+            <p className="text-4xl font-bold text-foreground tracking-tight">
               {stats.subscribers}
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 hover:border-gray-200 transition-colors">
-            <div className="flex items-center gap-3 mb-4 text-gray-500">
-              <div className="p-2 bg-green-50 rounded-xl text-green-600">
+          <div className="bg-card p-6 rounded-3xl border border-border hover:border-accent-green/20 transition-colors">
+            <div className="flex items-center gap-3 mb-4 text-muted-foreground">
+              <div className="p-2 bg-accent-green/10 rounded-xl text-accent-green">
                 <DollarSign className="w-5 h-5" />
               </div>
               <span className="font-medium">Monthly Revenue</span>
             </div>
-            <p className="text-4xl font-bold text-gray-900 tracking-tight">
+            <p className="text-4xl font-bold text-foreground tracking-tight">
               {formatPrice(stats.mrr)}
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 hover:border-gray-200 transition-colors">
-            <div className="flex items-center gap-3 mb-4 text-gray-500">
-              <div className="p-2 bg-purple-50 rounded-xl text-purple-600">
+          <div className="bg-card p-6 rounded-3xl border border-border hover:border-purple-500/20 transition-colors">
+            <div className="flex items-center gap-3 mb-4 text-muted-foreground">
+              <div className="p-2 bg-purple-500/10 rounded-xl text-purple-500">
                 <FileText className="w-5 h-5" />
               </div>
               <span className="font-medium">Published Posts</span>
             </div>
-            <p className="text-4xl font-bold text-gray-900 tracking-tight">
+            <p className="text-4xl font-bold text-foreground tracking-tight">
               {stats.posts}
             </p>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border border-gray-100 hover:border-gray-200 transition-colors">
-            <div className="flex items-center gap-3 mb-4 text-gray-500">
-              <div className="p-2 bg-amber-50 rounded-xl text-amber-600">
+          <div className="bg-card p-6 rounded-3xl border border-border hover:border-amber-500/20 transition-colors">
+            <div className="flex items-center gap-3 mb-4 text-muted-foreground">
+              <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
                 <TrendingUp className="w-5 h-5" />
               </div>
               <span className="font-medium">All Time Earnings</span>
             </div>
-            <p className="text-4xl font-bold text-gray-900 tracking-tight">
+            <p className="text-4xl font-bold text-foreground tracking-tight">
               {formatPrice(stats.totalEarnings)}
             </p>
           </div>
@@ -185,41 +185,41 @@ export default async function CreatorDashboardPage() {
           {/* Recent Posts */}
           <div className="lg:col-span-2">
             <div className="flex items-center justify-between mb-6 px-1">
-              <h2 className="text-xl font-bold text-gray-900">Recent Posts</h2>
+              <h2 className="text-xl font-bold text-foreground">Recent Posts</h2>
               <Link
                 href="/dashboard/creator/posts"
-                className="text-sm font-medium text-gray-500 hover:text-gray-900"
+                className="text-sm font-medium text-muted-foreground hover:text-foreground"
               >
                 View All
               </Link>
             </div>
 
-            <div className="bg-white rounded-3xl border border-gray-100 overflow-hidden">
+            <div className="bg-card rounded-3xl border border-border overflow-hidden">
               {profile.posts.length === 0 ? (
                 <div className="text-center py-12 px-6">
-                  <p className="text-gray-500 mb-4">You haven't posted anything yet.</p>
+                  <p className="text-muted-foreground mb-4">You haven't posted anything yet.</p>
                   <Link
                     href="/dashboard/creator/posts/new"
-                    className="text-blue-600 font-medium hover:underline"
+                    className="text-primary font-medium hover:underline"
                   >
                     Create your first post
                   </Link>
                 </div>
               ) : (
-                <div className="divide-y divide-gray-50">
+                <div className="divide-y divide-border">
                   {profile.posts.map((post) => (
                     <div
                       key={post.id}
-                      className="flex items-center gap-5 p-5 hover:bg-gray-50 transition-colors group"
+                      className="flex items-center gap-5 p-5 hover:bg-muted transition-colors group"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center flex-shrink-0 text-gray-400 group-hover:bg-white group-hover:shadow-sm transition-all">
+                      <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground group-hover:bg-card group-hover:shadow-sm transition-all">
                         <FileText className="w-6 h-6" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate mb-1 text-lg">
+                        <h3 className="font-semibold text-foreground truncate mb-1 text-lg">
                           {post.title}
                         </h3>
-                        <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
                           <span>
                             {new Date(post.createdAt).toLocaleDateString("en-IN", {
                               day: "numeric",
@@ -227,7 +227,7 @@ export default async function CreatorDashboardPage() {
                             })}
                           </span>
                           {post.isPaid && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent-green/10 text-accent-green">
                               Premium
                             </span>
                           )}
@@ -248,19 +248,19 @@ export default async function CreatorDashboardPage() {
             {/* Recent Subscribers */}
             <div>
               <div className="flex items-center justify-between mb-6 px-1">
-                <h2 className="text-xl font-bold text-gray-900">New Fans</h2>
+                <h2 className="text-xl font-bold text-foreground">New Fans</h2>
                 <Link
                   href="/dashboard/creator/subscribers"
-                  className="text-sm font-medium text-gray-500 hover:text-gray-900"
+                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
                 >
                   View All
                 </Link>
               </div>
 
-              <div className="bg-white rounded-3xl border border-gray-100 p-6">
+              <div className="bg-card rounded-3xl border border-border p-6">
                 {profile.subscriptions.length === 0 ? (
                   <div className="text-center py-6">
-                    <p className="text-gray-500 text-sm">No subscribers yet.</p>
+                    <p className="text-muted-foreground text-sm">No subscribers yet.</p>
                   </div>
                 ) : (
                   <div className="space-y-6">
@@ -272,10 +272,10 @@ export default async function CreatorDashboardPage() {
                           size="md"
                         />
                         <div className="flex-1 min-w-0">
-                          <p className="font-bold text-gray-900 truncate text-sm">
+                          <p className="font-bold text-foreground truncate text-sm">
                             {sub.fan.name || "Anonymous"}
                           </p>
-                          <p className="text-xs text-gray-500 bg-gray-100 inline-block px-2 py-0.5 rounded-full mt-1">
+                          <p className="text-xs text-muted-foreground bg-muted inline-block px-2 py-0.5 rounded-full mt-1">
                             {sub.tier.name}
                           </p>
                         </div>
@@ -287,14 +287,14 @@ export default async function CreatorDashboardPage() {
             </div>
 
             {/* Quick Actions / Tiers */}
-            <div className="bg-blue-600 rounded-3xl p-6 text-white">
+            <div className="bg-primary rounded-3xl p-6 text-white">
               <h3 className="font-bold text-lg mb-2">Membership Tiers</h3>
-              <p className="text-blue-100 text-sm mb-6">
+              <p className="text-primary-100 text-sm mb-6">
                 You have {profile.tiers.length} active tiers.
               </p>
               <Link
                 href="/dashboard/creator/tiers"
-                className="block w-full text-center py-3 bg-white text-blue-600 rounded-xl font-bold hover:bg-blue-50 transition-colors"
+                className="block w-full text-center py-3 bg-white text-primary rounded-xl font-bold hover:bg-primary-50 transition-colors"
               >
                 Manage Tiers
               </Link>

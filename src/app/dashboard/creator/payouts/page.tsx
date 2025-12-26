@@ -65,20 +65,20 @@ export default function PayoutsPage() {
 
   if (loading) {
       return (
-          <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-              <div className="w-8 h-8 border-4 border-blue-600 border-t-transparent rounded-full animate-spin"></div>
+          <div className="min-h-screen bg-background flex items-center justify-center">
+              <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
           </div>
       );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans text-gray-900">
+    <div className="min-h-screen bg-background font-sans text-foreground">
       <Header />
       
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-            <h1 className="text-3xl font-bold text-gray-900">Payouts & Earnings</h1>
-            <p className="text-gray-500 mt-1">Manage your withdrawals and track your earnings.</p>
+            <h1 className="text-3xl font-bold text-foreground">Payouts & Earnings</h1>
+            <p className="text-muted-foreground mt-1">Manage your withdrawals and track your earnings.</p>
         </div>
 
         <BalanceCard 
