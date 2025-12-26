@@ -90,16 +90,16 @@ const benefits = [
 
 export default function HowItWorksPage() {
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-700 text-white py-20">
+      <section className="bg-gradient-to-br from-primary to-primary-700 text-white py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">
             How CreatorConnect Works
           </h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-primary-100 max-w-2xl mx-auto">
             Whether you&apos;re a creator looking to monetize your content or a fan wanting to support your favorites, we make it simple.
           </p>
         </div>
@@ -109,13 +109,13 @@ export default function HowItWorksPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
               For Creators
             </span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
               Start Earning in 4 Simple Steps
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               Turn your passion into income. Set up once, earn monthly from your dedicated fanbase.
             </p>
           </div>
@@ -125,23 +125,23 @@ export default function HowItWorksPage() {
               <div key={step.title} className="relative">
                 {/* Connector Line */}
                 {index < creatorSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-12 left-1/2 w-full h-0.5 bg-blue-200" />
+                  <div className="hidden lg:block absolute top-12 left-1/2 w-full h-0.5 bg-primary/20" />
                 )}
                 
-                <Card className="relative bg-white h-full">
+                <Card className="relative h-full">
                   <CardContent className="pt-6">
                     {/* Step Number */}
-                    <div className="absolute -top-4 left-6 w-8 h-8 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    <div className="absolute -top-4 left-6 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
                       {index + 1}
                     </div>
                     
-                    <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4 mt-2">
-                      <step.icon className="w-6 h-6 text-blue-600" />
+                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 mt-2">
+                      <step.icon className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
                       {step.title}
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       {step.description}
                     </p>
                   </CardContent>
@@ -163,20 +163,20 @@ export default function HowItWorksPage() {
 
       {/* Divider */}
       <div className="container mx-auto px-4">
-        <div className="h-px bg-gray-200" />
+        <div className="h-px bg-border" />
       </div>
 
       {/* For Fans Section */}
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-1 bg-accent-green/10 text-accent-green rounded-full text-sm font-medium mb-4">
               For Fans
             </span>
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
               Support Creators You Love
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               Get exclusive access to premium content and connect directly with your favorite creators.
             </p>
           </div>
@@ -186,23 +186,23 @@ export default function HowItWorksPage() {
               <div key={step.title} className="relative">
                 {/* Connector Line */}
                 {index < fanSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-12 left-1/2 w-full h-0.5 bg-green-200" />
+                  <div className="hidden lg:block absolute top-12 left-1/2 w-full h-0.5 bg-accent-green/20" />
                 )}
                 
-                <Card className="relative bg-white h-full">
+                <Card className="relative h-full">
                   <CardContent className="pt-6">
                     {/* Step Number */}
-                    <div className="absolute -top-4 left-6 w-8 h-8 bg-green-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    <div className="absolute -top-4 left-6 w-8 h-8 bg-accent-green text-white rounded-full flex items-center justify-center text-sm font-bold">
                       {index + 1}
                     </div>
                     
-                    <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4 mt-2">
-                      <step.icon className="w-6 h-6 text-green-600" />
+                    <div className="w-12 h-12 bg-accent-green/10 rounded-lg flex items-center justify-center mb-4 mt-2">
+                      <step.icon className="w-6 h-6 text-accent-green" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    <h3 className="text-lg font-semibold text-foreground mb-2">
                       {step.title}
                     </h3>
-                    <p className="text-gray-600 text-sm">
+                    <p className="text-muted-foreground text-sm">
                       {step.description}
                     </p>
                   </CardContent>
@@ -223,13 +223,13 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-gray-100">
+      <section className="py-20 bg-muted">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            <h2 className="text-3xl font-bold text-foreground mb-4">
               Why Choose CreatorConnect?
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               We built this platform with creators and fans in mind.
             </p>
           </div>
@@ -238,13 +238,13 @@ export default function HowItWorksPage() {
             {benefits.map((benefit) => (
               <Card key={benefit.title} className="text-center">
                 <CardContent className="py-8">
-                  <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <benefit.icon className="w-8 h-8 text-blue-600" />
+                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <benefit.icon className="w-8 h-8 text-primary" />
                   </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  <h3 className="text-lg font-semibold text-foreground mb-2">
                     {benefit.title}
                   </h3>
-                  <p className="text-gray-600 text-sm">
+                  <p className="text-muted-foreground text-sm">
                     {benefit.description}
                   </p>
                 </CardContent>
@@ -258,7 +258,7 @@ export default function HowItWorksPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-900 mb-8 text-center">
+            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
               Frequently Asked Questions
             </h2>
             
@@ -285,15 +285,15 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-blue-600 text-white">
+      <section className="py-20 bg-primary text-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-blue-100 mb-8 max-w-xl mx-auto">
+          <p className="text-primary-100 mb-8 max-w-xl mx-auto">
             Join thousands of creators and fans already using CreatorConnect.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link href="/signup?role=creator">
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-blue-50">
+              <Button size="lg" className="bg-white text-primary hover:bg-primary-50">
                 Start as Creator
               </Button>
             </Link>
@@ -314,16 +314,16 @@ export default function HowItWorksPage() {
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <details className="group bg-white rounded-lg border border-gray-200">
+    <details className="group bg-card rounded-lg border border-border">
       <summary className="flex items-center justify-between p-4 cursor-pointer list-none">
-        <span className="font-medium text-gray-900">{question}</span>
-        <span className="text-gray-400 group-open:rotate-180 transition-transform">
+        <span className="font-medium text-foreground">{question}</span>
+        <span className="text-muted-foreground group-open:rotate-180 transition-transform">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </span>
       </summary>
-      <div className="px-4 pb-4 text-gray-600">
+      <div className="px-4 pb-4 text-muted-foreground">
         {answer}
       </div>
     </details>

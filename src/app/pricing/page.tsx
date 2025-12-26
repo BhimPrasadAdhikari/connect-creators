@@ -66,14 +66,14 @@ const paymentMethods = [
 
 export default function PricingPage() {
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-background">
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-blue-600 to-blue-700 text-white py-20">
+      <section className="bg-gradient-to-br from-primary to-primary-700 text-white py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <h1 className="text-4xl sm:text-5xl font-bold mb-4">Simple, Transparent Pricing</h1>
-          <p className="text-xl text-blue-100 max-w-2xl mx-auto">
+          <p className="text-xl text-primary-100 max-w-2xl mx-auto">
             We only make money when you do. Creators keep up to 88% of their earnings.
           </p>
         </div>
@@ -83,38 +83,38 @@ export default function PricingPage() {
       <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
               For Creators
             </span>
-            <h2 className="text-3xl font-bold text-gray-900">Start Free, Pay Only When You Earn</h2>
+            <h2 className="text-3xl font-bold text-foreground">Start Free, Pay Only When You Earn</h2>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
             {creatorPlans.map((plan) => (
               <Card
                 key={plan.name}
-                className={`relative ${plan.popular ? "border-2 border-blue-600" : ""}`}
+                className={`relative ${plan.popular ? "border-2 border-primary" : ""}`}
               >
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-blue-600 text-white text-sm font-medium px-3 py-1 rounded-full">
+                    <span className="bg-primary text-white text-sm font-medium px-3 py-1 rounded-full">
                       Most Popular
                     </span>
                   </div>
                 )}
                 <CardContent className="p-8">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{plan.name}</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-2">{plan.name}</h3>
                   <div className="mb-4">
-                    <span className="text-4xl font-bold text-gray-900">{plan.price}</span>
-                    <span className="text-gray-500 ml-1">/{plan.period}</span>
+                    <span className="text-4xl font-bold text-foreground">{plan.price}</span>
+                    <span className="text-muted-foreground ml-1">/{plan.period}</span>
                   </div>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
+                  <p className="text-muted-foreground mb-6">{plan.description}</p>
                   
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2">
-                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-600">{feature}</span>
+                        <Check className="w-5 h-5 text-accent-green flex-shrink-0 mt-0.5" />
+                        <span className="text-muted-foreground">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -136,14 +136,14 @@ export default function PricingPage() {
       </section>
 
       {/* For Fans */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-1 bg-accent-green/10 text-accent-green rounded-full text-sm font-medium mb-4">
               For Fans
             </span>
-            <h2 className="text-3xl font-bold text-gray-900">Subscribe to Creators You Love</h2>
-            <p className="text-gray-600 mt-4 max-w-xl mx-auto">
+            <h2 className="text-3xl font-bold text-foreground">Subscribe to Creators You Love</h2>
+            <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
               Subscription prices are set by individual creators. You only pay for what you subscribe to.
             </p>
           </div>
@@ -154,13 +154,13 @@ export default function PricingPage() {
                 <ul className="space-y-4">
                   {fanFeatures.map((feature) => (
                     <li key={feature} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-gray-700">{feature}</span>
+                      <Check className="w-5 h-5 text-accent-green flex-shrink-0 mt-0.5" />
+                      <span className="text-foreground">{feature}</span>
                     </li>
                   ))}
                 </ul>
                 
-                <div className="mt-8 pt-8 border-t border-gray-200 text-center">
+                <div className="mt-8 pt-8 border-t border-border text-center">
                   <Link href="/explore">
                     <Button size="lg">
                       Explore Creators
@@ -175,15 +175,15 @@ export default function PricingPage() {
       </section>
 
       {/* Earnings Calculator */}
-      <section className="py-20 bg-gray-100">
+      <section className="py-20 bg-muted">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
+            <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
               <Calculator className="w-4 h-4 inline mr-1" />
               Calculate Your Earnings
             </span>
-            <h2 className="text-3xl font-bold text-gray-900">See What You&apos;ll Earn</h2>
-            <p className="text-gray-600 mt-4 max-w-xl mx-auto">
+            <h2 className="text-3xl font-bold text-foreground">See What You&apos;ll Earn</h2>
+            <p className="text-muted-foreground mt-4 max-w-xl mx-auto">
               Use our calculator to see exactly how much you&apos;ll earn after platform and payment fees.
             </p>
           </div>
@@ -195,11 +195,11 @@ export default function PricingPage() {
       </section>
 
       {/* Payment Methods */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-card">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-gray-900">Payment Methods & Fees</h2>
-            <p className="text-gray-600 mt-4">
+            <h2 className="text-3xl font-bold text-foreground">Payment Methods & Fees</h2>
+            <p className="text-muted-foreground mt-4">
               We support multiple payment options. Lower fees = more earnings for you!
             </p>
           </div>
@@ -208,16 +208,16 @@ export default function PricingPage() {
             {paymentMethods.map((method) => (
               <div
                 key={method.name}
-                className="bg-gray-50 rounded-lg border border-gray-200 px-6 py-4 text-center min-w-[140px]"
+                className="bg-muted rounded-lg border border-border px-6 py-4 text-center min-w-[140px]"
               >
-                <p className="font-semibold text-gray-900">{method.name}</p>
-                <p className="text-sm text-gray-500">{method.region}</p>
-                <p className="text-sm font-medium text-green-600 mt-1">{method.fee} fee</p>
+                <p className="font-semibold text-foreground">{method.name}</p>
+                <p className="text-sm text-muted-foreground">{method.region}</p>
+                <p className="text-sm font-medium text-accent-green mt-1">{method.fee} fee</p>
               </div>
             ))}
           </div>
 
-          <p className="text-center text-sm text-gray-500 mt-8 max-w-xl mx-auto">
+          <p className="text-center text-sm text-muted-foreground mt-8 max-w-xl mx-auto">
             💡 <strong>Pro tip:</strong> Encourage your Indian fans to pay via UPI for the lowest fees. 
             You&apos;ll keep more of what they pay!
           </p>
@@ -225,9 +225,9 @@ export default function PricingPage() {
       </section>
 
       {/* FAQ */}
-      <section className="py-20 bg-white">
+      <section className="py-20">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-gray-900 text-center mb-12">Pricing FAQ</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-12">Pricing FAQ</h2>
           
           <div className="max-w-2xl mx-auto space-y-4">
             <FAQItem
@@ -257,16 +257,16 @@ export default function PricingPage() {
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <details className="group bg-gray-50 rounded-lg border border-gray-200">
+    <details className="group bg-card rounded-lg border border-border">
       <summary className="flex items-center justify-between p-4 cursor-pointer list-none">
-        <span className="font-medium text-gray-900">{question}</span>
-        <span className="text-gray-400 group-open:rotate-180 transition-transform">
+        <span className="font-medium text-foreground">{question}</span>
+        <span className="text-muted-foreground group-open:rotate-180 transition-transform">
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </span>
       </summary>
-      <div className="px-4 pb-4 text-gray-600">{answer}</div>
+      <div className="px-4 pb-4 text-muted-foreground">{answer}</div>
     </details>
   );
 }
