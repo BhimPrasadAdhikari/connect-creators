@@ -134,7 +134,7 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
       {navSections.map((section, sectionIdx) => (
         <div key={sectionIdx} className={sectionIdx > 0 ? "mt-6" : ""}>
           {section.title && (!isCollapsed || mobile) && (
-            <div className="px-4 pb-2 text-xs font-semibold text-gray-400 uppercase tracking-wider">
+            <div className="px-4 pb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
               {section.title}
             </div>
           )}
@@ -150,8 +150,8 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
                     "flex items-center gap-3 rounded-2xl font-medium transition-all",
                     !mobile && isCollapsed ? "justify-center p-3" : "px-4 py-3",
                     active
-                      ? "bg-gray-900 text-white shadow-md shadow-gray-900/10"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                      ? "bg-foreground text-background shadow-md"
+                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
                   )}
                   title={!mobile && isCollapsed ? item.label : undefined}
                 >
@@ -174,7 +174,7 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
           <Avatar src={user.image} name={user.name || ""} size="sm" />
           <Link
             href="/api/auth/signout"
-            className="p-2 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"
+            className="p-2 rounded-lg text-muted-foreground hover:text-accent-red hover:bg-accent-red/10 transition-colors"
             title="Sign out"
           >
             <LogOut className="w-4 h-4" />
@@ -185,7 +185,7 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
           <div className="flex items-center gap-3 mb-3">
             <Avatar src={user.image} name={user.name || ""} size="sm" />
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-gray-900 truncate">
+              <p className="font-semibold text-sm text-foreground truncate">
                 {variant === "creator" && creatorProfile?.displayName
                   ? creatorProfile.displayName
                   : user.name}
@@ -194,19 +194,19 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
                 <Link
                   href={`/creator/${creatorProfile.username}`}
                   onClick={mobile ? closeMobile : undefined}
-                  className="text-xs text-blue-600 hover:text-blue-700 font-medium"
+                  className="text-xs text-primary hover:text-primary-700 font-medium"
                 >
                   View Profile ↗
                 </Link>
               )}
               {variant === "fan" && (
-                <p className="text-xs text-gray-500 truncate">{user.email}</p>
+                <p className="text-xs text-muted-foreground truncate">{user.email}</p>
               )}
             </div>
           </div>
           <Link
             href="/api/auth/signout"
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-red-500 transition-colors"
+            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-red transition-colors"
           >
             <LogOut className="w-4 h-4" />
             Sign out
@@ -221,7 +221,7 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
       {/* Mobile Sidebar Overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity"
+          className="fixed inset-0 bg-overlay/50 z-40 lg:hidden transition-opacity"
           onClick={closeMobile}
           aria-hidden="true"
         />
@@ -230,23 +230,23 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
       {/* Mobile Sidebar Drawer */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full w-72 bg-white flex flex-col z-50 lg:hidden transition-transform duration-300 ease-in-out border-r border-gray-100",
+          "fixed left-0 top-0 h-full w-72 bg-card flex flex-col z-50 lg:hidden transition-transform duration-300 ease-in-out border-r border-border",
           isMobileOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         {/* Mobile Header */}
-        <div className="flex items-center justify-between h-16 px-4 border-b border-gray-100">
+        <div className="flex items-center justify-between h-16 px-4 border-b border-border">
           <Link href="/" className="flex items-center gap-3" onClick={closeMobile}>
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
               <Heart className="w-5 h-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-gray-900 tracking-tight">
+            <span className="text-xl font-bold text-foreground tracking-tight">
               CreatorConnect
             </span>
           </Link>
           <button
             onClick={closeMobile}
-            className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             aria-label="Close menu"
           >
             <X className="w-5 h-5" />
@@ -259,7 +259,7 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
         </nav>
 
         {/* Mobile User Profile */}
-        <div className="border-t border-gray-100 p-4">
+        <div className="border-t border-border p-4">
           <UserProfileContent mobile />
         </div>
       </aside>
@@ -267,18 +267,18 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
       {/* Desktop Sidebar */}
       <aside
         className={cn(
-          "fixed left-0 top-0 h-full bg-white hidden lg:flex flex-col z-40 transition-all duration-300 border-r border-gray-100",
+          "fixed left-0 top-0 h-full bg-card hidden lg:flex flex-col z-40 transition-all duration-300 border-r border-border",
           isCollapsed ? "w-20" : "w-72"
         )}
       >
         {/* Desktop Header */}
         <div className={cn("flex items-center h-16 px-4", isCollapsed ? "justify-center" : "justify-between")}>
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20 flex-shrink-0">
+            <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 flex-shrink-0">
               <Heart className="w-5 h-5 text-white" />
             </div>
             {!isCollapsed && (
-              <span className="text-xl font-bold text-gray-900 tracking-tight">
+              <span className="text-xl font-bold text-foreground tracking-tight">
                 CreatorConnect
               </span>
             )}
@@ -286,7 +286,7 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
           {!isCollapsed && (
             <button
               onClick={toggle}
-              className="p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               aria-label="Collapse sidebar"
             >
               <ChevronLeft className="w-5 h-5" />
@@ -298,7 +298,7 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
         {isCollapsed && (
           <button
             onClick={toggle}
-            className="mx-auto mt-2 p-2 rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+            className="mx-auto mt-2 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             aria-label="Expand sidebar"
           >
             <ChevronRight className="w-5 h-5" />
@@ -311,7 +311,7 @@ export function DashboardSidebar({ variant, user, creatorProfile }: DashboardSid
         </nav>
 
         {/* Desktop User Profile */}
-        <div className={cn("border-t border-gray-100", isCollapsed ? "p-2" : "p-4")}>
+        <div className={cn("border-t border-border", isCollapsed ? "p-2" : "p-4")}>
           <UserProfileContent />
         </div>
       </aside>
@@ -365,25 +365,25 @@ export function DashboardLayout({ children, variant, user, creatorProfile }: Das
       toggleMobile: () => setIsMobileOpen(!isMobileOpen),
       closeMobile
     }}>
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-background">
         <DashboardSidebar variant={variant} user={user} creatorProfile={creatorProfile} />
 
         {/* Mobile Header */}
-        <header className="lg:hidden sticky top-0 bg-white/80 backdrop-blur-md border-b border-gray-100 z-30 px-4 py-3 safe-area-top">
+        <header className="lg:hidden sticky top-0 bg-card/80 backdrop-blur-md border-b border-border z-30 px-4 py-3 safe-area-top">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsMobileOpen(true)}
-                className="p-2 -ml-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                className="p-2 -ml-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
                 aria-label="Open menu"
               >
                 <Menu className="w-6 h-6" />
               </button>
               <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                   <Heart className="w-4 h-4 text-white" />
                 </div>
-                <span className="font-bold text-gray-900 text-sm">CreatorConnect</span>
+                <span className="font-bold text-foreground text-sm">CreatorConnect</span>
               </Link>
             </div>
             <Avatar src={user.image} name={user.name || ""} size="sm" />
