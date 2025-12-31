@@ -75,3 +75,60 @@ export { SectionHeader } from "./SectionHeader";
 export type { SectionHeaderProps } from "./SectionHeader";
 export { FeatureCard } from "./FeatureCard";
 export type { FeatureCardProps } from "./FeatureCard";
+
+export { CreatorCard } from "./CreatorCard";
+
+// Neubrutalist Bento Grid System
+export {
+  BentoGrid,
+  BentoCell,
+  BentoHeader,
+  BentoContent,
+  BentoTitle,
+  BentoDescription,
+} from "./BentoGrid";
+export type {
+  BentoGridProps,
+  BentoCellProps,
+  BentoHeaderProps,
+  BentoContentProps,
+  BentoTitleProps,
+  BentoDescriptionProps,
+} from "./BentoGrid";
+
+// Glass Navigation
+export { GlassNav, GlassNavContent } from "./GlassNav";
+export type { GlassNavProps, GlassNavContentProps } from "./GlassNav";
+
+// Trust Signals
+export { TrustBadge, TrustBadgeGroup } from "./TrustBadge";
+export type { TrustBadgeProps, TrustBadgeType, TrustBadgeGroupProps } from "./TrustBadge";
+
+// AI Smart Discovery
+export {
+  AffinityScore,
+  ROIPredictor,
+  MatchCard,
+  SmartDiscoveryHeader,
+} from "./SmartDiscovery";
+export type {
+  AffinityScoreProps,
+  ROIPredictorProps,
+  MatchCardProps,
+  SmartDiscoveryHeaderProps,
+} from "./SmartDiscovery";
+
+// Low-Friction Forms
+export {
+  FormInput,
+  FormTextarea,
+  FormProgress,
+  FormSection,
+} from "./LowFrictionForm";
+export type {
+  FormInputProps,
+  FormTextareaProps,
+  FormProgressProps,
+  FormSectionProps,
+} from "./LowFrictionForm";
+

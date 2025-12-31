@@ -7,7 +7,7 @@ export default function Loading() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Sidebar skeleton */}
-      <aside className="fixed left-0 top-0 h-full w-64 bg-white border-r border-gray-200 z-40 hidden lg:block">
+      <aside className="fixed left-0 top-0 h-full w-64 bg-card border-r border-gray-200 z-40 hidden lg:block">
         <div className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-200">
             <Link href="/" className="flex items-center gap-2">
@@ -41,7 +41,7 @@ export default function Loading() {
       {/* Main Content */}
       <main className="lg:ml-64 min-h-screen">
         {/* Mobile Header */}
-        <header className="lg:hidden sticky top-0 z-30 bg-white border-b border-gray-200 px-4 py-3">
+        <header className="lg:hidden sticky top-0 z-30 bg-card border-b border-gray-200 px-4 py-3">
           <div className="flex items-center gap-3">
             <Skeleton className="w-5 h-5" />
             <Skeleton className="h-5 w-28" />

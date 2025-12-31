@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { authOptions } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { CreatorDashboardShell } from "@/components/layout/CreatorDashboardShell";
+import { DatabaseError } from "@/components/ui/DatabaseError";
 
 export default async function CreatorDashboardLayout({
   children,
@@ -21,16 +22,26 @@ export default async function CreatorDashboardLayout({
   }
 
   // Fetch creator profile for sidebar
-  const creatorProfile = await prisma.creatorProfile.findUnique({
-    where: { userId },
-    select: {
-      displayName: true,
-      username: true,
-      user: {
-        select: { name: true, email: true, image: true },
+  let creatorProfile;
+  try {
+    creatorProfile = await prisma.creatorProfile.findUnique({
+      where: { userId },
+      select: {
+        displayName: true,
+        username: true,
+        user: {
+          select: { name: true, email: true, image: true },
+        },
       },
-    },
-  });
+    });
+  } catch (error) {
+    // Re-throw redirect errors (Next.js uses exceptions for redirects)
+    if (error instanceof Error && error.message.includes("NEXT_REDIRECT")) {
+      throw error;
+    }
+    console.error("Database connection error:", error);
+    return <DatabaseError />;
+  }
 
   if (!creatorProfile) {
     redirect("/dashboard");

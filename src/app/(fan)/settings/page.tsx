@@ -13,6 +13,7 @@ import {
   Save,
   Loader2,
   Check,
+  ChevronRight,
 } from "lucide-react";
 import {
   Button,
@@ -21,6 +22,8 @@ import {
   Input,
   Toggle,
   Avatar,
+  CardHeader,
+  CardTitle,
 } from "@/components/ui";
 
 interface UserSettings {
@@ -218,8 +221,8 @@ export default function SettingsPage() {
 
   if (status === "loading") {
     return (
-      <div className="p-6 lg:p-8 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+      <div className="p-6 lg:p-8 flex items-center justify-center min-h-[50vh]">
+        <Loader2 className="w-10 h-10 animate-spin text-primary stroke-[3]" />
       </div>
     );
   }
@@ -238,238 +241,267 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="p-6 lg:p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Settings</h1>
+    <div className="p-4 sm:p-6 lg:p-8 max-w-[1600px] mx-auto space-y-8">
+      <div className="flex flex-col gap-2">
+        <h1 className="font-display text-4xl font-black uppercase tracking-tight text-foreground">
+          Settings
+        </h1>
+        <p className="text-xl text-muted-foreground font-medium">
+          Manage your account preferences and security.
+        </p>
+      </div>
 
-        <div className="grid md:grid-cols-4 gap-6">
-          {/* Sidebar Navigation */}
-          <nav className="md:col-span-1">
-            <Card>
-              <CardContent className="p-2">
-                {sections.map((section) => {
-                  const Icon = section.icon;
-                  return (
-                    <button
-                      key={section.id}
-                      onClick={() => setActiveSection(section.id)}
-                      className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
-                        activeSection === section.id
-                          ? "bg-blue-50 text-blue-600"
-                          : "text-gray-600 hover:bg-gray-50"
-                      }`}
-                    >
-                      <Icon className="w-5 h-5" />
-                      <span className="text-sm font-medium">{section.label}</span>
-                    </button>
-                  );
-                })}
-              </CardContent>
-            </Card>
-          </nav>
+      <div className="grid lg:grid-cols-12 gap-8">
+        {/* Sidebar Navigation */}
+        <nav className="lg:col-span-3 space-y-2">
+          {sections.map((section) => {
+            const Icon = section.icon;
+            const isActive = activeSection === section.id;
+            
+            // Special styling for Danger Zone
+            const isDanger = section.id === "danger";
+            
+            return (
+              <button
+                key={section.id}
+                onClick={() => setActiveSection(section.id)}
+                className={`
+                  w-full flex items-center justify-between px-4 py-3 border-2 transition-all duration-200 group
+                  ${isActive 
+                    ? isDanger 
+                      ? "bg-accent-red text-white border-brutal-black shadow-brutal-sm translate-x-[-2px] translate-y-[-2px]" 
+                      : "bg-primary text-white border-brutal-black shadow-brutal-sm translate-x-[-2px] translate-y-[-2px]"
+                    : isDanger
+                      ? "bg-card text-accent-red border-transparent hover:border-accent-red hover:bg-accent-red/10"
+                      : "bg-card text-muted-foreground border-transparent hover:border-brutal-black hover:text-foreground hover:bg-accent-yellow/20"
+                  }
+                `}
+              >
+                <div className="flex items-center gap-3">
+                  <Icon className={`w-5 h-5 stroke-[2.5] ${isActive ? "scale-110" : "group-hover:scale-110"} transition-transform`} />
+                  <span className="font-bold font-display uppercase tracking-wide text-sm">{section.label}</span>
+                </div>
+                {isActive && <ChevronRight className="w-5 h-5 stroke-[3]" />}
+              </button>
+            );
+          })}
+        </nav>
 
-          {/* Content */}
-          <div className="md:col-span-3">
-            {/* Success/Error Messages */}
-            {saved && (
-              <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-lg flex items-center gap-2">
-                <Check className="w-5 h-5" />
-                Settings saved successfully!
-              </div>
-            )}
-            {error && (
-              <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
-                {error}
-              </div>
-            )}
+        {/* Content */}
+        <div className="lg:col-span-9">
+          <Card variant="brutal" className="bg-card min-h-[500px]">
+            <CardHeader className="border-b-4 border-brutal-black bg-muted/30 pb-6">
+              <CardTitle className="font-display text-2xl font-black uppercase tracking-tight flex items-center gap-3">
+                {sections.find(s => s.id === activeSection)?.icon && (
+                  <div className="p-2 bg-card border-2 border-brutal-black shadow-brutal-sm">
+                    {(() => {
+                      const Icon = sections.find(s => s.id === activeSection)!.icon;
+                      return <Icon className="w-6 h-6 stroke-[2.5]" />;
+                    })()}
+                  </div>
+                )}
+                {sections.find(s => s.id === activeSection)?.label}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="p-6 lg:p-8 space-y-8">
+              {/* Success/Error Messages */}
+              {saved && (
+                <div className="p-4 bg-accent-green/10 border-2 border-accent-green text-accent-green-darker font-bold flex items-center gap-3 shadow-brutal-sm animate-in fade-in slide-in-from-top-2">
+                  <div className="w-8 h-8 bg-accent-green text-white border-2 border-accent-green-darker flex items-center justify-center">
+                    <Check className="w-5 h-5 stroke-[3]" />
+                  </div>
+                  <span className="uppercase tracking-wide font-mono text-sm">Settings saved successfully!</span>
+                </div>
+              )}
+              {error && (
+                <div className="p-4 bg-accent-red/10 border-2 border-accent-red text-accent-red font-bold animate-in fade-in slide-in-from-top-2">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-6 h-6 stroke-[3]" />
+                    <span className="uppercase tracking-wide font-mono text-sm">{error}</span>
+                  </div>
+                </div>
+              )}
 
-            {/* Profile Section */}
-            {activeSection === "profile" && (
-              <Card>
-                <CardContent>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                    Profile Settings
-                  </h2>
-
-                  <div className="flex items-center gap-4 mb-6">
-                    <Avatar
-                      src={session.user?.image}
-                      name={session.user?.name || ""}
-                      size="lg"
-                    />
+              {/* Profile Section */}
+              {activeSection === "profile" && (
+                <div className="space-y-8 max-w-2xl">
+                  <div className="flex items-center gap-6 p-6 border-2 border-brutal-black bg-muted/20 border-dashed">
+                    <div className="border-2 border-brutal-black p-1 bg-card shadow-brutal-sm">
+                      <Avatar
+                        src={session.user?.image}
+                        name={session.user?.name || ""}
+                        size="lg"
+                        className="rounded-none w-20 h-20"
+                      />
+                    </div>
                     <div>
-                      <p className="font-medium text-gray-900">Profile Photo</p>
-                      <p className="text-sm text-gray-500">
-                        Connected via your authentication provider
+                      <p className="font-black text-lg uppercase font-display mb-1">Profile Photo</p>
+                      <p className="text-sm font-mono text-muted-foreground bg-card px-2 py-1 border border-brutal-black inline-block">
+                        Managed via OAuth Provider
                       </p>
                     </div>
                   </div>
 
-                  <div className="space-y-4">
-                    <Input
-                      label="Display Name"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Your name"
-                    />
-
-                    <Input
-                      label="Email Address"
-                      type="email"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      placeholder="your@email.com"
-                    />
-                  </div>
-
-                  <div className="mt-6 flex justify-end">
-                    <Button onClick={saveProfile} disabled={loading}>
-                      {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Save className="w-4 h-4" />
-                      )}
-                      Save Changes
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Password Section */}
-            {activeSection === "password" && (
-              <Card>
-                <CardContent>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                    Change Password
-                  </h2>
-
-                  <div className="space-y-4">
-                    <Input
-                      label="Current Password"
-                      type="password"
-                      value={currentPassword}
-                      onChange={(e) => setCurrentPassword(e.target.value)}
-                      placeholder="••••••••"
-                    />
-
-                    <Input
-                      label="New Password"
-                      type="password"
-                      value={newPassword}
-                      onChange={(e) => setNewPassword(e.target.value)}
-                      placeholder="••••••••"
-                    />
-
-                    <Input
-                      label="Confirm New Password"
-                      type="password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      placeholder="••••••••"
-                    />
-                  </div>
-
-                  <p className="text-sm text-gray-500 mt-4">
-                    Password must be at least 8 characters long.
-                  </p>
-
-                  <div className="mt-6 flex justify-end">
-                    <Button onClick={changePassword} disabled={loading}>
-                      {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <Save className="w-4 h-4" />
-                      )}
-                      Update Password
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
-
-            {/* Notifications Section */}
-            {activeSection === "notifications" && (
-              <Card>
-                <CardContent>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                    Notification Preferences
-                  </h2>
-
                   <div className="space-y-6">
-                    <Toggle
-                      label="Email Notifications"
-                      description="Receive email notifications about new content, messages, and updates"
-                      checked={emailNotifications}
-                      onChange={(e) => setEmailNotifications(e.target.checked)}
-                    />
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold uppercase font-mono tracking-wide">Display Name</label>
+                      <Input
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        placeholder="YOUR NAME"
+                        className="font-bold text-lg"
+                      />
+                    </div>
 
-                    <Toggle
-                      label="Marketing Emails"
-                      description="Receive promotional emails about new features and offers"
-                      checked={marketingEmails}
-                      onChange={(e) => setMarketingEmails(e.target.checked)}
-                    />
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold uppercase font-mono tracking-wide">Email Address</label>
+                      <Input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="YOUR@EMAIL.COM"
+                        className="font-bold text-lg"
+                      />
+                    </div>
                   </div>
 
-                  <div className="mt-6 flex justify-end">
-                    <Button onClick={saveNotifications} disabled={loading}>
+                  <div className="pt-4 border-t-2 border-brutal-black border-dashed flex justify-end">
+                    <Button onClick={saveProfile} disabled={loading} variant="brutal-accent" size="lg">
                       {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
                       ) : (
-                        <Save className="w-4 h-4" />
+                        <Save className="w-5 h-5 mr-2 stroke-[3]" />
                       )}
-                      Save Preferences
+                      SAVE CHANGES
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              )}
 
-            {/* Privacy Section */}
-            {activeSection === "privacy" && (
-              <Card>
-                <CardContent>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                    Privacy Settings
-                  </h2>
-
+              {/* Password Section */}
+              {activeSection === "password" && (
+                <div className="space-y-8 max-w-2xl">
                   <div className="space-y-6">
-                    <Toggle
-                      label="Public Profile"
-                      description="Allow others to see your profile and subscriptions"
-                      checked={profilePublic}
-                      onChange={(e) => setProfilePublic(e.target.checked)}
-                    />
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold uppercase font-mono tracking-wide">Current Password</label>
+                      <Input
+                        type="password"
+                        value={currentPassword}
+                        onChange={(e) => setCurrentPassword(e.target.value)}
+                        placeholder="••••••••"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold uppercase font-mono tracking-wide">New Password</label>
+                      <Input
+                        type="password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="••••••••"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-sm font-bold uppercase font-mono tracking-wide">Confirm New Password</label>
+                      <Input
+                        type="password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="••••••••"
+                      />
+                    </div>
                   </div>
 
-                  <div className="mt-6 flex justify-end">
-                    <Button onClick={savePrivacy} disabled={loading}>
+                  <div className="p-4 bg-blue-50 border-2 border-blue-500 text-blue-700 text-sm font-mono font-bold flex items-center gap-3">
+                     <Shield className="w-5 h-5" />
+                     PASSWORD MUST BE AT LEAST 8 CHARACTERS LONG
+                  </div>
+
+                  <div className="pt-4 border-t-2 border-brutal-black border-dashed flex justify-end">
+                    <Button onClick={changePassword} disabled={loading} variant="brutal-accent" size="lg">
                       {loading ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
                       ) : (
-                        <Save className="w-4 h-4" />
+                        <Save className="w-5 h-5 mr-2 stroke-[3]" />
                       )}
-                      Save Settings
+                      UPDATE PASSWORD
                     </Button>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              )}
 
-            {/* Connected Accounts Section */}
-            {activeSection === "connections" && (
-              <Card>
-                <CardContent>
-                  <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                    Connected Accounts
-                  </h2>
+              {/* Notifications Section */}
+              {activeSection === "notifications" && (
+                <div className="space-y-8 max-w-2xl">
+                  <div className="space-y-6">
+                    <div className="p-6 border-2 border-brutal-black bg-card shadow-brutal-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform">
+                      <Toggle
+                        label="Email Notifications"
+                        description="Receive email notifications about new content, messages, and updates"
+                        checked={emailNotifications}
+                        onChange={(e) => setEmailNotifications(e.target.checked)}
+                      />
+                    </div>
 
+                    <div className="p-6 border-2 border-brutal-black bg-card shadow-brutal-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform">
+                      <Toggle
+                        label="Marketing Emails"
+                        description="Receive promotional emails about new features and offers"
+                        checked={marketingEmails}
+                        onChange={(e) => setMarketingEmails(e.target.checked)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t-2 border-brutal-black border-dashed flex justify-end">
+                    <Button onClick={saveNotifications} disabled={loading} variant="brutal-accent" size="lg">
+                      {loading ? (
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      ) : (
+                        <Save className="w-5 h-5 mr-2 stroke-[3]" />
+                      )}
+                      SAVE PREFERENCES
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Privacy Section */}
+              {activeSection === "privacy" && (
+                <div className="space-y-8 max-w-2xl">
+                  <div className="space-y-6">
+                     <div className="p-6 border-2 border-brutal-black bg-card shadow-brutal-sm hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform">
+                      <Toggle
+                        label="Public Profile"
+                        description="Allow others to see your profile and subscriptions"
+                        checked={profilePublic}
+                        onChange={(e) => setProfilePublic(e.target.checked)}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="pt-4 border-t-2 border-brutal-black border-dashed flex justify-end">
+                     <Button onClick={savePrivacy} disabled={loading} variant="brutal-accent" size="lg">
+                      {loading ? (
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      ) : (
+                        <Save className="w-5 h-5 mr-2 stroke-[3]" />
+                      )}
+                      SAVE SETTINGS
+                    </Button>
+                  </div>
+                </div>
+              )}
+
+              {/* Connected Accounts Section */}
+              {activeSection === "connections" && (
+                <div className="space-y-8 max-w-2xl">
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center border">
-                          <svg className="w-5 h-5" viewBox="0 0 24 24">
+                    <div className="flex items-center justify-between p-6 border-2 border-brutal-black bg-card shadow-brutal-sm">
+                      <div className="flex items-center gap-4">
+                        <div className="w-12 h-12 border-2 border-brutal-black flex items-center justify-center p-2 bg-card shadow-[2px_2px_0_0_#000]">
+                          <svg className="w-full h-full" viewBox="0 0 24 24">
                             <path
                               fill="#4285F4"
                               d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -489,83 +521,89 @@ export default function SettingsPage() {
                           </svg>
                         </div>
                         <div>
-                          <p className="font-medium text-gray-900">Google</p>
-                          <p className="text-sm text-gray-500">
-                            {session.user?.email}
+                          <p className="font-black font-display uppercase text-lg">Google</p>
+                          <p className="text-sm font-mono text-muted-foreground uppercase">
+                            {session.user?.email || "NOT CONNECTED"}
                           </p>
                         </div>
                       </div>
-                      <span className="px-3 py-1 bg-green-100 text-green-800 text-sm font-medium rounded-full">
+                      <div className="px-3 py-1 bg-accent-green text-white text-xs font-bold uppercase tracking-wider border-2 border-brutal-black shadow-[2px_2px_0_0_#000]">
                         Connected
-                      </span>
+                      </div>
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            )}
+                </div>
+              )}
 
-            {/* Danger Zone Section */}
-            {activeSection === "danger" && (
-              <Card className="border-red-200">
-                <CardContent>
-                  <h2 className="text-lg font-semibold text-red-600 mb-2">
-                    Danger Zone
-                  </h2>
-                  <p className="text-gray-600 mb-6">
-                    Once you delete your account, there is no going back. Please be certain.
-                  </p>
+              {/* Danger Zone Section */}
+              {activeSection === "danger" && (
+                <div className="space-y-8 max-w-2xl border-4 border-accent-red p-6 bg-red-50/50">
+                  <div className="flex items-start gap-4">
+                    <div className="p-3 bg-accent-red text-white border-2 border-brutal-black shadow-brutal-sm">
+                       <AlertTriangle className="w-8 h-8 stroke-[3]" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black text-accent-red uppercase font-display mb-2">
+                        Danger Zone
+                      </h2>
+                      <p className="text-foreground font-medium">
+                        Once you delete your account, there is no going back. Please be certain.
+                      </p>
+                    </div>
+                  </div>
 
                   {!showDeleteConfirm ? (
                     <Button
-                      variant="outline"
-                      className="border-red-500 text-red-500 hover:bg-red-50"
+                      variant="brutal"
+                      className="bg-card text-accent-red border-accent-red hover:bg-accent-red hover:text-white w-full"
                       onClick={() => setShowDeleteConfirm(true)}
                     >
-                      Delete Account
+                      DELETE ACCOUNT INTENT
                     </Button>
                   ) : (
-                    <div className="p-4 bg-red-50 rounded-lg">
-                      <p className="text-sm text-red-800 mb-4">
+                    <div className="p-6 bg-card border-2 border-accent-red shadow-brutal-sm">
+                      <p className="text-sm font-bold text-accent-red mb-4 uppercase">
                         This action cannot be undone. This will permanently delete your account
                         and remove all your data including subscriptions and content.
                       </p>
-                      <p className="text-sm text-red-800 mb-3">
-                        Type <strong>DELETE</strong> to confirm:
-                      </p>
-                      <Input
-                        value={deleteConfirmText}
-                        onChange={(e) => setDeleteConfirmText(e.target.value)}
-                        placeholder="DELETE"
-                        className="mb-4"
-                      />
-                      <div className="flex gap-3">
+                      <div className="mb-4 space-y-2">
+                        <label className="text-xs font-black uppercase font-mono">Type "DELETE" to confirm:</label>
+                        <Input
+                          value={deleteConfirmText}
+                          onChange={(e) => setDeleteConfirmText(e.target.value)}
+                          placeholder="DELETE"
+                          className="border-accent-red focus:ring-accent-red"
+                        />
+                      </div>
+                      <div className="flex gap-4">
                         <Button
-                          variant="outline"
+                          variant="brutal"
+                          className="flex-1"
                           onClick={() => {
                             setShowDeleteConfirm(false);
                             setDeleteConfirmText("");
                           }}
                         >
-                          Cancel
+                          CANCEL
                         </Button>
                         <Button
-                          className="bg-red-600 hover:bg-red-700"
+                          className="flex-1 bg-accent-red text-white border-2 border-brutal-black shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal-lg rounded-none transition-all font-bold uppercase"
                           onClick={deleteAccount}
                           disabled={loading || deleteConfirmText !== "DELETE"}
                         >
                           {loading ? (
                             <Loader2 className="w-4 h-4 animate-spin" />
                           ) : (
-                            "Delete My Account"
+                            "PERMANENTLY DELETE"
                           )}
                         </Button>
                       </div>
                     </div>
                   )}
-                </CardContent>
-              </Card>
-            )}
-          </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

@@ -1,11 +1,13 @@
 import Link from "next/link";
-import { Users as UsersIcon } from "lucide-react";
-import { Avatar, Button, SkeletonCreatorCard, SkeletonGrid } from "@/components/ui";
+import { Button, SkeletonCreatorCard, SkeletonGrid, CreatorCard } from "@/components/ui";
 import { ExploreFilters } from "@/components/ui/ExploreFilters";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import prisma from "@/lib/prisma";
 import { Suspense } from "react";
+
+// Enable ISR - revalidate every 60 seconds for fresh data with caching
+export const revalidate = 60;
 
 // Helper function to format price
 function formatPrice(amountInPaise: number): string {
@@ -43,7 +45,11 @@ async function getCreators(filters: {
         { bio: { contains: q, mode: "insensitive" } },
       ],
     } : undefined,
-    include: {
+    select: {
+      username: true,
+      displayName: true,
+      bio: true,
+      isVerified: true,
       user: {
         select: {
           name: true,
@@ -54,6 +60,9 @@ async function getCreators(filters: {
         where: { isActive: true },
         orderBy: { price: "asc" },
         take: 1,
+        select: {
+          price: true,
+        },
       },
       _count: {
         select: {
@@ -64,6 +73,7 @@ async function getCreators(filters: {
       },
     },
     orderBy,
+    take: 12, // Limit initial load for performance
   });
 
   let mappedCreators = creators.map((creator) => ({
@@ -112,15 +122,32 @@ export default async function ExplorePage({ searchParams }: PageProps) {
     <main className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Page Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Explore Creators
-          </h1>
-          <p className="text-muted-foreground max-w-xl mx-auto">
-            Support creators you love. Join their exclusive communities.
-            Starting at just ₹99/month.
-          </p>
+        {/* Page Header - Neubrutalist Style */}
+        {/* Page Header - Neubrutalist Style */}
+        {/* Page Header - Neubrutalist Style */}
+        <div className="relative mb-12 py-12 px-4 bg-primary border-4 border-brutal-black text-white overflow-hidden">
+           {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-20" 
+               style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+          </div>
+
+          <div className="relative z-10 text-center">
+            <div className="inline-block transform -rotate-2 mb-6">
+              <span className="bg-card text-foreground border-3 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-6 py-2 font-black uppercase tracking-widest text-sm sm:text-base">
+                Starting at ₹99/month
+              </span>
+            </div>
+
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black mb-6 font-display uppercase tracking-tighter text-white drop-shadow-[6px_6px_0px_rgba(0,0,0,1)]">
+              Explore Creators
+            </h1>
+            
+            <div className="max-w-2xl mx-auto bg-brutal-black/20 p-6 border-2 border-white/20 backdrop-blur-sm transform rotate-1">
+              <p className="text-lg sm:text-xl font-bold font-mono text-white/90 leading-relaxed">
+                Support creators you love. Join their exclusive communities.
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Filters */}
@@ -146,70 +173,33 @@ async function CreatorsContent({ filters }: { filters: { q?: string; category?: 
   return (
     <>
       {creators.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-muted-foreground mb-2">
+        <div className="text-center py-12 border-3 border-dashed border-border">
+          <p className="text-muted-foreground mb-4 text-lg">
             {filters.q ? `No creators found for "${filters.q}"` : "No creators found. Be the first to join!"}
           </p>
           {filters.q ? (
-            <Link href="/explore" className="text-primary hover:underline">
-              Clear search
+            <Link href="/explore">
+              <Button variant="brutal">Clear Search</Button>
             </Link>
           ) : (
-            <Link href="/signup?role=creator" className="text-primary hover:underline">
-              Become a Creator
+            <Link href="/signup?role=creator">
+              <Button variant="brutal-accent">Become a Creator</Button>
             </Link>
           )}
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {creators.map((creator) => (
-            <Link key={creator.username} href={`/creator/${creator.username}`} className="block group">
-              <div className="h-full p-5 rounded-3xl bg-card border border-transparent hover:border-border hover:shadow-lg transition-all duration-300">
-                <div className="flex items-start gap-4 mb-4">
-                  <div className="relative">
-                    <Avatar
-                      src={creator.image}
-                      name={creator.name}
-                      size="lg"
-                      className="w-16 h-16 ring-4 ring-muted group-hover:ring-card transition-all"
-                    />
-                    {creator.isVerified && (
-                      <div className="absolute -bottom-1 -right-1 bg-card rounded-full p-0.5">
-                        <div className="w-5 h-5 bg-primary rounded-full flex items-center justify-center">
-                          <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                          </svg>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  
-                  <div className="flex-1 min-w-0 pt-1">
-                    <h3 className="font-bold text-foreground truncate text-lg group-hover:text-primary transition-colors">
-                      {creator.name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground font-medium">
-                      @{creator.username}
-                    </p>
-                  </div>
-                </div>
-
-                <p className="text-muted-foreground text-sm mb-6 line-clamp-2 leading-relaxed min-h-[40px]">
-                  {creator.bio || "Creator on CreatorConnect. Join to see their exclusive content."}
-                </p>
-
-                <div className="flex items-center justify-between pt-4 border-t border-border-light group-hover:border-border transition-colors">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <UsersIcon className="w-4 h-4" />
-                    <span className="font-semibold text-foreground">{creator.subscriberCount.toLocaleString()}</span>
-                  </div>
-                  
-                  <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm font-bold group-hover:bg-primary group-hover:text-white transition-all">
-                    <span>{formatPrice(creator.startingPrice)}</span>
-                  </div>
-                </div>
-              </div>
-            </Link>
+            <CreatorCard
+              key={creator.username}
+              username={creator.username}
+              name={creator.name}
+              bio={creator.bio}
+              image={creator.image}
+              isVerified={creator.isVerified}
+              subscriberCount={creator.subscriberCount}
+              startingPrice={formatPrice(creator.startingPrice)}
+            />
           ))}
         </div>
       )}
@@ -217,7 +207,7 @@ async function CreatorsContent({ filters }: { filters: { q?: string; category?: 
       {/* Load More */}
       {creators.length > 0 && (
         <div className="text-center mt-12">
-          <Button variant="outline" size="lg">
+          <Button variant="brutal" size="lg">
             Load More Creators
           </Button>
         </div>
@@ -225,3 +215,4 @@ async function CreatorsContent({ filters }: { filters: { q?: string; category?: 
     </>
   );
 }
+

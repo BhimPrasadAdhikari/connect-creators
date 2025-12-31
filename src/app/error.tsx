@@ -18,40 +18,42 @@ export default function Error({
   }, [error]);
 
   return (
-    <main className="min-h-screen bg-background flex flex-col">
+    <main className="min-h-screen bg-background flex flex-col font-sans">
       <Header />
 
       <div className="flex-1 flex items-center justify-center px-4 py-16">
-        <Card className="max-w-md w-full">
+        <Card variant="brutal" className="max-w-md w-full border-4 bg-brutal-cream">
           <CardContent className="p-8 text-center">
-            <div className="w-16 h-16 rounded-full bg-red-500/10 flex items-center justify-center mx-auto mb-6">
-              <AlertTriangle className="w-8 h-8 text-red-500" />
+            <div className="w-20 h-20 border-3 border-brutal-black bg-accent-red text-white flex items-center justify-center mx-auto mb-6 shadow-brutal-sm">
+              <AlertTriangle className="w-10 h-10 stroke-[3]" />
             </div>
             
-            <h1 className="text-2xl font-bold text-foreground mb-3">
+            <h1 className="font-display text-3xl font-black text-foreground mb-3 uppercase tracking-tight">
               Something went wrong
             </h1>
-            <p className="text-muted-foreground mb-8">
-              We encountered an error loading this page. Please try again.
+            <p className="text-foreground font-medium mb-8 font-mono text-sm">
+              {error.message || "We encountered an error loading this page. Please try again."}
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button onClick={() => reset()}>
-                <RotateCcw className="w-4 h-4 mr-2" />
-                Try Again
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button onClick={() => reset()} variant="brutal-accent" className="w-full sm:w-auto">
+                <RotateCcw className="w-4 h-4 mr-2 stroke-[3]" />
+                TRY AGAIN
               </Button>
-              <Link href="/">
-                <Button variant="outline" className="w-full sm:w-auto">
-                  <Home className="w-4 h-4 mr-2" />
-                  Go Home
+              <Link href="/" className="w-full sm:w-auto">
+                <Button variant="brutal" className="w-full">
+                  <Home className="w-4 h-4 mr-2 stroke-[3]" />
+                  GO HOME
                 </Button>
               </Link>
             </div>
 
             {error.digest && (
-              <p className="text-xs text-muted-foreground mt-6">
-                Error ID: {error.digest}
-              </p>
+              <div className="mt-8 p-2 border-2 border-dashed border-brutal-black/30 bg-muted/50">
+                <p className="text-[10px] uppercase font-bold text-muted-foreground font-mono">
+                  Error ID: {error.digest}
+                </p>
+              </div>
             )}
           </CardContent>
         </Card>

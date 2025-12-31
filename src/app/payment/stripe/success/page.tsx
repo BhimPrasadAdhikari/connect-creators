@@ -3,7 +3,7 @@
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Heart, Loader2, Download, Package } from "lucide-react";
+import { CheckCircle, Heart, Loader2, Download, Package, ArrowRight, XCircle } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -53,28 +53,35 @@ function StripeSuccessContent() {
   if (verifying) {
     return (
       <div className="text-center py-12">
-        <Loader2 className="w-12 h-12 animate-spin text-accent-green mx-auto mb-4" />
-        <p className="text-muted-foreground">Verifying your payment...</p>
+        <Loader2 className="w-16 h-16 animate-spin text-foreground stroke-[3] mx-auto mb-6" />
+        <h2 className="text-3xl font-display font-black text-foreground uppercase mb-4 tracking-tight animate-pulse">
+          Verifying Payment...
+        </h2>
+        <p className="text-foreground font-mono font-bold text-lg bg-accent-yellow p-2 inline-block border-2 border-brutal-black transform rotate-1">
+          Checking Stripe status...
+        </p>
       </div>
     );
   }
 
   if (error || !success) {
     return (
-      <Card className="max-w-md w-full mx-auto">
+      <Card variant="brutal" className="max-w-md w-full mx-auto bg-card border-4">
         <CardContent className="p-8 text-center">
-          <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center mx-auto mb-4">
-            <Heart className="w-8 h-8 text-accent-red" />
+          <div className="w-24 h-24 rounded-none border-4 border-brutal-black flex items-center justify-center mx-auto mb-8 bg-accent-red shadow-brutal">
+            <Heart className="w-12 h-12 text-foreground stroke-[3]" />
           </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">
+          <h1 className="text-3xl font-display font-black text-foreground uppercase mb-4 tracking-tight">
             Payment Issue
           </h1>
-          <p className="text-muted-foreground mb-6">
-            {error || "There was an issue with your payment. Please try again."}
-          </p>
-          <div className="space-y-3">
+          <div className="bg-accent-red/20 p-4 border-2 border-brutal-black mb-8 transform -rotate-1">
+            <p className="text-foreground font-medium text-lg font-mono">
+              {error || "There was an issue with your payment. Please try again."}
+            </p>
+          </div>
+          <div className="space-y-4">
             <Link href="/explore" className="block">
-              <Button variant="primary" className="w-full">
+              <Button variant="brutal" size="lg" className="w-full">
                 Back to Explore
               </Button>
             </Link>
@@ -101,51 +108,53 @@ function StripeSuccessContent() {
   };
 
   return (
-    <Card className="max-w-md w-full mx-auto">
+    <Card variant="brutal" className="max-w-md w-full mx-auto bg-card border-4">
       <CardContent className="p-8 text-center">
-        <div className={`w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 ${
-          isTip ? "bg-pink-500/20" : "bg-accent-green/20"
+        <div className={`w-24 h-24 rounded-none border-4 border-brutal-black flex items-center justify-center mx-auto mb-8 shadow-brutal ${
+          isTip ? "bg-accent-pink" : "bg-accent-green"
         }`}>
           {isTip ? (
-            <Heart className="w-12 h-12 text-pink-500 fill-pink-500" />
+            <Heart className="w-12 h-12 text-foreground stroke-[3] fill-white" />
           ) : (
-            <CheckCircle className="w-12 h-12 text-accent-green" />
+            <CheckCircle className="w-12 h-12 text-foreground stroke-[3]" />
           )}
         </div>
         
-        <h1 className="text-2xl font-bold text-foreground mb-2">
+        <h1 className="text-3xl md:text-4xl font-display font-black text-foreground uppercase mb-6 tracking-tight leading-none">
           {getTitle()}
         </h1>
         
-        <p className="text-muted-foreground mb-6">
-          {getMessage()}
-        </p>
+        <div className="bg-accent-yellow/30 p-4 border-2 border-brutal-black mb-10 transform rotate-1">
+          <p className="text-foreground font-bold text-lg font-mono leading-relaxed">
+            {getMessage()}
+          </p>
+        </div>
 
-        <div className="space-y-3">
+        <div className="space-y-4">
           {isTip ? (
             <>
               <Link href="/explore" className="block">
-                <Button variant="primary" className="w-full bg-pink-600 hover:bg-pink-700">
-                  <Heart className="w-4 h-4 mr-2" />
+                <Button variant="brutal" className="w-full text-lg py-6 bg-accent-pink hover:bg-foreground hover:text-white">
+                  <Heart className="w-5 h-5 mr-3 stroke-[3]" />
                   Explore More Creators
                 </Button>
               </Link>
               <Link href="/dashboard" className="block">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full border-3 text-lg py-6 bg-card hover:bg-foreground hover:text-white transition-all transform hover:-translate-y-1 hover:shadow-brutal-sm">
                   Go to Dashboard
                 </Button>
               </Link>
             </>
           ) : isProduct ? (
             <>
-              <Link href="/dashboard/purchases" className="block">
-                <Button variant="primary" className="w-full">
-                  <Download className="w-4 h-4 mr-2" />
+              <Link href="/purchases" className="block">
+                <Button variant="brutal" className="w-full text-lg py-6">
+                  <Download className="w-5 h-5 mr-3 stroke-[3]" />
                   View My Purchases
                 </Button>
               </Link>
               <Link href="/explore" className="block">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full border-3 text-lg py-6 bg-card hover:bg-foreground hover:text-white transition-all transform hover:-translate-y-1 hover:shadow-brutal-sm">
                   Continue Browsing
                 </Button>
               </Link>
@@ -153,12 +162,12 @@ function StripeSuccessContent() {
           ) : (
             <>
               <Link href="/dashboard" className="block">
-                <Button variant="primary" className="w-full">
-                  Go to Dashboard
+                <Button variant="brutal" className="w-full text-lg py-6">
+                  Go to Dashboard <ArrowRight className="ml-2 w-5 h-5 stroke-[3]" />
                 </Button>
               </Link>
               <Link href="/explore" className="block">
-                <Button variant="outline" className="w-full">
+                <Button variant="outline" className="w-full border-3 text-lg py-6 bg-card hover:bg-foreground hover:text-white transition-all transform hover:-translate-y-1 hover:shadow-brutal-sm">
                   Explore More Creators
                 </Button>
               </Link>
@@ -166,7 +175,7 @@ function StripeSuccessContent() {
           )}
         </div>
 
-        <p className="text-sm text-muted-foreground mt-6">
+        <p className="text-xs font-bold uppercase tracking-wide text-foreground/60 mt-8">
           {isTip 
             ? "The creator has been notified of your tip."
             : "A confirmation email has been sent to your registered email address."}
@@ -178,14 +187,14 @@ function StripeSuccessContent() {
 
 export default function StripeSuccessPage() {
   return (
-    <main className="min-h-screen bg-background flex flex-col">
+    <main className="min-h-screen bg-accent-green/5 flex flex-col">
       <Header />
       
       <div className="flex-1 flex items-center justify-center p-4">
         <Suspense fallback={
-          <div className="text-center">
-            <Loader2 className="w-12 h-12 animate-spin text-accent-green mx-auto mb-4" />
-            <p className="text-muted-foreground">Loading...</p>
+          <div className="text-center py-12">
+            <Loader2 className="w-12 h-12 animate-spin text-foreground stroke-[3] mx-auto mb-4" />
+            <p className="text-foreground font-mono font-bold">Loading...</p>
           </div>
         }>
           <StripeSuccessContent />

@@ -1,17 +1,19 @@
 import { cn } from "@/lib/utils";
 
 export interface BadgeProps {
-  variant?: "default" | "success" | "accent" | "warning" | "error";
+  variant?: "default" | "success" | "accent" | "warning" | "error" | "neutral" | "brutal";
   children: React.ReactNode;
   className?: string;
 }
 
 const variants = {
-  default: "bg-primary/10 text-primary",
+  default: "bg-primary/20 text-primary",
   success: "bg-green-100 text-green-700",
   accent: "bg-accent/10 text-accent-700",
   warning: "bg-yellow-100 text-yellow-700",
   error: "bg-red-100 text-red-700",
+  neutral: "bg-gray-100 text-gray-700",
+  brutal: "bg-card text-foreground border-2 border-brutal-black rounded-none shadow-brutal-sm font-bold uppercase tracking-wider",
 };
 
 export function Badge({ variant = "default", children, className }: BadgeProps) {

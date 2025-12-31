@@ -142,12 +142,12 @@ export default function PostDetailPage() {
 
   if (!post) {
     return (
-      <main className="min-h-screen bg-background">
+      <main className="min-h-screen bg-background font-sans">
         <Header />
-        <div className="container mx-auto px-4 py-8 text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">Post Not Found</h1>
+        <div className="container mx-auto px-4 py-16 text-center">
+          <h1 className="text-4xl font-black text-foreground mb-4 font-display uppercase">Post Not Found</h1>
           <Link href="/explore">
-            <Button>Explore Creators</Button>
+            <Button variant="brutal">Explore Creators</Button>
           </Link>
         </div>
         <Footer />
@@ -158,148 +158,165 @@ export default function PostDetailPage() {
   const displayName = post.creator.displayName || post.creator.user.name;
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background font-sans">
       <Header />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="max-w-3xl mx-auto">
           {/* Back Link */}
           <Link
             href={`/creator/${post.creator.username}`}
-            className="inline-flex items-center text-muted-foreground hover:text-primary mb-6"
+            className="inline-flex items-center text-muted-foreground hover:text-foreground mb-6 font-bold font-mono group"
           >
-            <ArrowLeft className="w-4 h-4 mr-1" />
+            <ArrowLeft className="w-4 h-4 mr-2 group-hover:-translate-x-1 transition-transform" />
             Back to {displayName}
           </Link>
 
           {/* Post Card */}
-          <Card className="mb-8">
-            <CardContent className="p-6 sm:p-8">
-              {/* Creator Info */}
-              <div className="flex items-center gap-3 mb-6">
-                <Link href={`/creator/${post.creator.username}`}>
-                  <Avatar src={post.creator.user.image} name={displayName} size="md" />
-                </Link>
-                <div>
-                  <Link
-                    href={`/creator/${post.creator.username}`}
-                    className="font-medium text-foreground hover:text-primary"
-                  >
-                    {displayName}
-                  </Link>
-                  <p className="text-sm text-muted-foreground">
-                    {new Date(post.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
-                {post.isPaid && (
-                  <Badge variant={post.hasAccess ? "success" : "accent"} className="ml-auto">
-                    {post.hasAccess ? "Unlocked" : "Premium"}
-                  </Badge>
-                )}
-              </div>
+          <Card variant="brutal" className="mb-8 p-0 overflow-hidden">
+            <CardContent className="p-0">
+               {/* Header of Card */}
+               <div className="p-6 bg-card border-b-4 border-brutal-black">
+                 <div className="flex items-center gap-4">
+                    <Link href={`/creator/${post.creator.username}`} className="flex-shrink-0">
+                      <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-brutal-black hover:scale-105 transition-transform shadow-brutal-sm">
+                        <Avatar src={post.creator.user.image} name={displayName} size="md" />
+                      </div>
+                    </Link>
+                    <div className="flex-1">
+                       <Link
+                        href={`/creator/${post.creator.username}`}
+                        className="font-black text-xl text-foreground hover:underline decoration-4 underline-offset-4 decoration-primary font-display uppercase"
+                      >
+                        {displayName}
+                      </Link>
+                      <p className="text-sm font-bold font-mono text-muted-foreground">
+                        {new Date(post.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                     {post.isPaid && (
+                      <Badge variant={post.hasAccess ? "success" : "accent"} className="ml-auto text-sm font-black uppercase">
+                        {post.hasAccess ? "Unlocked" : "Premium"}
+                      </Badge>
+                    )}
+                 </div>
+               </div>
 
-              {/* Title */}
-              <h1 className="text-2xl font-bold text-foreground mb-4">{post.title}</h1>
+              <div className="p-6 sm:p-8">
+                {/* Title */}
+                <h1 className="text-4xl font-black text-foreground mb-6 font-display uppercase leading-tight">{post.title}</h1>
 
-              {/* Media */}
-              {post.mediaUrl && post.hasAccess && (
-                <div className="mb-6 rounded-lg overflow-hidden">
-                  {post.mediaType === "image" && (
-                    <Image
-                      src={post.mediaUrl}
-                      alt={post.title}
-                      width={800}
-                      height={450}
-                      className="w-full object-cover"
-                    />
-                  )}
-                  {post.mediaType === "video" && (
-                    <video src={post.mediaUrl} controls className="w-full" />
-                  )}
-                  {post.mediaType === "audio" && (
-                    <audio src={post.mediaUrl} controls className="w-full" />
-                  )}
-                </div>
-              )}
-
-              {/* Content */}
-              {post.hasAccess ? (
-                <div className="prose prose-gray dark:prose-invert max-w-none">
-                  <p className="text-foreground-secondary whitespace-pre-wrap">{post.content}</p>
-                </div>
-              ) : (
-                <div className="relative">
-                  <p className="text-muted-foreground blur-sm select-none">{post.content}</p>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <Card className="bg-card/95 shadow-lg">
-                      <CardContent className="p-6 text-center">
-                        <Lock className="w-8 h-8 text-primary mx-auto mb-3" />
-                        <h3 className="font-semibold text-foreground mb-2">Premium Content</h3>
-                        <p className="text-muted-foreground text-sm mb-4">
-                          Subscribe to {displayName}&apos;s {post.requiredTier?.name || "paid tier"} to unlock
-                        </p>
-                        <Link
-                          href={post.requiredTier ? `/checkout/${post.requiredTier.id}` : `/creator/${post.creator.username}`}
-                        >
-                          <Button>
-                            Subscribe for ₹{(post.requiredTier?.price || 0) / 100}/month
-                          </Button>
-                        </Link>
-                      </CardContent>
-                    </Card>
+                {/* Media */}
+                {post.mediaUrl && post.hasAccess && (
+                  <div className="mb-8 rounded-none border-4 border-brutal-black shadow-brutal overflow-hidden">
+                    {post.mediaType === "image" && (
+                      <Image
+                        src={post.mediaUrl}
+                        alt={post.title}
+                        width={800}
+                        height={450}
+                        className="w-full object-cover"
+                      />
+                    )}
+                    {post.mediaType === "video" && (
+                      <video src={post.mediaUrl} controls className="w-full" />
+                    )}
+                    {post.mediaType === "audio" && (
+                      <div className="p-6 bg-secondary/10 flex items-center justify-center">
+                          <audio src={post.mediaUrl} controls className="w-full" />
+                      </div>
+                    )}
                   </div>
-                </div>
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center gap-4 mt-6 pt-6 border-t border-border">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <MessageCircle className="w-5 h-5" />
-                  <span>{post._count.comments} comments</span>
-                </div>
-                
-                {session && post.hasAccess && (
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowTipModal(true)}
-                    className="ml-auto"
-                  >
-                    <Heart className="w-4 h-4 mr-2 text-red-500" />
-                    Send Tip
-                  </Button>
                 )}
+
+                {/* Content */}
+                {post.hasAccess ? (
+                  <div className="prose prose-neutral dark:prose-invert max-w-none mb-8">
+                    <p className="text-foreground text-lg whitespace-pre-wrap leading-relaxed font-medium">{post.content}</p>
+                  </div>
+                ) : (
+                  <div className="relative mb-8">
+                    <div className="filter blur-sm select-none bg-muted/20 p-8 h-48 mb-4">
+                       <p className="text-muted-foreground/30 font-display text-4xl font-black">
+                         This content is locked.
+                         Subscribe to view.
+                       </p>
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Card className="bg-card shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] border-4 border-brutal-black max-w-sm w-full mx-4">
+                        <CardContent className="p-8 text-center">
+                          <div className="w-16 h-16 bg-accent-yellow border-2 border-brutal-black flex items-center justify-center mx-auto mb-4 rounded-full shadow-brutal-sm">
+                              <Lock className="w-8 h-8 text-brutal-black" strokeWidth={2.5} />
+                          </div>
+                          <h3 className="text-xl font-black text-foreground mb-2 font-display uppercase">Premium Content</h3>
+                          <p className="text-muted-foreground font-bold mb-6">
+                            Subscribe to {displayName}&apos;s {post.requiredTier?.name || "paid tier"} to unlock
+                          </p>
+                          <Link
+                            href={post.requiredTier ? `/checkout/${post.requiredTier.id}` : `/creator/${post.creator.username}`}
+                          >
+                            <Button variant="brutal" className="w-full">
+                              Subscribe for ₹{(post.requiredTier?.price || 0) / 100}/month
+                            </Button>
+                          </Link>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex items-center gap-4 mt-8 pt-8 border-t-4 border-brutal-black border-dashed">
+                  <div className="flex items-center gap-2 text-foreground font-bold">
+                    <MessageCircle className="w-6 h-6 stroke-[2.5px]" />
+                    <span>{post._count.comments} comments</span>
+                  </div>
+                  
+                  {session && post.hasAccess && (
+                    <Button
+                      variant="outline"
+                      onClick={() => setShowTipModal(true)}
+                      className="ml-auto border-2 border-brutal-black hover:bg-accent-pink/10 hover:border-accent-pink hover:text-accent-pink font-bold"
+                    >
+                      <Heart className="w-5 h-5 mr-2" />
+                      Send Tip
+                    </Button>
+                  )}
+                </div>
               </div>
             </CardContent>
           </Card>
 
           {/* Comments Section */}
           {post.hasAccess && (
-            <Card>
+            <Card variant="brutal">
               <CardContent className="p-6">
-                <h2 className="text-lg font-semibold text-foreground mb-4">
-                  Comments ({post._count.comments})
+                <h2 className="text-2xl font-black text-foreground mb-6 font-display uppercase flex items-center gap-2">
+                   Comments <span className="text-lg text-muted-foreground ml-1">({post._count.comments})</span>
                 </h2>
 
                 {/* Add Comment */}
                 {session ? (
-                  <form onSubmit={handleComment} className="mb-6">
-                    <div className="flex gap-3">
-                      <Avatar src={session.user?.image} name={session.user?.name || ""} size="sm" />
+                  <form onSubmit={handleComment} className="mb-8 bg-secondary/10 p-4 border-2 border-brutal-black shadow-brutal-sm">
+                    <div className="flex gap-4">
+                      <div className="hidden sm:block">
+                          <Avatar src={session.user?.image} name={session.user?.name || ""} size="md" />
+                      </div>
                       <div className="flex-1">
                         <textarea
                           value={comment}
                           onChange={(e) => setComment(e.target.value)}
                           placeholder="Add a comment..."
                           rows={2}
-                          className="w-full px-4 py-2 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none placeholder:text-muted-foreground"
+                          className="w-full px-4 py-3 rounded-none border-2 border-brutal-black bg-card text-foreground focus:outline-none focus:ring-0 focus:border-primary resize-none placeholder:text-muted-foreground/70 font-medium"
                         />
-                        <div className="flex justify-end mt-2">
-                          <Button type="submit" disabled={submittingComment || !comment.trim()} size="sm">
-                            {submittingComment ? "Posting..." : "Post"}
+                        <div className="flex justify-end mt-3">
+                          <Button type="submit" disabled={submittingComment || !comment.trim()} size="sm" variant="brutal" className="px-6">
+                            {submittingComment ? "Posting..." : "Post Comment"}
                             <Send className="w-4 h-4 ml-2" />
                           </Button>
                         </div>
@@ -307,33 +324,33 @@ export default function PostDetailPage() {
                     </div>
                   </form>
                 ) : (
-                  <div className="text-center py-4 mb-6 bg-muted rounded-lg">
-                    <p className="text-muted-foreground mb-2">Sign in to comment</p>
+                  <div className="text-center py-8 mb-8 bg-secondary/10 border-2 border-brutal-black border-dashed">
+                    <p className="text-foreground font-bold mb-4">Sign in to join the conversation</p>
                     <Link href="/login">
-                      <Button size="sm">Sign In</Button>
+                      <Button size="sm" variant="brutal">Sign In</Button>
                     </Link>
                   </div>
                 )}
 
                 {/* Comments List */}
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {post.comments.map((c) => (
-                    <div key={c.id} className="flex gap-3">
+                    <div key={c.id} className="flex gap-4 p-4 border-b-2 border-border last:border-0 hover:bg-muted/5 transition-colors">
                       <Avatar src={c.user.image} name={c.user.name} size="sm" />
                       <div>
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-foreground">{c.user.name}</span>
-                          <span className="text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-black text-foreground uppercase text-sm">{c.user.name}</span>
+                          <span className="text-xs font-mono font-bold text-muted-foreground">
                             {new Date(c.createdAt).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="text-foreground-secondary">{c.content}</p>
+                        <p className="text-foreground font-medium text-sm leading-relaxed">{c.content}</p>
                       </div>
                     </div>
                   ))}
                   
                   {post.comments.length === 0 && (
-                    <p className="text-center text-muted-foreground py-4">
+                    <p className="text-center text-muted-foreground py-8 font-medium italic">
                       No comments yet. Be the first to comment!
                     </p>
                   )}
@@ -346,36 +363,40 @@ export default function PostDetailPage() {
 
       {/* Tip Modal */}
       {showTipModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-sm">
-            <CardContent className="p-6">
+        <div className="fixed inset-0 bg-brutal-black/80 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+          <Card variant="brutal" className="w-full max-w-sm bg-card shadow-[12px_12px_0px_0px_#8b5cf6] border-4 border-white">
+            <CardContent className="p-8">
               {tipSent ? (
-                <div className="text-center py-4">
-                  <CheckCircle className="w-12 h-12 text-accent-green mx-auto mb-3" />
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Tip Sent!</h3>
-                  <p className="text-muted-foreground">Thank you for supporting {displayName}!</p>
+                <div className="text-center py-6">
+                  <div className="w-16 h-16 bg-accent-green border-4 border-brutal-black rounded-full flex items-center justify-center mx-auto mb-4 animate-bounce">
+                     <CheckCircle className="w-8 h-8 text-brutal-black" strokeWidth={3} />
+                  </div>
+                  <h3 className="text-2xl font-black text-foreground mb-2 font-display uppercase">Tip Sent!</h3>
+                  <p className="text-muted-foreground font-bold">Thank you for supporting {displayName}!</p>
                 </div>
               ) : (
                 <>
-                  <h3 className="text-xl font-semibold text-foreground mb-2">Send a Tip</h3>
-                  <p className="text-muted-foreground mb-4">
-                    Show your appreciation to {displayName}
-                  </p>
-                  <div className="grid grid-cols-3 gap-3 mb-4">
+                  <div className="text-center mb-6">
+                    <h3 className="text-2xl font-black text-foreground mb-2 font-display uppercase">Send a Tip</h3>
+                    <p className="text-muted-foreground font-medium">
+                        Show your appreciation to {displayName}
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-3 mb-6">
                     {TIP_AMOUNTS.map((tip) => (
                       <button
                         key={tip.value}
                         onClick={() => handleTip(tip.value)}
-                        className="py-3 px-4 rounded-lg border-2 border-border hover:border-primary hover:bg-primary/5 font-semibold text-foreground transition-colors"
+                        className="py-3 px-2 rounded-none border-2 border-brutal-black hover:bg-accent-yellow hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all font-black text-foreground bg-card"
                       >
                         {tip.label}
                       </button>
                     ))}
                   </div>
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => setShowTipModal(false)}
-                    className="w-full"
+                    className="w-full border-2 border-transparent hover:border-brutal-black hover:bg-secondary/10 font-bold"
                   >
                     Cancel
                   </Button>

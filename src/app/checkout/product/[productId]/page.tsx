@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Heart, Check, Shield, Smartphone, Loader2, Package, ArrowLeft, CreditCard } from "lucide-react";
 import { Button, Card, CardContent, Badge } from "@/components/ui";
 import { Breadcrumbs } from "@/components/ui/Breadcrumbs";
+import { Header } from "@/components/layout/Header";
 import { formatPrice, calculateFees } from "@/lib/utils";
 import { cn } from "@/lib/utils";
 
@@ -257,8 +258,8 @@ export default function ProductCheckoutPage() {
   // Loading state
   if (loading) {
     return (
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+      <main className="min-h-screen bg-accent-yellow/10 flex items-center justify-center">
+        <Loader2 className="w-12 h-12 animate-spin text-foreground stroke-[3]" />
       </main>
     );
   }
@@ -266,177 +267,195 @@ export default function ProductCheckoutPage() {
   // Error state
   if (error || !product) {
     return (
-      <main className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-4">
+      <main className="min-h-screen bg-background flex items-center justify-center p-4">
+        <Card variant="brutal" className="max-w-md w-full text-center p-8 bg-accent-red/10">
+          <h1 className="text-3xl font-display font-black uppercase text-foreground mb-4">
             {error || "Product not found"}
           </h1>
-          <Button onClick={() => router.back()}>Go Back</Button>
-        </div>
+          <Button variant="brutal" onClick={() => router.back()}>Go Back</Button>
+        </Card>
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="py-4 px-4 sm:px-6 lg:px-8 border-b border-border bg-card">
-        <div className="container mx-auto">
-          <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white" />
-            </div>
-            <span className="text-xl font-semibold text-foreground">
-              CreatorConnect
-            </span>
-          </Link>
-        </div>
-      </header>
+      <Header />
 
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Back link */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-6 mb-12">
           <button
             onClick={() => router.back()}
-            className="inline-flex items-center gap-2 text-muted-foreground hover:text-foreground"
+            className="group inline-flex items-center gap-2 font-black font-display text-xl uppercase tracking-wider hover:text-primary transition-colors"
           >
-            <ArrowLeft className="w-4 h-4" />
-            Back
+            <ArrowLeft className="w-6 h-6 stroke-[3] group-hover:-translate-x-1 transition-transform" />
+            BACK
           </button>
-          <Breadcrumbs />
+          <div className="h-8 w-0.5 bg-brutal-black" />
+          <Breadcrumbs className="font-mono text-sm font-bold uppercase tracking-wide text-muted-foreground" />
         </div>
 
-        <div className="max-w-4xl mx-auto">
-          <h1 className="text-2xl font-bold text-foreground mb-8">Complete Purchase</h1>
+        <div className="max-w-5xl mx-auto">
+          <h1 className="text-4xl md:text-5xl font-display font-black uppercase text-foreground mb-10 tracking-tight">
+            Purchase <span className="text-accent-green">/</span> Product
+          </h1>
 
           <div className="grid lg:grid-cols-5 gap-8">
             {/* Left - Payment Form */}
             <div className="lg:col-span-3">
-              <Card>
-                <CardContent className="p-6">
-                  {/* Product Info */}
-                  <div className="flex items-center gap-4 pb-6 border-b border-border mb-6">
-                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center">
-                      <Package className="w-7 h-7 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Purchasing</p>
-                      <p className="font-semibold text-foreground">{product.title}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <span className="text-sm text-muted-foreground">
-                          by {product.creator.displayName || product.creator.username}
-                        </span>
-                        {product.fileType && (
-                          <Badge variant="accent">{product.fileType.toUpperCase()}</Badge>
-                        )}
+              <Card variant="brutal" className="bg-card overflow-hidden">
+                <CardContent className="p-0">
+                  <div className="p-8 border-b-4 border-brutal-black bg-accent-blue/10">
+                    {/* Product Info */}
+                    <div className="flex items-center gap-6">
+                      <div className="w-16 h-16 rounded-none border-3 border-brutal-black bg-card flex items-center justify-center shadow-brutal-sm">
+                        <Package className="w-8 h-8 text-foreground stroke-[2.5]" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-mono font-bold text-foreground/70 mb-1 uppercase tracking-wider">
+                          Purchasing
+                        </p>
+                        <p className="text-2xl font-display font-black text-foreground uppercase leading-none mb-2">
+                          {product.title}
+                        </p>
+                        <div className="flex items-center gap-3 mt-1 flex-wrap">
+                          <span className="text-sm font-bold text-foreground bg-card px-2 py-0.5 border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+                            by {product.creator.displayName || product.creator.username}
+                          </span>
+                          {product.fileType && (
+                            <Badge className="bg-accent-pink text-foreground border-2 border-brutal-black rounded-none shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] font-bold">
+                              {product.fileType.toUpperCase()}
+                            </Badge>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Payment Methods */}
-                  <form onSubmit={handleSubmit}>
-                    <h3 className="font-semibold text-foreground mb-4">
-                      Select Payment Method
-                    </h3>
+                  <div className="p-8">
+                    {/* Payment Methods */}
+                    <form onSubmit={handleSubmit}>
+                      <h3 className="text-xl font-display font-black uppercase text-foreground mb-6 flex items-center gap-3">
+                        <span className="w-8 h-8 rounded-none bg-foreground text-white flex items-center justify-center text-sm">1</span>
+                        Select Payment Method
+                      </h3>
 
-                    <div className="space-y-3 mb-6">
-                      {paymentMethods.map((method) => (
-                        <button
-                          key={method.id}
-                          type="button"
-                          onClick={() => setPaymentMethod(method.id)}
-                          className={cn(
-                            "w-full flex items-center gap-4 p-4 rounded-lg border-2 text-left transition-all",
-                            paymentMethod === method.id
-                              ? "border-primary bg-primary/5"
-                              : "border-border bg-card hover:border-muted-foreground/30"
-                          )}
-                        >
-                          <method.icon
+                      <div className="space-y-4 mb-8">
+                        {paymentMethods.map((method) => (
+                          <button
+                            key={method.id}
+                            type="button"
+                            onClick={() => setPaymentMethod(method.id)}
                             className={cn(
-                              "w-6 h-6",
+                              "w-full flex items-center gap-4 p-5 text-left transition-all border-3 relative group",
                               paymentMethod === method.id
-                                ? "text-primary"
-                                : "text-muted-foreground"
+                                ? "border-brutal-black bg-accent-purple/10 shadow-brutal"
+                                : "border-brutal-black/20 hover:border-brutal-black hover:bg-card hover:shadow-brutal-sm bg-gray-50"
                             )}
-                          />
-                          <div className="flex-1">
-                            <span className="font-medium text-foreground">
-                              {method.name}
+                          >
+                            <div className={cn(
+                              "w-12 h-12 border-2 border-brutal-black flex items-center justify-center transition-colors",
+                              paymentMethod === method.id ? "bg-brutal-black text-brutal-white" : "bg-card text-foreground group-hover:bg-brutal-black group-hover:text-brutal-white"
+                            )}>
+                              <method.icon className="w-6 h-6 stroke-[2.5]" />
+                            </div>
+                            
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className={cn(
+                                  "font-bold text-lg uppercase tracking-tight",
+                                  paymentMethod === method.id ? "text-accent-purple" : "text-foreground"
+                                )}>
+                                  {method.name}
+                                </span>
+                              </div>
+                              <p className="text-sm font-mono text-foreground/70 mt-1">
+                                {method.description}
+                              </p>
+                            </div>
+                            <span className="text-xs font-bold uppercase tracking-wide px-2 py-1 bg-foreground text-white border border-black">
+                              {method.region}
                             </span>
-                            <p className="text-sm text-muted-foreground">
-                              {method.description}
-                            </p>
-                          </div>
-                          <span className="text-xs text-muted-foreground px-2 py-1 bg-muted rounded">
-                            {method.region}
-                          </span>
-                        </button>
-                      ))}
-                    </div>
+                            
+                             {paymentMethod === method.id && (
+                                <div className="absolute top-0 right-0 p-1 bg-accent-purple border-l-2 border-b-2 border-brutal-black">
+                                    <Check className="w-4 h-4 text-white stroke-[4]" />
+                                </div>
+                            )}
+                          </button>
+                        ))}
+                      </div>
 
-                    {/* Submit */}
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      size="lg"
-                      loading={isProcessing}
-                    >
-                      {isProcessing ? "Processing..." : `Pay ${formatPrice(product.price)}`}
-                    </Button>
+                      {/* Submit */}
+                      <div className="pt-4">
+                        <Button
+                          type="submit"
+                          className="w-full text-lg py-6 bg-accent-green text-foreground hover:bg-card hover:text-foreground shadow-brutal"
+                          size="lg"
+                          variant="brutal"
+                          loading={isProcessing}
+                        >
+                          {isProcessing ? "Processing..." : `Pay ${formatPrice(product.price)}`}
+                        </Button>
+                      </div>
 
-                    {/* Security Note */}
-                    <div className="flex items-center justify-center gap-2 mt-4 text-sm text-muted-foreground">
-                      <Shield className="w-4 h-4 text-accent-green" />
-                      <span>Secure encrypted payment</span>
-                    </div>
-                  </form>
+                      {/* Security Note */}
+                      <div className="flex items-center justify-center gap-2 mt-6 text-xs font-bold uppercase tracking-wide text-foreground/60">
+                        <Shield className="w-4 h-4 text-accent-green stroke-[3]" />
+                        <span>Secure encrypted payment</span>
+                      </div>
+                    </form>
+                  </div>
                 </CardContent>
               </Card>
             </div>
 
             {/* Right - Order Summary */}
             <div className="lg:col-span-2">
-              <Card className="sticky top-24">
+              <Card variant="brutal" className="sticky top-24 bg-accent-green/20 border-4">
                 <CardContent className="p-6">
-                  <h3 className="font-semibold text-foreground mb-4">
+                  <h3 className="text-xl font-display font-black uppercase text-foreground mb-6 border-b-4 border-brutal-black pb-2">
                     Order Summary
                   </h3>
 
                   {/* Product Details */}
-                  <div className="pb-4 border-b border-border mb-4">
-                    <p className="font-medium text-foreground mb-2">
+                  <div className="pb-6 mb-6 border-b-2 border-dashed border-brutal-black/50">
+                    <p className="font-bold text-lg text-foreground mb-2 uppercase leading-snug">
                       {product.title}
                     </p>
                     {product.description && (
-                      <p className="text-sm text-muted-foreground line-clamp-2">
+                      <p className="text-sm font-medium text-foreground/70 line-clamp-3 bg-card/50 p-2 border-2 border-transparent">
                         {product.description}
                       </p>
                     )}
                   </div>
 
                   {/* Price */}
-                  <div className="space-y-3 pb-4 border-b border-border mb-4">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Product price</span>
-                      <span className="text-foreground">
+                  <div className="space-y-3 pb-6 mb-6">
+                    <div className="flex items-center justify-between text-sm font-bold">
+                       <span className="text-foreground/70 uppercase">Product price</span>
+                      <span className="text-foreground font-mono text-lg">
                         {formatPrice(product.price)}
                       </span>
                     </div>
                   </div>
 
                   {/* Total */}
-                  <div className="flex items-center justify-between">
-                    <span className="font-semibold text-foreground">Total</span>
-                    <span className="text-xl font-bold text-foreground">
+                  <div className="flex items-center justify-between p-4 bg-foreground text-white border-2 border-transparent mb-6">
+                    <span className="font-display font-black uppercase tracking-wide text-lg">Total</span>
+                    <span className="text-2xl font-mono font-bold text-accent-green">
                       {formatPrice(product.price)}
                     </span>
                   </div>
 
-                  <div className="mt-4 p-3 bg-accent-green/10 rounded-lg border border-accent-green/20">
-                    <div className="flex items-center gap-2 text-sm text-accent-green">
-                      <Check className="w-4 h-4" />
-                      <span>Instant download after payment</span>
+                  <div className="mt-4 p-4 bg-card border-3 border-brutal-black shadow-brutal-sm">
+                    <div className="flex gap-3 text-sm font-bold text-foreground">
+                      <div className="w-6 h-6 bg-accent-green border-2 border-brutal-black flex items-center justify-center flex-shrink-0">
+                         <Check className="w-4 h-4 text-foreground stroke-[3]" />
+                      </div>
+                      <span className="uppercase tracking-tight leading-tight pt-0.5">Instant download access immediately after payment</span>
                     </div>
                   </div>
                 </CardContent>

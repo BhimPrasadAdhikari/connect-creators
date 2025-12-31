@@ -12,7 +12,7 @@ export interface FeatureCardProps {
 const variants = {
   default: "text-center p-6 rounded-xl hover:bg-gray-50 transition-colors",
   outlined:
-    "text-center p-6 rounded-xl bg-white border border-gray-200 shadow-sm hover:shadow-md transition-all",
+    "text-center p-6 rounded-xl bg-card border border-gray-200 shadow-sm hover:shadow-md transition-all",
   problem: "text-center p-6 rounded-xl hover:bg-gray-50 transition-colors",
 };
 

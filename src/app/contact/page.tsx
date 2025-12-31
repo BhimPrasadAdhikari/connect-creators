@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, Phone, MapPin, Send, MessageSquare } from "lucide-react";
+import { Mail, Phone, MapPin, Send, MessageSquare, ArrowRight } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
-import { Button, Card, CardContent, Input } from "@/components/ui";
+import { Button, Card, CardContent, Input, Textarea } from "@/components/ui";
 
 const contactInfo = [
   {
@@ -12,18 +12,21 @@ const contactInfo = [
     title: "Email",
     value: "support@creatorconnect.com",
     href: "mailto:support@creatorconnect.com",
+    color: "bg-accent-blue"
   },
   {
     icon: Phone,
     title: "Phone",
     value: "+977 1-4XXXXXX",
     href: "tel:+97714000000",
+    color: "bg-accent-green"
   },
   {
     icon: MapPin,
     title: "Location",
     value: "Kathmandu, Nepal",
     href: null,
+    color: "bg-accent-pink"
   },
 ];
 
@@ -49,14 +52,18 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background font-sans text-foreground">
       <Header />
 
       {/* Hero */}
-      <section className="bg-gradient-to-br from-primary to-primary-700 text-white py-16">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl text-white/80 max-w-xl mx-auto">
+      <section className="bg-primary text-white py-20 border-b-4 border-brutal-black relative overflow-hidden">
+         <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-accent-yellow rounded-full border-4 border-brutal-black"></div>
+         
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <h1 className="text-5xl sm:text-7xl font-black mb-6 font-display uppercase tracking-tighter drop-shadow-[4px_4px_0px_#000]">
+            Contact Us
+          </h1>
+          <p className="text-xl sm:text-2xl font-bold font-mono text-white/90 max-w-xl mx-auto bg-black/20 p-2 inline-block">
             Have a question or feedback? We&apos;d love to hear from you.
           </p>
         </div>
@@ -65,61 +72,63 @@ export default function ContactPage() {
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid lg:grid-cols-3 gap-12">
           {/* Contact Info */}
-          <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Get in Touch</h2>
+          <div className="space-y-8">
+            <h2 className="text-3xl font-black text-foreground font-display uppercase bg-secondary/20 inline-block px-2 border-l-4 border-brutal-black">
+                Get in Touch
+            </h2>
             
-            {contactInfo.map((item) => (
-              <Card key={item.title}>
-                <CardContent className="flex items-start gap-4 py-4">
-                  <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                    <item.icon className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{item.title}</p>
-                    {item.href ? (
-                      <a
-                        href={item.href}
-                        className="font-medium text-foreground hover:text-primary transition-colors"
-                      >
-                        {item.value}
-                      </a>
-                    ) : (
-                      <p className="font-medium text-foreground">{item.value}</p>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+            <div className="space-y-6">
+                {contactInfo.map((item) => (
+                <Card key={item.title} variant="brutal" className="hover:translate-x-2 transition-transform">
+                    <CardContent className="flex items-center gap-5 p-5">
+                    <div className={`w-14 h-14 ${item.color} border-2 border-brutal-black flex items-center justify-center flex-shrink-0 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]`}>
+                        <item.icon className="w-7 h-7 text-brutal-black" strokeWidth={2.5} />
+                    </div>
+                    <div>
+                        <p className="text-xs font-black uppercase text-muted-foreground tracking-widest mb-1">{item.title}</p>
+                        {item.href ? (
+                        <a
+                            href={item.href}
+                            className="font-bold text-lg text-foreground hover:text-primary transition-colors font-mono break-all"
+                        >
+                            {item.value}
+                        </a>
+                        ) : (
+                        <p className="font-bold text-lg text-foreground font-mono">{item.value}</p>
+                        )}
+                    </div>
+                    </CardContent>
+                </Card>
+                ))}
+            </div>
 
-            <Card className="bg-primary/5 border-primary/20">
-              <CardContent className="py-4">
-                <div className="flex items-center gap-3 mb-2">
-                  <MessageSquare className="w-5 h-5 text-primary" />
-                  <span className="font-medium text-foreground">Response Time</span>
+            <div className="bg-card border-2 border-brutal-black p-6 shadow-brutal-sm">
+                <div className="flex items-center gap-3 mb-3">
+                  <MessageSquare className="w-6 h-6 text-primary" strokeWidth={2.5} />
+                  <span className="font-black text-foreground uppercase font-display text-lg">Response Time</span>
                 </div>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-sm font-bold font-mono text-muted-foreground border-t-2 border-dashed border-brutal-black/20 pt-3">
                   We typically respond within 24-48 hours during business days.
                 </p>
-              </CardContent>
-            </Card>
+            </div>
           </div>
 
           {/* Contact Form */}
           <div className="lg:col-span-2">
-            <Card>
-              <CardContent className="p-6 sm:p-8">
+            <Card variant="brutal" className="bg-card">
+              <CardContent className="p-8 sm:p-10">
                 {submitted ? (
-                  <div className="text-center py-12">
-                    <div className="w-16 h-16 bg-accent-green/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                      <Send className="w-8 h-8 text-accent-green" />
+                  <div className="text-center py-16">
+                    <div className="w-24 h-24 bg-accent-green text-brutal-black border-4 border-brutal-black rounded-full flex items-center justify-center mx-auto mb-6 shadow-brutal">
+                      <Send className="w-10 h-10" strokeWidth={3} />
                     </div>
-                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                    <h3 className="text-4xl font-black text-foreground mb-4 font-display uppercase">
                       Message Sent!
                     </h3>
-                    <p className="text-muted-foreground mb-6">
+                    <p className="text-muted-foreground font-bold font-mono text-lg mb-10">
                       Thank you for reaching out. We&apos;ll get back to you soon.
                     </p>
-                    <Button onClick={() => setSubmitted(false)}>
+                    <Button onClick={() => setSubmitted(false)} variant="brutal" size="lg">
                       Send Another Message
                     </Button>
                   </div>
@@ -132,6 +141,7 @@ export default function ContactPage() {
                         value={formData.name}
                         onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                         required
+                        variant="brutal"
                       />
                       <Input
                         label="Email Address"
@@ -140,6 +150,7 @@ export default function ContactPage() {
                         value={formData.email}
                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                         required
+                        variant="brutal"
                       />
                     </div>
                     <Input
@@ -148,23 +159,28 @@ export default function ContactPage() {
                       value={formData.subject}
                       onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
                       required
+                      variant="brutal"
                     />
                     <div>
-                      <label className="block text-sm font-medium text-foreground mb-1">
-                        Message
-                      </label>
-                      <textarea
-                        rows={5}
+                      <Textarea
+                        label="Message"
+                        variant="brutal"
+                        rows={6}
                         placeholder="Tell us more about your inquiry..."
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         required
-                        className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none placeholder:text-muted-foreground"
                       />
                     </div>
-                    <Button type="submit" size="lg" disabled={isSubmitting} className="w-full sm:w-auto">
+                    <Button 
+                        type="submit" 
+                        size="lg" 
+                        variant="brutal"
+                        disabled={isSubmitting} 
+                        className="w-full sm:w-auto text-xl px-10 py-6 bg-brutal-black text-brutal-white hover:bg-primary hover:text-white"
+                    >
                       {isSubmitting ? "Sending..." : "Send Message"}
-                      <Send className="w-5 h-5 ml-2" />
+                      <ArrowRight className="w-6 h-6 ml-3" />
                     </Button>
                   </form>
                 )}

@@ -71,18 +71,18 @@ export function ExploreFilters({ categories, className }: ExploreFiltersProps) {
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
         {/* Search Input */}
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground stroke-[3]" />
           <input
             type="text"
             placeholder="Search creators and topics..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-12 pr-10 py-4 text-base border border-border bg-card text-foreground rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-muted-foreground"
+            className="w-full pl-12 pr-10 py-4 text-base border-3 border-brutal-black bg-card text-foreground rounded-none shadow-brutal-sm focus:outline-none focus:shadow-brutal transition-all placeholder:text-muted-foreground font-medium"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery("")}
-              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 rounded-full hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-1 border-2 border-brutal-black bg-accent-red text-white hover:bg-red-600 transition-colors"
             >
               <X className="w-4 h-4" />
             </button>
@@ -93,23 +93,23 @@ export function ExploreFilters({ categories, className }: ExploreFiltersProps) {
         <Button
           variant="outline"
           onClick={() => setIsFilterOpen(!isFilterOpen)}
-          className="sm:hidden relative h-14 rounded-2xl"
+          className="sm:hidden relative h-14 rounded-none border-3"
         >
-          <SlidersHorizontal className="w-5 h-5 mr-2" />
+          <SlidersHorizontal className="w-5 h-5 mr-2 stroke-[3]" />
           Filters
           {activeFiltersCount > 0 && (
-            <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white text-xs rounded-full flex items-center justify-center">
+            <span className="absolute -top-2 -right-2 w-6 h-6 bg-accent-yellow border-2 border-brutal-black text-foreground text-xs font-bold flex items-center justify-center">
               {activeFiltersCount}
             </span>
           )}
         </Button>
 
         {/* Sort Dropdown (Desktop) */}
-        <div className="hidden sm:block relative min-w-[180px]">
+        <div className="hidden sm:block relative min-w-[200px]">
           <select
             value={currentSort}
             onChange={(e) => updateFilters({ sort: e.target.value })}
-            className="w-full appearance-none px-5 py-4 pr-10 border border-border bg-card text-foreground rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/20 cursor-pointer font-medium"
+            className="w-full appearance-none px-5 py-4 pr-10 border-3 border-brutal-black bg-card text-foreground rounded-none shadow-brutal-sm focus:outline-none focus:shadow-brutal cursor-pointer font-bold uppercase tracking-wide"
           >
             {sortOptions.map((option) => (
               <option key={option.value} value={option.value} className="bg-card text-foreground">
@@ -117,21 +117,21 @@ export function ExploreFilters({ categories, className }: ExploreFiltersProps) {
               </option>
             ))}
           </select>
-          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+          <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground stroke-[3] pointer-events-none" />
         </div>
       </div>
 
       {/* Category Pills */}
-      <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+      <div className="flex gap-3 overflow-x-auto pb-4 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
         {categories.map((category) => (
           <button
             key={category}
             onClick={() => updateFilters({ category: category })}
             className={cn(
-              "px-5 py-2.5 rounded-full text-sm font-semibold whitespace-nowrap transition-all shrink-0",
+              "px-6 py-2.5 rounded-none text-sm font-bold uppercase tracking-wider whitespace-nowrap transition-all shrink-0 border-2 border-brutal-black",
               currentCategory === category
-                ? "bg-primary text-white shadow-md shadow-primary/25"
-                : "bg-card text-muted-foreground hover:bg-muted hover:text-foreground border border-border"
+                ? "bg-primary text-white shadow-brutal-sm translate-x-[-2px] translate-y-[-2px]"
+                : "bg-card text-foreground hover:bg-primary hover:text-white hover:shadow-brutal-sm"
             )}
           >
             {category}
@@ -141,15 +141,15 @@ export function ExploreFilters({ categories, className }: ExploreFiltersProps) {
 
       {/* Mobile Filter Panel */}
       {isFilterOpen && (
-        <div className="sm:hidden p-4 bg-card rounded-xl border border-border space-y-4">
+        <div className="sm:hidden p-4 bg-card border-3 border-brutal-black shadow-brutal space-y-4">
           <div>
-            <label className="block text-sm font-medium text-foreground mb-2">
+            <label className="block text-sm font-bold text-foreground uppercase mb-2">
               Sort By
             </label>
             <select
               value={currentSort}
               onChange={(e) => updateFilters({ sort: e.target.value })}
-              className="w-full px-4 py-3 border border-border rounded-lg bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20"
+              className="w-full px-4 py-3 border-2 border-brutal-black rounded-none bg-card text-foreground font-medium focus:outline-none focus:ring-0 focus:bg-accent-yellow/10"
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value} className="bg-card text-foreground">
@@ -177,29 +177,29 @@ export function ExploreFilters({ categories, className }: ExploreFiltersProps) {
 
       {/* Active Filters Summary */}
       {(currentQuery || currentCategory !== "All" || currentSort !== "popular") && (
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="text-muted-foreground">Active filters:</span>
+        <div className="flex flex-wrap items-center gap-3 text-sm">
+          <span className="text-foreground font-bold uppercase">Active filters:</span>
           {currentQuery && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary text-white border-2 border-brutal-black font-bold rounded-none shadow-brutal-sm">
               Search: "{currentQuery}"
-              <button onClick={() => setSearchQuery("")} className="ml-1">
-                <X className="w-3 h-3" />
+              <button onClick={() => setSearchQuery("")} className="hover:text-foreground">
+                <X className="w-4 h-4 stroke-[3]" />
               </button>
             </span>
           )}
           {currentCategory !== "All" && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-primary text-white border-2 border-brutal-black font-bold rounded-none shadow-brutal-sm">
               {currentCategory}
-              <button onClick={() => updateFilters({ category: null })}>
-                <X className="w-3 h-3" />
+              <button onClick={() => updateFilters({ category: null })} className="hover:text-foreground">
+                <X className="w-4 h-4 stroke-[3]" />
               </button>
             </span>
           )}
           {currentSort !== "popular" && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 bg-primary/10 text-primary rounded-full">
+            <span className="inline-flex items-center gap-2 px-3 py-1 bg-accent-yellow text-foreground border-2 border-brutal-black font-bold rounded-none shadow-brutal-sm">
               {sortOptions.find((o) => o.value === currentSort)?.label}
-              <button onClick={() => updateFilters({ sort: null })}>
-                <X className="w-3 h-3" />
+              <button onClick={() => updateFilters({ sort: null })} className="hover:text-white">
+                <X className="w-4 h-4 stroke-[3]" />
               </button>
             </span>
           )}

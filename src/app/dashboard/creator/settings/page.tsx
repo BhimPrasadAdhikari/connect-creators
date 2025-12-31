@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import {
   User,
   Link2,
-  CreditCard,
   Bell,
   Save,
   Loader2,
@@ -19,6 +18,7 @@ import {
   AlertTriangle,
   LogOut,
   DollarSign,
+  CreditCard,
 } from "lucide-react";
 import {
   Button,
@@ -214,50 +214,50 @@ export default function CreatorSettingsPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto">
-      <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6 sm:mb-8">Creator Settings</h1>
+      <h1 className="font-display text-4xl font-bold text-foreground mb-8">Creator Settings</h1>
 
       {/* Mobile Tabs - Horizontal scroll on mobile */}
-      <div className="md:hidden mb-6 -mx-4 px-4">
-        <nav className="flex gap-2 overflow-x-auto scrollbar-hide pb-2">
+      <div className="md:hidden mb-8 -mx-4 px-4">
+        <nav className="flex gap-4 overflow-x-auto scrollbar-hide pb-2">
           {sections.map((section) => {
             const Icon = section.icon;
             return (
               <button
                 key={section.id}
                 onClick={() => setActiveSection(section.id)}
-                className={`flex items-center gap-2 px-4 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-colors ${
+                className={`flex items-center gap-2 px-4 py-2.5 font-bold whitespace-nowrap transition-all border-2 shadow-brutal-sm ${
                   activeSection === section.id
-                    ? "bg-blue-600 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    ? "bg-primary text-white border-brutal-black translate-x-[-2px] translate-y-[-2px]"
+                    : "bg-card text-foreground border-brutal-black hover:bg-secondary/20"
                 }`}
               >
                 <Icon className="w-4 h-4" />
-                {section.label}
+                <span className="font-display uppercase tracking-wide text-sm">{section.label}</span>
               </button>
             );
           })}
         </nav>
       </div>
 
-      <div className="grid md:grid-cols-4 gap-6">
+      <div className="grid md:grid-cols-4 gap-8">
         {/* Settings Navigation - Desktop only */}
         <nav className="md:col-span-1 hidden md:block">
-          <Card>
-            <CardContent className="p-2">
+          <Card variant="brutal" className="sticky top-24">
+            <CardContent className="p-2 space-y-2">
               {sections.map((section) => {
                 const Icon = section.icon;
                 return (
                   <button
                     key={section.id}
                     onClick={() => setActiveSection(section.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                    className={`w-full flex items-center gap-3 px-4 py-3 text-left transition-all border-2 ${
                       activeSection === section.id
-                        ? "bg-blue-50 text-blue-600"
-                        : "text-gray-600 hover:bg-gray-50"
+                        ? "bg-primary text-white border-brutal-black shadow-brutal-sm translate-x-[-2px] translate-y-[-2px]"
+                        : "bg-transparent text-muted-foreground border-transparent hover:border-brutal-black hover:bg-secondary/20 hover:text-foreground"
                     }`}
                   >
                     <Icon className="w-5 h-5" />
-                    <span className="text-sm font-medium">{section.label}</span>
+                    <span className="font-display font-bold uppercase text-xs tracking-wide">{section.label}</span>
                   </button>
                 );
               })}
@@ -269,27 +269,36 @@ export default function CreatorSettingsPage() {
             <div className="md:col-span-3">
               {/* Success/Error Messages */}
               {saved && (
-                <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-lg flex items-center gap-2">
-                  <Check className="w-5 h-5" />
-                  Settings saved successfully!
+                <div className="mb-6 p-4 bg-accent-green/10 border-2 border-accent-green text-green-800 flex items-center gap-3 font-bold shadow-brutal-sm">
+                  <div className="w-6 h-6 bg-accent-green rounded-full flex items-center justify-center border-2 border-brutal-black text-white shrink-0">
+                    <Check className="w-4 h-4" />
+                  </div>
+                  Changes saved successfully!
                 </div>
               )}
               {error && (
-                <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
+                <div className="mb-6 p-4 bg-accent-red/10 border-2 border-accent-red text-red-800 font-bold shadow-brutal-sm flex items-center gap-3">
+                  <AlertTriangle className="w-5 h-5 shrink-0" />
                   {error}
                 </div>
               )}
 
               {/* Profile Section */}
               {activeSection === "profile" && (
-                <Card>
-                  <CardContent>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                      Profile Settings
-                    </h2>
+                <Card variant="brutal" className="bg-card">
+                  <CardContent className="p-6 sm:p-8">
+                    <div className="flex items-center gap-3 mb-8 border-b-4 border-brutal-black pb-4">
+                      <div className="w-10 h-10 bg-accent-blue border-2 border-brutal-black flex items-center justify-center shadow-brutal-sm">
+                        <User className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="font-display text-2xl font-bold uppercase">
+                        Profile Settings
+                      </h2>
+                    </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <Input
+                        variant="brutal"
                         label="Display Name"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
@@ -297,26 +306,27 @@ export default function CreatorSettingsPage() {
                       />
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1.5">
+                        <label className="block text-sm font-bold text-foreground mb-1.5 uppercase tracking-wide font-display">
                           Username
                         </label>
-                        <div className="flex items-center">
-                          <span className="px-4 py-3 bg-gray-100 text-gray-500 border border-r-0 border-gray-200 rounded-l-lg">
+                        <div className="flex items-center font-mono">
+                          <span className="px-4 py-3 bg-secondary/20 text-muted-foreground border-2 border-r-0 border-brutal-black font-bold">
                             @
                           </span>
                           <input
                             type="text"
                             value={username}
                             disabled
-                            className="flex-1 px-4 py-3 border border-gray-200 rounded-r-lg bg-gray-50 text-gray-500"
+                            className="flex-1 px-4 py-3 border-2 border-brutal-black bg-muted/30 text-muted-foreground font-bold cursor-not-allowed"
                           />
                         </div>
-                        <p className="text-sm text-gray-500 mt-1">
+                        <p className="font-mono text-xs font-bold text-muted-foreground mt-2">
                           Username cannot be changed
                         </p>
                       </div>
 
                       <Textarea
+                        variant="brutal"
                         label="Bio"
                         value={bio}
                         onChange={(e) => setBio(e.target.value)}
@@ -325,12 +335,12 @@ export default function CreatorSettingsPage() {
                       />
                     </div>
 
-                    <div className="mt-6 flex justify-end">
-                      <Button onClick={saveProfile} disabled={loading}>
+                    <div className="mt-8 flex justify-end pt-6 border-t-2 border-dashed border-brutal-black/20">
+                      <Button variant="brutal" onClick={saveProfile} disabled={loading} size="lg">
                         {loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : (
-                          <Save className="w-4 h-4" />
+                          <Save className="w-4 h-4 mr-2" />
                         )}
                         Save Changes
                       </Button>
@@ -341,92 +351,101 @@ export default function CreatorSettingsPage() {
 
               {/* Social Links Section */}
               {activeSection === "social" && (
-                <Card>
-                  <CardContent>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                      Social Links
-                    </h2>
+                <Card variant="brutal">
+                  <CardContent className="p-6 sm:p-8">
+                    <div className="flex items-center gap-3 mb-8 border-b-4 border-brutal-black pb-4">
+                      <div className="w-10 h-10 bg-accent-pink border-2 border-brutal-black flex items-center justify-center shadow-brutal-sm">
+                        <Link2 className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="font-display text-2xl font-bold uppercase">
+                        Social Links
+                      </h2>
+                    </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1.5">
+                        <label className="block text-sm font-bold text-foreground mb-1.5 uppercase tracking-wide font-display">
                           Instagram
                         </label>
                         <div className="flex items-center">
-                          <span className="px-4 py-3 bg-gray-100 text-gray-500 border border-r-0 border-gray-200 rounded-l-lg">
+                          <span className="px-4 py-3 bg-secondary/20 text-foreground border-2 border-r-0 border-brutal-black">
                             <Instagram className="w-5 h-5" />
                           </span>
-                          <input
-                            type="text"
+                          <Input
+                            variant="brutal"
                             value={instagram}
                             onChange={(e) => setInstagram(e.target.value)}
                             placeholder="username"
-                            className="flex-1 px-4 py-3 border border-gray-200 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            className="rounded-none border-l-0"
+                            containerClassName="mb-0 flex-1"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1.5">
+                        <label className="block text-sm font-bold text-foreground mb-1.5 uppercase tracking-wide font-display">
                           Twitter / X
                         </label>
                         <div className="flex items-center">
-                          <span className="px-4 py-3 bg-gray-100 text-gray-500 border border-r-0 border-gray-200 rounded-l-lg">
+                          <span className="px-4 py-3 bg-secondary/20 text-foreground border-2 border-r-0 border-brutal-black">
                             <Twitter className="w-5 h-5" />
                           </span>
-                          <input
-                            type="text"
+                          <Input
+                            variant="brutal"
                             value={twitter}
                             onChange={(e) => setTwitter(e.target.value)}
                             placeholder="username"
-                            className="flex-1 px-4 py-3 border border-gray-200 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            className="rounded-none border-l-0"
+                            containerClassName="mb-0 flex-1"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1.5">
+                        <label className="block text-sm font-bold text-foreground mb-1.5 uppercase tracking-wide font-display">
                           YouTube
                         </label>
                         <div className="flex items-center">
-                          <span className="px-4 py-3 bg-gray-100 text-gray-500 border border-r-0 border-gray-200 rounded-l-lg">
+                          <span className="px-4 py-3 bg-secondary/20 text-foreground border-2 border-r-0 border-brutal-black">
                             <Youtube className="w-5 h-5" />
                           </span>
-                          <input
-                            type="text"
+                          <Input
+                            variant="brutal"
                             value={youtube}
                             onChange={(e) => setYoutube(e.target.value)}
                             placeholder="channel URL or username"
-                            className="flex-1 px-4 py-3 border border-gray-200 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            className="rounded-none border-l-0"
+                            containerClassName="mb-0 flex-1"
                           />
                         </div>
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-1.5">
+                        <label className="block text-sm font-bold text-foreground mb-1.5 uppercase tracking-wide font-display">
                           TikTok
                         </label>
                         <div className="flex items-center">
-                          <span className="px-4 py-3 bg-gray-100 text-gray-500 border border-r-0 border-gray-200 rounded-l-lg text-sm font-bold">
+                          <span className="px-4 py-3 bg-secondary/20 text-foreground border-2 border-r-0 border-brutal-black font-display font-bold">
                             TT
                           </span>
-                          <input
-                            type="text"
+                          <Input
+                            variant="brutal"
                             value={tiktok}
                             onChange={(e) => setTiktok(e.target.value)}
                             placeholder="username"
-                            className="flex-1 px-4 py-3 border border-gray-200 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                            className="rounded-none border-l-0"
+                            containerClassName="mb-0 flex-1"
                           />
                         </div>
                       </div>
                     </div>
 
-                    <div className="mt-6 flex justify-end">
-                      <Button onClick={saveProfile} disabled={loading}>
+                    <div className="mt-8 flex justify-end pt-6 border-t-2 border-dashed border-brutal-black/20">
+                      <Button variant="brutal" onClick={saveProfile} disabled={loading} size="lg">
                         {loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : (
-                          <Save className="w-4 h-4" />
+                          <Save className="w-4 h-4 mr-2" />
                         )}
                         Save Links
                       </Button>
@@ -437,14 +456,19 @@ export default function CreatorSettingsPage() {
 
               {/* Monetization Section */}
               {activeSection === "monetization" && (
-                <Card>
-                  <CardContent>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                      Monetization Settings
-                    </h2>
+                <Card variant="brutal">
+                  <CardContent className="p-6 sm:p-8">
+                    <div className="flex items-center gap-3 mb-8 border-b-4 border-brutal-black pb-4">
+                      <div className="w-10 h-10 bg-accent-green border-2 border-brutal-black flex items-center justify-center shadow-brutal-sm">
+                        <DollarSign className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="font-display text-2xl font-bold uppercase">
+                        Monetization
+                      </h2>
+                    </div>
 
                     <div className="space-y-6">
-                      <div className="p-4 bg-gray-50 rounded-lg">
+                      <div className="p-6 bg-secondary/10 border-2 border-brutal-black border-dashed">
                         <Toggle
                           label="Paid Direct Messages"
                           description="Charge fans for sending you direct messages"
@@ -453,25 +477,27 @@ export default function CreatorSettingsPage() {
                         />
 
                         {dmEnabled && (
-                          <div className="mt-4 pl-8">
-                            <label className="block text-sm font-medium text-gray-900 mb-1.5">
+                          <div className="mt-6 pl-8 border-l-2 border-brutal-black border-dashed ml-4">
+                            <label className="block text-sm font-bold text-foreground mb-1.5 uppercase tracking-wide font-display">
                               Price per message (₹)
                             </label>
-                            <div className="flex items-center max-w-xs">
-                              <span className="px-4 py-3 bg-gray-100 text-gray-500 border border-r-0 border-gray-200 rounded-l-lg">
+                            <div className="flex items-center max-w-xs font-display font-bold text-xl">
+                              <span className="px-4 py-3 bg-secondary/20 text-foreground border-2 border-r-0 border-brutal-black">
                                 ₹
                               </span>
-                              <input
+                              <Input
                                 type="number"
                                 min="0"
                                 step="1"
                                 value={dmPrice}
                                 onChange={(e) => setDmPrice(e.target.value)}
                                 placeholder="50"
-                                className="w-full px-4 py-3 border border-gray-200 rounded-r-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
+                                variant="brutal"
+                                className="rounded-none border-l-0"
+                                containerClassName="mb-0 w-full"
                               />
                             </div>
-                            <p className="text-sm text-gray-500 mt-1">
+                            <p className="font-mono text-xs font-bold text-muted-foreground mt-2">
                               Subscribers can still message you for free
                             </p>
                           </div>
@@ -479,12 +505,12 @@ export default function CreatorSettingsPage() {
                       </div>
                     </div>
 
-                    <div className="mt-6 flex justify-end">
-                      <Button onClick={saveMonetization} disabled={loading}>
+                    <div className="mt-8 flex justify-end pt-6 border-t-2 border-dashed border-brutal-black/20">
+                      <Button variant="brutal" onClick={saveMonetization} disabled={loading} size="lg">
                         {loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : (
-                          <Save className="w-4 h-4" />
+                          <Save className="w-4 h-4 mr-2" />
                         )}
                         Save Settings
                       </Button>
@@ -495,13 +521,18 @@ export default function CreatorSettingsPage() {
 
               {/* Notifications Section */}
               {activeSection === "notifications" && (
-                <Card>
-                  <CardContent>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                      Notification Preferences
-                    </h2>
+                <Card variant="brutal">
+                  <CardContent className="p-6 sm:p-8">
+                    <div className="flex items-center gap-3 mb-8 border-b-4 border-brutal-black pb-4">
+                      <div className="w-10 h-10 bg-accent-yellow border-2 border-brutal-black flex items-center justify-center shadow-brutal-sm">
+                        <Bell className="w-6 h-6 text-brutal-black" />
+                      </div>
+                      <h2 className="font-display text-2xl font-bold uppercase">
+                        Notifications
+                      </h2>
+                    </div>
 
-                    <div className="space-y-6">
+                    <div className="space-y-6 bg-secondary/5 p-6 border-2 border-brutal-black">
                       <Toggle
                         label="New Subscriber"
                         description="Get notified when someone subscribes to you"
@@ -509,12 +540,16 @@ export default function CreatorSettingsPage() {
                         onChange={(e) => setNewSubscriberNotif(e.target.checked)}
                       />
 
+                      <div className="border-t-2 border-dashed border-brutal-black/20 my-4"></div>
+
                       <Toggle
                         label="New Message"
                         description="Get notified when you receive a new message"
                         checked={newMessageNotif}
                         onChange={(e) => setNewMessageNotif(e.target.checked)}
                       />
+
+                      <div className="border-t-2 border-dashed border-brutal-black/20 my-4"></div>
 
                       <Toggle
                         label="New Tip"
@@ -524,12 +559,12 @@ export default function CreatorSettingsPage() {
                       />
                     </div>
 
-                    <div className="mt-6 flex justify-end">
-                      <Button onClick={saveNotifications} disabled={loading}>
+                    <div className="mt-8 flex justify-end pt-6 border-t-2 border-dashed border-brutal-black/20">
+                      <Button variant="brutal" onClick={saveNotifications} disabled={loading} size="lg">
                         {loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : (
-                          <Save className="w-4 h-4" />
+                          <Save className="w-4 h-4 mr-2" />
                         )}
                         Save Preferences
                       </Button>
@@ -540,14 +575,20 @@ export default function CreatorSettingsPage() {
 
               {/* Payout Section */}
               {activeSection === "payout" && (
-                <Card>
-                  <CardContent>
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6">
-                      Payout Settings
-                    </h2>
+                <Card variant="brutal">
+                  <CardContent className="p-6 sm:p-8">
+                    <div className="flex items-center gap-3 mb-8 border-b-4 border-brutal-black pb-4">
+                      <div className="w-10 h-10 bg-accent-purple border-2 border-brutal-black flex items-center justify-center shadow-brutal-sm">
+                        <CreditCard className="w-6 h-6 text-white" />
+                      </div>
+                      <h2 className="font-display text-2xl font-bold uppercase">
+                        Payout Settings
+                      </h2>
+                    </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       <Select
+                        variant="brutal"
                         label="Payout Method"
                         value={payoutMethod}
                         onChange={(e) => setPayoutMethod(e.target.value)}
@@ -561,6 +602,7 @@ export default function CreatorSettingsPage() {
                       {payoutMethod === "bank" && (
                         <>
                           <Input
+                            variant="brutal"
                             label="Bank Name"
                             value={bankName}
                             onChange={(e) => setBankName(e.target.value)}
@@ -568,6 +610,7 @@ export default function CreatorSettingsPage() {
                           />
 
                           <Input
+                            variant="brutal"
                             label="Account Number"
                             value={accountNumber}
                             onChange={(e) => setAccountNumber(e.target.value)}
@@ -575,6 +618,7 @@ export default function CreatorSettingsPage() {
                           />
 
                           <Input
+                            variant="brutal"
                             label="IFSC Code"
                             value={ifscCode}
                             onChange={(e) => setIfscCode(e.target.value)}
@@ -585,6 +629,7 @@ export default function CreatorSettingsPage() {
 
                       {payoutMethod === "upi" && (
                         <Input
+                          variant="brutal"
                           label="UPI ID"
                           placeholder="yourname@upi"
                         />
@@ -592,6 +637,7 @@ export default function CreatorSettingsPage() {
 
                       {payoutMethod === "paypal" && (
                         <Input
+                          variant="brutal"
                           label="PayPal Email"
                           type="email"
                           placeholder="your@email.com"
@@ -599,17 +645,17 @@ export default function CreatorSettingsPage() {
                       )}
                     </div>
 
-                    <p className="text-sm text-gray-500 mt-4">
-                      Payouts are processed every Monday for the previous week&apos;s earnings.
-                      Minimum payout threshold is ₹500.
-                    </p>
+                    <div className="mt-6 p-4 bg-secondary/10 border-2 border-brutal-black border-dashed font-mono text-sm font-bold text-muted-foreground flex gap-3 items-start">
+                      <div className="min-w-1.5 min-h-1.5 w-1.5 h-1.5 bg-accent-blue rounded-full mt-1.5"></div>
+                      Payouts are processed every Monday for the previous week&apos;s earnings. Minimum payout threshold is ₹500.
+                    </div>
 
-                    <div className="mt-6 flex justify-end">
-                      <Button onClick={savePayout} disabled={loading}>
+                    <div className="mt-8 flex justify-end pt-6 border-t-2 border-dashed border-brutal-black/20">
+                      <Button variant="brutal" onClick={savePayout} disabled={loading} size="lg">
                         {loading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : (
-                          <Save className="w-4 h-4" />
+                          <Save className="w-4 h-4 mr-2" />
                         )}
                         Save Payout Info
                       </Button>
@@ -620,31 +666,32 @@ export default function CreatorSettingsPage() {
 
               {/* Account & Security Section */}
               {activeSection === "account" && (
-                <div className="space-y-6">
+                <div className="space-y-8">
                   {/* Password Change */}
-                  <Card>
-                    <CardContent>
+                  <Card variant="brutal">
+                    <CardContent className="p-6 sm:p-8">
                       <div className="flex items-center gap-3 mb-6">
-                        <Lock className="w-5 h-5 text-gray-600" />
-                        <h2 className="text-lg font-semibold text-gray-900">
+                        <Lock className="w-6 h-6 text-foreground" />
+                        <h2 className="font-display text-xl font-bold uppercase">
                           Change Password
                         </h2>
                       </div>
 
                       {passwordSaved && (
-                        <div className="mb-4 p-4 bg-green-50 text-green-700 rounded-lg flex items-center gap-2">
+                        <div className="mb-4 p-4 bg-accent-green/10 border-2 border-accent-green text-green-800 rounded-none shadow-brutal-sm flex items-center gap-2 font-bold">
                           <Check className="w-5 h-5" />
                           Password changed successfully!
                         </div>
                       )}
                       {passwordError && (
-                        <div className="mb-4 p-4 bg-red-50 text-red-700 rounded-lg">
+                        <div className="mb-4 p-4 bg-accent-red/10 border-2 border-accent-red text-red-800 rounded-none shadow-brutal-sm font-bold">
                           {passwordError}
                         </div>
                       )}
 
                       <div className="space-y-4">
                         <Input
+                          variant="brutal"
                           label="Current Password"
                           type="password"
                           value={currentPassword}
@@ -653,17 +700,19 @@ export default function CreatorSettingsPage() {
                         />
 
                         <Input
+                          variant="brutal"
                           label="New Password"
                           type="password"
                           value={newPassword}
                           onChange={(e) => setNewPassword(e.target.value)}
                           placeholder="Enter new password"
                         />
-                        <p className="text-sm text-gray-500 -mt-2">
+                        <p className="font-mono text-xs font-bold text-muted-foreground -mt-2 mb-2">
                           Min 8 characters, include uppercase, lowercase, and number
                         </p>
 
                         <Input
+                          variant="brutal"
                           label="Confirm New Password"
                           type="password"
                           value={confirmPassword}
@@ -674,6 +723,7 @@ export default function CreatorSettingsPage() {
 
                       <div className="mt-6 flex justify-end">
                         <Button
+                          variant="brutal"
                           onClick={async () => {
                             if (newPassword !== confirmPassword) {
                               setPasswordError("Passwords do not match");
@@ -709,9 +759,9 @@ export default function CreatorSettingsPage() {
                           disabled={loading || !currentPassword || !newPassword || !confirmPassword}
                         >
                           {loading ? (
-                            <Loader2 className="w-4 h-4 animate-spin" />
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
                           ) : (
-                            <Lock className="w-4 h-4" />
+                            <Lock className="w-4 h-4 mr-2" />
                           )}
                           Change Password
                         </Button>
@@ -720,22 +770,23 @@ export default function CreatorSettingsPage() {
                   </Card>
 
                   {/* Session Security */}
-                  <Card>
-                    <CardContent>
-                      <div className="flex items-center gap-3 mb-6">
-                        <Shield className="w-5 h-5 text-gray-600" />
-                        <h2 className="text-lg font-semibold text-gray-900">
+                  <Card variant="brutal" className="border-dashed">
+                    <CardContent className="p-6">
+                      <div className="flex items-center gap-3 mb-4">
+                        <Shield className="w-5 h-5 text-foreground" />
+                        <h2 className="font-display text-lg font-bold uppercase">
                           Session Security
                         </h2>
                       </div>
 
-                      <p className="text-gray-600 mb-4">
+                      <p className="font-mono text-sm text-muted-foreground mb-6 font-bold">
                         If you suspect unauthorized access to your account, you can sign out from all devices.
                         This will require you to log in again on all devices.
                       </p>
 
                       <Button
-                        variant="outline"
+                        variant="ghost"
+                        className="border-2 border-brutal-black hover:bg-secondary w-full sm:w-auto"
                         onClick={async () => {
                           if (!confirm("Are you sure you want to sign out from all devices?")) {
                             return;
@@ -758,9 +809,9 @@ export default function CreatorSettingsPage() {
                         disabled={revokingSession}
                       >
                         {revokingSession ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
                         ) : (
-                          <LogOut className="w-4 h-4" />
+                          <LogOut className="w-4 h-4 mr-2" />
                         )}
                         Sign Out All Devices
                       </Button>
@@ -768,23 +819,25 @@ export default function CreatorSettingsPage() {
                   </Card>
 
                   {/* Danger Zone */}
-                  <Card className="border-red-200">
-                    <CardContent>
+                  <Card variant="brutal" className="border-accent-red">
+                    <CardContent className="p-6 bg-accent-red/5">
                       <div className="flex items-center gap-3 mb-6">
-                        <AlertTriangle className="w-5 h-5 text-red-600" />
-                        <h2 className="text-lg font-semibold text-red-600">
+                        <div className="w-8 h-8 bg-accent-red border-2 border-brutal-black flex items-center justify-center shadow-brutal-sm text-white">
+                          <AlertTriangle className="w-5 h-5" />
+                        </div>
+                        <h2 className="font-display text-lg font-bold uppercase text-accent-red">
                           Danger Zone
                         </h2>
                       </div>
 
-                      <p className="text-gray-600 mb-4">
+                      <p className="font-mono text-sm text-muted-foreground mb-6 font-bold">
                         Once you delete your account, there is no going back. All your content,
                         subscribers, and earnings will be permanently deleted.
                       </p>
 
                       <Button
-                        variant="outline"
-                        className="text-red-600 border-red-300 hover:bg-red-50"
+                        variant="ghost"
+                        className="text-accent-red border-2 border-accent-red hover:bg-accent-red hover:text-white w-full sm:w-auto font-bold shadow-brutal-sm hover:shadow-none hover:translate-x-[2px] hover:translate-y-[2px]"
                         onClick={() => {
                           if (confirm("Are you sure you want to delete your account? This action cannot be undone.")) {
                             if (confirm("This will permanently delete all your content, subscribers, and earnings. Type 'DELETE' to confirm.")) {
@@ -794,15 +847,14 @@ export default function CreatorSettingsPage() {
                           }
                         }}
                       >
-                        Delete Account
+                        DELETE ACCOUNT
                       </Button>
                     </CardContent>
                   </Card>
                 </div>
               )}
-        </div>
+            </div>
       </div>
     </div>
   );
 }
-

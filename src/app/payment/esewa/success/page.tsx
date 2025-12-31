@@ -2,8 +2,7 @@
 
 import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import Link from "next/link";
-import { Heart, CheckCircle, Loader2 } from "lucide-react";
+import { Heart, CheckCircle, Loader2, ArrowRight, Download, CreditCard, XCircle } from "lucide-react";
 import { Button, Card, CardContent } from "@/components/ui";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -74,12 +73,12 @@ function SuccessContent() {
 
   if (verifying) {
     return (
-      <div className="text-center">
-        <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-foreground mb-2">
+      <div className="text-center py-12">
+        <Loader2 className="w-16 h-16 animate-spin text-foreground stroke-[3] mx-auto mb-6" />
+        <h2 className="text-3xl font-display font-black text-foreground uppercase mb-4 tracking-tight animate-pulse">
           Verifying Payment...
         </h2>
-        <p className="text-muted-foreground">
+        <p className="text-foreground font-mono font-bold text-lg bg-accent-yellow p-2 inline-block border-2 border-brutal-black transform -rotate-1">
           Please wait while we confirm your payment with eSewa.
         </p>
       </div>
@@ -88,15 +87,17 @@ function SuccessContent() {
 
   if (error) {
     return (
-      <div className="text-center">
-        <div className="w-16 h-16 rounded-full bg-accent-red/20 flex items-center justify-center mx-auto mb-4">
-          <span className="text-accent-red text-2xl">✕</span>
+      <div className="text-center py-8">
+        <div className="w-24 h-24 rounded-none border-4 border-brutal-black flex items-center justify-center mx-auto mb-8 bg-accent-red shadow-brutal">
+          <XCircle className="w-12 h-12 text-foreground stroke-[3]" />
         </div>
-        <h2 className="text-xl font-semibold text-foreground mb-2">
+        <h2 className="text-3xl font-display font-black text-foreground uppercase mb-4 tracking-tight">
           Payment Verification Failed
         </h2>
-        <p className="text-muted-foreground mb-6">{error}</p>
-        <Button onClick={() => router.push("/dashboard")}>
+        <div className="bg-accent-red/20 p-4 border-2 border-brutal-black mb-8 max-w-lg mx-auto transform rotate-1">
+          <p className="text-foreground font-medium text-lg font-mono">{error}</p>
+        </div>
+        <Button onClick={() => router.push("/dashboard")} variant="brutal" size="lg">
           Go to Dashboard
         </Button>
       </div>
@@ -104,47 +105,54 @@ function SuccessContent() {
   }
 
   return (
-    <div className="text-center">
-      <div className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 ${
-        paymentType === "tip" ? "bg-pink-500/20" : "bg-accent-green/20"
+    <div className="text-center py-8">
+      <div className={`w-24 h-24 rounded-none border-4 border-brutal-black flex items-center justify-center mx-auto mb-8 shadow-brutal ${
+        paymentType === "tip" ? "bg-accent-pink" : "bg-accent-green"
       }`}>
         {paymentType === "tip" ? (
-          <Heart className="w-10 h-10 text-pink-500 fill-pink-500" />
+          <Heart className="w-12 h-12 text-foreground stroke-[3] fill-white" />
         ) : (
-          <CheckCircle className="w-10 h-10 text-accent-green" />
+          <CheckCircle className="w-12 h-12 text-foreground stroke-[3]" />
         )}
       </div>
-      <h2 className="text-2xl font-bold text-foreground mb-2">
+      <h2 className="text-3xl md:text-4xl font-display font-black text-foreground uppercase mb-6 tracking-tight leading-none">
         {getTitle()}
       </h2>
-      <p className="text-muted-foreground mb-6">
-        {getMessage()}
-      </p>
-      <div className="flex flex-col sm:flex-row gap-3 justify-center">
+      
+      <div className="bg-accent-yellow/30 p-4 border-2 border-brutal-black mb-10 max-w-lg mx-auto transform -rotate-1">
+        <p className="text-foreground font-bold text-lg font-mono leading-relaxed">
+          {getMessage()}
+        </p>
+      </div>
+
+      <div className="flex flex-col sm:flex-row gap-4 justify-center">
         {paymentType === "tip" ? (
           <>
-            <Button onClick={() => router.push("/explore")} className="bg-pink-600 hover:bg-pink-700">
+            <Button onClick={() => router.push("/explore")} variant="brutal" size="lg" className="w-full sm:w-auto">
+              <Heart className="w-5 h-5 mr-2 stroke-[3]" />
               Explore More Creators
             </Button>
-            <Button variant="outline" onClick={() => router.push("/dashboard")}>
+            <Button variant="outline" onClick={() => router.push("/dashboard")} className="w-full sm:w-auto border-3 text-lg bg-card hover:bg-foreground hover:text-white transition-all transform hover:-translate-y-1 hover:shadow-brutal-sm py-6">
               Go to Dashboard
             </Button>
           </>
         ) : paymentType === "product" ? (
           <>
-            <Button onClick={() => router.push("/purchases")}>
+            <Button onClick={() => router.push("/purchases")} variant="brutal" size="lg" className="w-full sm:w-auto">
+              <Download className="w-5 h-5 mr-2 stroke-[3]" />
               View My Purchases
             </Button>
-            <Button variant="outline" onClick={() => router.push("/explore")}>
+            <Button variant="outline" onClick={() => router.push("/explore")} className="w-full sm:w-auto border-3 text-lg bg-card hover:bg-foreground hover:text-white transition-all transform hover:-translate-y-1 hover:shadow-brutal-sm py-6">
               Continue Browsing
             </Button>
           </>
         ) : (
           <>
-            <Button onClick={() => router.push("/dashboard")}>
-              Go to Dashboard
+            <Button onClick={() => router.push("/dashboard")} variant="brutal" size="lg" className="w-full sm:w-auto">
+              Go to Dashboard <ArrowRight className="ml-2 w-5 h-5 stroke-[3]" />
             </Button>
-            <Button variant="outline" onClick={() => router.push("/subscriptions")}>
+            <Button variant="outline" onClick={() => router.push("/subscriptions")} className="w-full sm:w-auto border-3 text-lg bg-card hover:bg-foreground hover:text-white transition-all transform hover:-translate-y-1 hover:shadow-brutal-sm py-6">
+              <CreditCard className="w-5 h-5 mr-2 stroke-[3]" />
               View Subscriptions
             </Button>
           </>
@@ -156,16 +164,17 @@ function SuccessContent() {
 
 export default function EsewaSuccessPage() {
   return (
-    <main className="min-h-screen bg-background flex flex-col">
+    <main className="min-h-screen bg-accent-green/5 flex flex-col">
       <Header />
 
       {/* Content */}
       <div className="flex-1 flex items-center justify-center p-4">
-        <Card className="w-full max-w-md">
-          <CardContent className="p-8">
+        <Card variant="brutal" className="w-full max-w-2xl bg-card border-4">
+          <CardContent className="p-8 sm:p-12">
             <Suspense fallback={
-              <div className="text-center">
-                <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto" />
+              <div className="text-center py-12">
+                <Loader2 className="w-16 h-16 animate-spin text-foreground stroke-[3] mx-auto mb-6" />
+                <h2 className="text-2xl font-bold text-foreground uppercase mb-4">Loading...</h2>
               </div>
             }>
               <SuccessContent />

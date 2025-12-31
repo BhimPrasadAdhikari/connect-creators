@@ -98,106 +98,108 @@ export default async function EarningsPage() {
 
   return (
     <div className="p-4 sm:p-6 lg:p-12 max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-8">Earnings & Analytics</h1>
+        <h1 className="font-display text-display-sm font-bold text-foreground mb-8">Earnings & Analytics</h1>
 
         {/* Overview Cards */}
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-card p-6 rounded-3xl border border-border">
+          <Card variant="brutal" className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 border-2 border-brutal-black bg-primary/20 flex items-center justify-center shadow-brutal-sm">
                 <Users className="w-5 h-5 text-primary" />
               </div>
-              <span className="text-sm text-muted-foreground font-medium">Active Subscribers</span>
+              <span className="text-sm text-foreground font-bold font-mono">SUBSCRIBERS</span>
             </div>
-            <p className="text-3xl font-bold text-foreground">{stats.totalSubscribers}</p>
-          </div>
+            <p className="font-display text-3xl font-bold text-foreground">{stats.totalSubscribers}</p>
+          </Card>
 
-          <div className="bg-card p-6 rounded-3xl border border-border">
+          <Card variant="brutal" className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-accent-green/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 border-2 border-brutal-black bg-accent-green/10 flex items-center justify-center shadow-brutal-sm">
                 <DollarSign className="w-5 h-5 text-accent-green" />
               </div>
-              <span className="text-sm text-muted-foreground font-medium">Monthly Revenue</span>
+              <span className="text-sm text-foreground font-bold font-mono">REVENUE</span>
             </div>
-            <p className="text-3xl font-bold text-foreground">{formatCurrency(stats.monthlyGross, "INR")}</p>
-          </div>
+            <p className="font-display text-3xl font-bold text-foreground">{formatCurrency(stats.monthlyGross, "INR")}</p>
+          </Card>
 
-          <div className="bg-card p-6 rounded-3xl border border-border">
+          <Card variant="brutal" className="p-6 bg-accent-yellow/10">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-purple-500/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 border-2 border-brutal-black bg-purple-500/10 flex items-center justify-center shadow-brutal-sm">
                 <TrendingUp className="w-5 h-5 text-purple-500" />
               </div>
-              <span className="text-sm text-muted-foreground font-medium">Your Earnings</span>
+              <span className="text-sm text-foreground font-bold font-mono uppercase">Your Earnings</span>
             </div>
-            <p className="text-3xl font-bold text-accent-green">{formatCurrency(stats.monthlyNet, "INR")}</p>
-          </div>
+            <p className="font-display text-3xl font-bold text-accent-green">{formatCurrency(stats.monthlyNet, "INR")}</p>
+          </Card>
 
-          <div className="bg-card p-6 rounded-3xl border border-border">
+          <Card variant="brutal" className="p-6">
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-pink-500/10 rounded-xl flex items-center justify-center">
+              <div className="w-10 h-10 border-2 border-brutal-black bg-pink-500/10 flex items-center justify-center shadow-brutal-sm">
                 <span className="text-lg">💝</span>
               </div>
-              <span className="text-sm text-muted-foreground font-medium">Tips This Month</span>
+              <span className="text-sm text-foreground font-bold font-mono">TIPS</span>
             </div>
-            <p className="text-3xl font-bold text-foreground">{formatCurrency(stats.monthlyTips, "INR")}</p>
-          </div>
+            <p className="font-display text-3xl font-bold text-foreground">{formatCurrency(stats.monthlyTips, "INR")}</p>
+          </Card>
         </div>
 
         {/* Earnings Breakdown */}
-        <div className="bg-card rounded-3xl border border-border p-8 mb-8">
-          <h2 className="text-lg font-bold text-foreground mb-6">Monthly Earnings Breakdown</h2>
+        <Card variant="brutal" className="p-8 mb-8">
+          <h2 className="font-display text-xl font-bold text-foreground mb-6">Monthly Earnings Breakdown</h2>
 
-          <div className="space-y-3">
-            <div className="flex justify-between py-3 border-b border-border">
-              <span className="text-muted-foreground">Gross Revenue (from subscriptions)</span>
-              <span className="font-medium text-foreground">{formatCurrency(earningsBreakdown.grossAmount, "INR")}</span>
+          <div className="space-y-3 font-mono text-sm">
+            <div className="flex justify-between py-3 border-b-2 border-dotted border-brutal-black">
+              <span className="text-muted-foreground uppercase">Gross Revenue (from subscriptions)</span>
+              <span className="font-bold text-foreground">{formatCurrency(earningsBreakdown.grossAmount, "INR")}</span>
             </div>
-            <div className="flex justify-between py-3 border-b border-border">
-              <span className="text-muted-foreground">
+            <div className="flex justify-between py-3 border-b-2 border-dotted border-brutal-black">
+              <span className="text-muted-foreground uppercase">
                 Payment Processing Fee ({earningsBreakdown.paymentFeePercentage}%)
               </span>
-              <span className="text-accent-red">-{formatCurrency(earningsBreakdown.paymentFee, "INR")}</span>
+              <span className="text-accent-red font-bold">-{formatCurrency(earningsBreakdown.paymentFee, "INR")}</span>
             </div>
-            <div className="flex justify-between py-3 border-b border-border">
-              <span className="text-muted-foreground">
+            <div className="flex justify-between py-3 border-b-2 border-dotted border-brutal-black">
+              <span className="text-muted-foreground uppercase">
                 Platform Fee ({earningsBreakdown.platformCommissionPercentage}%)
               </span>
-              <span className="text-accent-red">-{formatCurrency(earningsBreakdown.platformCommission, "INR")}</span>
+              <span className="text-accent-red font-bold">-{formatCurrency(earningsBreakdown.platformCommission, "INR")}</span>
             </div>
-            <div className="flex justify-between py-4 bg-accent-green/10 -mx-8 px-8 rounded-b-3xl">
-              <span className="font-bold text-foreground">Your Net Earnings</span>
+            <div className="flex justify-between py-4 bg-accent-green/10 -mx-8 px-8 border-t-2 border-brutal-black">
+              <span className="font-bold text-foreground uppercase text-base">Your Net Earnings</span>
               <div className="text-right">
-                <span className="font-bold text-accent-green text-xl">{formatCurrency(earningsBreakdown.netEarnings, "INR")}</span>
-                <span className="text-sm text-muted-foreground ml-2">
+                <span className="font-display font-bold text-accent-green text-xl">{formatCurrency(earningsBreakdown.netEarnings, "INR")}</span>
+                <span className="block text-xs text-muted-foreground mt-1">
                   ({earningsBreakdown.creatorSharePercentage.toFixed(1)}% of gross)
                 </span>
               </div>
             </div>
           </div>
-        </div>
+        </Card>
 
         {/* Payout Status */}
-        <div className={`bg-card rounded-3xl border p-6 mb-8 ${payoutEligibility.eligible ? "border-accent-green bg-accent-green/5" : "border-border"}`}>
+        <div className={`border-3 border-brutal-black shadow-brutal-sm p-6 mb-8 rounded-none ${payoutEligibility.eligible ? "bg-accent-green/10" : "bg-card"}`}>
           <div className="flex items-start gap-4">
-            <div className={`w-12 h-12 rounded-full flex items-center justify-center ${payoutEligibility.eligible ? "bg-accent-green/20" : "bg-muted"}`}>
+            <div className={`w-12 h-12 border-2 border-brutal-black flex items-center justify-center shadow-brutal-sm ${payoutEligibility.eligible ? "bg-accent-green/20" : "bg-muted"}`}>
               <Calendar className={`w-6 h-6 ${payoutEligibility.eligible ? "text-accent-green" : "text-muted-foreground"}`} />
             </div>
             <div className="flex-1">
-              <h3 className="font-bold text-foreground">Payout Status</h3>
-              <p className="text-muted-foreground">{payoutEligibility.message}</p>
-              <p className="text-sm text-muted-foreground mt-2">
+              <h3 className="font-display font-bold text-foreground text-lg uppercase">Payout Status</h3>
+              <p className="text-muted-foreground font-medium">{payoutEligibility.message}</p>
+              <p className="text-sm text-muted-foreground mt-2 font-mono">
                 Payouts are processed {PAYOUT_SCHEDULE.frequencies[PAYOUT_SCHEDULE.defaultFrequency].name.toLowerCase()}, with a {PAYOUT_SCHEDULE.holdPeriod}-day hold period.
               </p>
             </div>
-            {payoutEligibility.eligible && <Badge variant="success">Eligible</Badge>}
+            {payoutEligibility.eligible && 
+              <span className="bg-accent-green text-white px-3 py-1 border-2 border-brutal-black font-bold text-sm shadow-brutal-sm uppercase">Eligible</span>
+            }
           </div>
         </div>
 
         {/* Tier Performance */}
-        <div className="bg-card rounded-3xl border border-border p-8 mb-8">
+        <Card variant="brutal" className="p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-bold text-foreground">Tier Performance</h2>
-            <Link href="/dashboard/creator/tiers" className="text-primary text-sm hover:underline">
+            <h2 className="font-display text-xl font-bold text-foreground">Tier Performance</h2>
+            <Link href="/dashboard/creator/tiers" className="text-primary font-bold hover:underline font-mono text-sm uppercase">
               Manage Tiers →
             </Link>
           </div>
@@ -205,7 +207,7 @@ export default async function EarningsPage() {
           {tiers.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
               <p>No tiers created yet.</p>
-              <Link href="/dashboard/creator/tiers" className="text-primary hover:underline">
+              <Link href="/dashboard/creator/tiers" className="text-primary hover:underline font-bold">
                 Create your first tier
               </Link>
             </div>
@@ -214,53 +216,53 @@ export default async function EarningsPage() {
               {tiers.map((tier) => {
                 const tierRevenue = tier.price * (tier._count?.subscriptions || 0);
                 return (
-                  <div key={tier.id} className="flex items-center justify-between py-4 border-b border-border last:border-0">
+                  <div key={tier.id} className="flex items-center justify-between py-4 border-b-2 border-brutal-black last:border-0">
                     <div>
-                      <p className="font-medium text-foreground">{tier.name}</p>
-                      <p className="text-sm text-muted-foreground">{formatCurrency(tier.price, "INR")}/month</p>
+                      <p className="font-display font-bold text-foreground">{tier.name}</p>
+                      <p className="text-sm text-muted-foreground font-mono">{formatCurrency(tier.price, "INR")}/month</p>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-foreground">{tier._count?.subscriptions || 0} subscribers</p>
-                      <p className="text-sm text-accent-green">{formatCurrency(tierRevenue, "INR")}/month</p>
+                      <p className="font-bold text-foreground">{tier._count?.subscriptions || 0} subscribers</p>
+                      <p className="text-sm text-accent-green font-mono font-bold">{formatCurrency(tierRevenue, "INR")}/month</p>
                     </div>
                   </div>
                 );
               })}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Recent Tips */}
-        <div className="bg-card rounded-3xl border border-border p-8">
-          <h2 className="text-lg font-bold text-foreground mb-6">Recent Tips</h2>
+        <Card variant="brutal" className="p-8">
+          <h2 className="font-display text-xl font-bold text-foreground mb-6">Recent Tips</h2>
 
           {recentTips.length === 0 ? (
-            <p className="text-center py-8 text-muted-foreground">No tips received yet.</p>
+            <p className="text-center py-8 text-muted-foreground font-mono">No tips received yet.</p>
           ) : (
             <div className="space-y-4">
               {recentTips.map((tip) => (
-                <div key={tip.id} className="flex items-center justify-between py-3">
+                <div key={tip.id} className="flex items-center justify-between py-3 border-b border-dashed border-brutal-black last:border-0">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-pink-500/10 rounded-full flex items-center justify-center">💝</div>
+                    <div className="w-10 h-10 bg-pink-500/10 border-2 border-brutal-black flex items-center justify-center shadow-brutal-sm">💝</div>
                     <div>
-                      <p className="font-medium text-foreground">{tip.fromUser.name || "Anonymous"}</p>
-                      {tip.message && <p className="text-sm text-muted-foreground">&quot;{tip.message}&quot;</p>}
+                      <p className="font-bold text-foreground">{tip.fromUser.name || "Anonymous"}</p>
+                      {tip.message && <p className="text-sm text-muted-foreground italic">&quot;{tip.message}&quot;</p>}
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="font-semibold text-accent-green">{formatCurrency(tip.amount, "INR")}</p>
-                    <p className="text-xs text-muted-foreground">{new Date(tip.createdAt).toLocaleDateString()}</p>
+                    <p className="font-bold text-accent-green font-mono">{formatCurrency(tip.amount, "INR")}</p>
+                    <p className="text-xs text-muted-foreground font-mono">{new Date(tip.createdAt).toLocaleDateString()}</p>
                   </div>
                 </div>
               ))}
             </div>
           )}
-        </div>
+        </Card>
 
         {/* Info */}
-        <div className="mt-8 flex items-start gap-3 text-sm text-muted-foreground">
-          <Info className="w-5 h-5 mt-0.5" />
-          <p>
+        <div className="mt-8 flex items-start gap-3 text-sm text-muted-foreground bg-secondary/10 p-4 border-2 border-brutal-black border-dashed">
+          <Info className="w-5 h-5 mt-0.5 text-secondary" />
+          <p className="font-mono">
             Earnings are calculated based on your current active subscribers and the default UPI payment method.
             Actual earnings may vary based on payment methods used by your fans.
           </p>
@@ -268,3 +270,4 @@ export default async function EarningsPage() {
     </div>
   );
 }
+

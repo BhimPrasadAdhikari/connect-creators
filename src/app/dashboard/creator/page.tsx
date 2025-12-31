@@ -1,9 +1,20 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getServerSession } from "next-auth";
-import { FileText, Users, DollarSign, TrendingUp, Plus } from "lucide-react";
+import { FileText, Users, DollarSign, TrendingUp, Plus, ChevronRight, Sparkles, Zap, Target } from "lucide-react";
 import { authOptions } from "@/lib/auth";
-import { Avatar, Button } from "@/components/ui";
+import { 
+  Avatar, 
+  Button,
+  BentoGrid,
+  BentoCell,
+  BentoHeader,
+  BentoContent,
+  BentoTitle,
+  BentoDescription,
+  TrustBadge,
+  TrustBadgeGroup,
+} from "@/components/ui";
 import prisma from "@/lib/prisma";
 
 async function getCreatorData(userId: string) {
@@ -110,197 +121,303 @@ export default async function CreatorDashboardPage() {
   const { profile, stats } = data;
 
   return (
-    <div className="p-4 sm:p-6 lg:p-12 max-w-7xl mx-auto">
-        {/* Welcome & Quick Actions */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 sm:gap-6 mb-8 sm:mb-12">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto">
+      {/* Welcome Header with Neubrutalist Style */}
+      <div className="mb-8">
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 lg:gap-6 mb-6">
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-1 sm:mb-2">
+            <h1 className="font-display text-display-sm lg:text-display font-bold text-foreground mb-2">
               Welcome back, {profile.displayName || profile.user.name}
             </h1>
-            <p className="text-muted-foreground text-base sm:text-lg">
+            <p className="text-muted-foreground text-lg">
               Here's what's happening with your content today.
             </p>
           </div>
-          <Link
-            href="/dashboard/creator/posts/new"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-foreground text-background rounded-2xl hover:opacity-90 transition-all shadow-lg font-medium"
-          >
+          <div className="flex items-center gap-3">
+            <TrustBadgeGroup>
+              <TrustBadge type="verified" size="sm" />
+              <TrustBadge type="live" size="sm" />
+            </TrustBadgeGroup>
+          </div>
+        </div>
+        
+        {/* Quick Action - Brutal Style */}
+        <Link href="/dashboard/creator/posts/new">
+          <Button variant="brutal-accent" size="lg" className="gap-2">
             <Plus className="w-5 h-5" />
-            Create Post
-          </Link>
-        </div>
+            Create New Post
+          </Button>
+        </Link>
+      </div>
 
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-          <div className="bg-card p-6 rounded-3xl border border-border hover:border-primary/20 transition-colors">
-            <div className="flex items-center gap-3 mb-4 text-muted-foreground">
-              <div className="p-2 bg-primary/10 rounded-xl text-primary">
-                <Users className="w-5 h-5" />
+      {/* Main Bento Grid Dashboard */}
+      <BentoGrid cols={4} gap="lg">
+        
+        {/* Featured Stats Row - Span Full Width */}
+        <BentoCell span={4} variant="brutal">
+          <BentoContent className="py-6">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+              {/* Subscribers Stat */}
+              <div className="text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
+                  <div className="p-2 bg-primary/20 border-2 border-brutal-black">
+                    <Users className="w-5 h-5 text-primary" />
+                  </div>
+                  <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+                    Subscribers
+                  </span>
+                </div>
+                <p className="font-display text-display-sm lg:text-display font-bold text-foreground">
+                  {stats.subscribers}
+                </p>
               </div>
-              <span className="font-medium">Total Subscribers</span>
-            </div>
-            <p className="text-4xl font-bold text-foreground tracking-tight">
-              {stats.subscribers}
-            </p>
-          </div>
-
-          <div className="bg-card p-6 rounded-3xl border border-border hover:border-accent-green/20 transition-colors">
-            <div className="flex items-center gap-3 mb-4 text-muted-foreground">
-              <div className="p-2 bg-accent-green/10 rounded-xl text-accent-green">
-                <DollarSign className="w-5 h-5" />
+              
+              {/* Monthly Revenue */}
+              <div className="text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
+                  <div className="p-2 bg-secondary/10 border-2 border-brutal-black">
+                    <DollarSign className="w-5 h-5 text-secondary" />
+                  </div>
+                  <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+                    Monthly
+                  </span>
+                </div>
+                <p className="font-display text-display-sm lg:text-display font-bold text-foreground">
+                  {formatPrice(stats.mrr)}
+                </p>
               </div>
-              <span className="font-medium">Monthly Revenue</span>
-            </div>
-            <p className="text-4xl font-bold text-foreground tracking-tight">
-              {formatPrice(stats.mrr)}
-            </p>
-          </div>
-
-          <div className="bg-card p-6 rounded-3xl border border-border hover:border-purple-500/20 transition-colors">
-            <div className="flex items-center gap-3 mb-4 text-muted-foreground">
-              <div className="p-2 bg-purple-500/10 rounded-xl text-purple-500">
-                <FileText className="w-5 h-5" />
+              
+              {/* Posts */}
+              <div className="text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
+                  <div className="p-2 bg-accent-purple/10 border-2 border-brutal-black">
+                    <FileText className="w-5 h-5 text-accent-purple" />
+                  </div>
+                  <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+                    Posts
+                  </span>
+                </div>
+                <p className="font-display text-display-sm lg:text-display font-bold text-foreground">
+                  {stats.posts}
+                </p>
               </div>
-              <span className="font-medium">Published Posts</span>
-            </div>
-            <p className="text-4xl font-bold text-foreground tracking-tight">
-              {stats.posts}
-            </p>
-          </div>
-
-          <div className="bg-card p-6 rounded-3xl border border-border hover:border-amber-500/20 transition-colors">
-            <div className="flex items-center gap-3 mb-4 text-muted-foreground">
-              <div className="p-2 bg-amber-500/10 rounded-xl text-amber-500">
-                <TrendingUp className="w-5 h-5" />
+              
+              {/* All Time Earnings */}
+              <div className="text-center lg:text-left">
+                <div className="flex items-center justify-center lg:justify-start gap-2 mb-2">
+                  <div className="p-2 bg-accent/10 border-2 border-brutal-black">
+                    <TrendingUp className="w-5 h-5 text-accent" />
+                  </div>
+                  <span className="font-mono text-xs uppercase tracking-wide text-muted-foreground">
+                    Lifetime
+                  </span>
+                </div>
+                <p className="font-display text-display-sm lg:text-display font-bold text-foreground">
+                  {formatPrice(stats.totalEarnings)}
+                </p>
               </div>
-              <span className="font-medium">All Time Earnings</span>
             </div>
-            <p className="text-4xl font-bold text-foreground tracking-tight">
-              {formatPrice(stats.totalEarnings)}
-            </p>
-          </div>
-        </div>
+          </BentoContent>
+        </BentoCell>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Recent Posts */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-6 px-1">
-              <h2 className="text-xl font-bold text-foreground">Recent Posts</h2>
+        {/* Recent Posts - Span 2 columns */}
+        <BentoCell span={2} variant="brutal" rowSpan={2}>
+          <BentoHeader>
+            <div className="flex items-center justify-between">
+              <BentoTitle display>Recent Posts</BentoTitle>
               <Link
                 href="/dashboard/creator/posts"
-                className="text-sm font-medium text-muted-foreground hover:text-foreground"
+                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                View All
+                View All <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-
-            <div className="bg-card rounded-3xl border border-border overflow-hidden">
-              {profile.posts.length === 0 ? (
-                <div className="text-center py-12 px-6">
-                  <p className="text-muted-foreground mb-4">You haven't posted anything yet.</p>
-                  <Link
-                    href="/dashboard/creator/posts/new"
-                    className="text-primary font-medium hover:underline"
-                  >
-                    Create your first post
-                  </Link>
-                </div>
-              ) : (
-                <div className="divide-y divide-border">
-                  {profile.posts.map((post) => (
-                    <div
-                      key={post.id}
-                      className="flex items-center gap-5 p-5 hover:bg-muted transition-colors group"
-                    >
-                      <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center flex-shrink-0 text-muted-foreground group-hover:bg-card group-hover:shadow-sm transition-all">
-                        <FileText className="w-6 h-6" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-foreground truncate mb-1 text-lg">
-                          {post.title}
-                        </h3>
-                        <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                          <span>
-                            {new Date(post.createdAt).toLocaleDateString("en-IN", {
-                              day: "numeric",
-                              month: "short",
-                            })}
-                          </span>
-                          {post.isPaid && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-accent-green/10 text-accent-green">
-                              Premium
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <Button variant="ghost" size="sm" className="opacity-0 group-hover:opacity-100">
-                        Edit
-                      </Button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Sidebar Column */}
-          <div className="space-y-8">
-            {/* Recent Subscribers */}
-            <div>
-              <div className="flex items-center justify-between mb-6 px-1">
-                <h2 className="text-xl font-bold text-foreground">New Fans</h2>
-                <Link
-                  href="/dashboard/creator/subscribers"
-                  className="text-sm font-medium text-muted-foreground hover:text-foreground"
-                >
-                  View All
+          </BentoHeader>
+          <BentoContent>
+            {profile.posts.length === 0 ? (
+              <div className="text-center py-8 border-2 border-dashed border-border">
+                <FileText className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                <p className="text-muted-foreground mb-3">No posts yet</p>
+                <Link href="/dashboard/creator/posts/new">
+                  <Button variant="brutal" size="sm">
+                    Create First Post
+                  </Button>
                 </Link>
               </div>
-
-              <div className="bg-card rounded-3xl border border-border p-6">
-                {profile.subscriptions.length === 0 ? (
-                  <div className="text-center py-6">
-                    <p className="text-muted-foreground text-sm">No subscribers yet.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {profile.subscriptions.slice(0, 5).map((sub) => (
-                      <div key={sub.id} className="flex items-center gap-4">
-                        <Avatar
-                          src={sub.fan.image}
-                          name={sub.fan.name || "Fan"}
-                          size="md"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-bold text-foreground truncate text-sm">
-                            {sub.fan.name || "Anonymous"}
-                          </p>
-                          <p className="text-xs text-muted-foreground bg-muted inline-block px-2 py-0.5 rounded-full mt-1">
-                            {sub.tier.name}
-                          </p>
-                        </div>
+            ) : (
+              <div className="space-y-4">
+                {profile.posts.map((post) => (
+                  <div
+                    key={post.id}
+                    className="flex items-start gap-4 p-4 border-2 border-brutal-black bg-brutal-cream hover:shadow-brutal-sm transition-shadow cursor-pointer"
+                  >
+                    <div className="w-10 h-10 border-2 border-brutal-black bg-muted flex items-center justify-center flex-shrink-0">
+                      <FileText className="w-5 h-5 text-muted-foreground" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-foreground truncate mb-1">
+                        {post.title}
+                      </h4>
+                      <div className="flex items-center gap-2 text-xs">
+                        <span className="text-muted-foreground font-mono">
+                          {new Date(post.createdAt).toLocaleDateString("en-IN", {
+                            day: "2-digit",
+                            month: "short",
+                          })}
+                        </span>
+                        {post.isPaid && (
+                          <span className="px-2 py-0.5 border-2 border-brutal-black bg-secondary text-white text-[10px] font-bold uppercase">
+                            Premium
+                          </span>
+                        )}
                       </div>
-                    ))}
+                    </div>
                   </div>
-                )}
+                ))}
+              </div>
+            )}
+          </BentoContent>
+        </BentoCell>
+
+        {/* Smart Discovery Preview */}
+        <BentoCell span={2} variant="glass-brutal">
+          <BentoHeader>
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5 text-accent" />
+              <BentoTitle>Smart Discovery</BentoTitle>
+            </div>
+            <BentoDescription>AI-powered brand matching coming soon</BentoDescription>
+          </BentoHeader>
+          <BentoContent>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="p-4 border-2 border-brutal-black bg-card">
+                <div className="flex items-center gap-2 mb-2">
+                  <Target className="w-4 h-4 text-primary" />
+                  <span className="text-xs font-mono uppercase text-muted-foreground">
+                    Match Score
+                  </span>
+                </div>
+                <p className="font-display text-h1 font-bold text-primary">--</p>
+              </div>
+              <div className="p-4 border-2 border-brutal-black bg-card">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="w-4 h-4 text-secondary" />
+                  <span className="text-xs font-mono uppercase text-muted-foreground">
+                    Est. ROI
+                  </span>
+                </div>
+                <p className="font-display text-h1 font-bold text-secondary">--</p>
               </div>
             </div>
+            <p className="text-xs text-muted-foreground mt-4 text-center">
+              Complete your profile to unlock AI recommendations
+            </p>
+          </BentoContent>
+        </BentoCell>
 
-            {/* Quick Actions / Tiers */}
-            <div className="bg-primary rounded-3xl p-6 text-white">
-              <h3 className="font-bold text-lg mb-2">Membership Tiers</h3>
-              <p className="text-primary-100 text-sm mb-6">
-                You have {profile.tiers.length} active tiers.
-              </p>
+        {/* New Fans */}
+        <BentoCell span={2} variant="brutal">
+          <BentoHeader>
+            <div className="flex items-center justify-between">
+              <BentoTitle>New Fans</BentoTitle>
               <Link
-                href="/dashboard/creator/tiers"
-                className="block w-full text-center py-3 bg-white text-primary rounded-xl font-bold hover:bg-primary-50 transition-colors"
+                href="/dashboard/creator/subscribers"
+                className="flex items-center gap-1 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
               >
-                Manage Tiers
+                View All <ChevronRight className="w-4 h-4" />
               </Link>
             </div>
-          </div>
-        </div>
+          </BentoHeader>
+          <BentoContent>
+            {profile.subscriptions.length === 0 ? (
+              <div className="text-center py-6 border-2 border-dashed border-border">
+                <Users className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
+                <p className="text-sm text-muted-foreground">No subscribers yet</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {profile.subscriptions.slice(0, 4).map((sub) => (
+                  <div key={sub.id} className="flex items-center gap-3 p-2 hover:bg-muted transition-colors">
+                    <Avatar
+                      src={sub.fan.image}
+                      name={sub.fan.name || "Fan"}
+                      size="sm"
+                    />
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-foreground text-sm truncate">
+                        {sub.fan.name || "Anonymous"}
+                      </p>
+                      <span className="text-xs font-mono text-muted-foreground">
+                        {sub.tier.name}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </BentoContent>
+        </BentoCell>
+
+        {/* Membership Tiers CTA */}
+        <BentoCell span={2} variant="brutal" className="bg-primary">
+          <BentoContent className="h-full flex flex-col justify-between">
+            <div>
+              <h3 className="font-display text-h2 font-bold text-white mb-2">
+                Membership Tiers
+              </h3>
+              <p className="text-primary-100 text-sm mb-4">
+                You have {profile.tiers.length} active tier{profile.tiers.length !== 1 ? 's' : ''}.
+                Optimize your pricing to maximize revenue.
+              </p>
+            </div>
+            <Link href="/dashboard/creator/tiers">
+              <Button 
+                variant="brutal" 
+                className="w-full bg-card text-primary hover:bg-brutal-cream"
+              >
+                Manage Tiers
+              </Button>
+            </Link>
+          </BentoContent>
+        </BentoCell>
+
+        {/* Quick Actions */}
+        <BentoCell span={2} variant="brutal">
+          <BentoHeader>
+            <BentoTitle>Quick Actions</BentoTitle>
+          </BentoHeader>
+          <BentoContent>
+            <div className="grid grid-cols-2 gap-3">
+              <Link href="/dashboard/creator/earnings">
+                <Button variant="brutal" size="sm" fullWidth className="justify-start">
+                  <DollarSign className="w-4 h-4 mr-2" />
+                  Earnings
+                </Button>
+              </Link>
+              <Link href="/dashboard/creator/settings">
+                <Button variant="brutal" size="sm" fullWidth className="justify-start">
+                  <Users className="w-4 h-4 mr-2" />
+                  Settings
+                </Button>
+              </Link>
+              <Link href="/dashboard/creator/products">
+                <Button variant="brutal" size="sm" fullWidth className="justify-start">
+                  <FileText className="w-4 h-4 mr-2" />
+                  Products
+                </Button>
+              </Link>
+              <Link href="/dashboard/creator/payouts">
+                <Button variant="brutal" size="sm" fullWidth className="justify-start">
+                  <TrendingUp className="w-4 h-4 mr-2" />
+                  Payouts
+                </Button>
+              </Link>
+            </div>
+          </BentoContent>
+        </BentoCell>
+
+      </BentoGrid>
     </div>
   );
 }
+

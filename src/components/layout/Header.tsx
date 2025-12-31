@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { Heart, Menu, X, Search, Sun, Moon } from "lucide-react";
 import { useState } from "react";
-import { Avatar, NotificationDropdown, Notification } from "@/components/ui";
+import { Avatar, NotificationDropdown, Notification, Button } from "@/components/ui";
 import { useRouter } from "next/navigation";
 import { useTheme } from "@/components/providers/ThemeProvider";
 
@@ -65,77 +65,78 @@ export function Header({ transparent = false }: HeaderProps) {
 
   return (
     <header
-      className={`sticky top-0 z-40 border-b border-border ${
+      className={`sticky top-0 z-40 border-b-4 border-brutal-black ${
         transparent
-          ? "bg-background/80 backdrop-blur-md"
+          ? "bg-background/95 backdrop-blur-md"
           : "bg-card"
       }`}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-4">
+        <div className="flex items-center justify-between h-20 gap-4">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white" />
+          <Link href="/" className="flex items-center gap-3 shrink-0 group">
+            <div className="w-10 h-10 border-3 border-brutal-black bg-primary flex items-center justify-center shadow-brutal-sm group-hover:translate-x-[-2px] group-hover:translate-y-[-2px] group-hover:shadow-brutal transition-all">
+              <Heart className="w-5 h-5 text-white fill-current" />
             </div>
-            <span className="text-xl font-semibold text-foreground hidden sm:inline">
+            <span className="font-display text-2xl font-bold text-foreground hidden sm:inline tracking-tight">
               CreatorConnect
             </span>
           </Link>
 
           {/* Search Bar - Desktop */}
           <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-md mx-4">
-            <div className="relative w-full">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <div className="relative w-full group">
+              <div className="absolute inset-0 bg-brutal-black translate-x-1 translate-y-1 rounded-none -z-10 group-focus-within:translate-x-2 group-focus-within:translate-y-2 transition-transform"></div>
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground group-focus-within:text-foreground" />
               <input
                 type="text"
                 placeholder="Search creators..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 text-sm border border-border rounded-lg bg-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary focus:bg-card text-foreground placeholder:text-muted-foreground transition-colors"
+                className="w-full pl-11 pr-4 py-2.5 font-mono text-sm border-3 border-brutal-black bg-background focus:outline-none focus:ring-0 placeholder:text-muted-foreground transition-colors"
               />
             </div>
           </form>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-6">
+          <nav className="hidden md:flex items-center gap-8">
             <Link
               href="/explore"
-              className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
+              className="font-display font-bold text-lg hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary text-foreground"
             >
               Explore
             </Link>
             <Link
               href="/how-it-works"
-              className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
+              className="font-display font-bold text-lg hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary text-foreground"
             >
               How It Works
             </Link>
             <Link
               href="/pricing"
-              className="text-muted-foreground hover:text-primary transition-colors text-sm font-medium"
+              className="font-display font-bold text-lg hover:text-primary transition-colors border-b-2 border-transparent hover:border-primary text-foreground"
             >
               Pricing
             </Link>
           </nav>
 
           {/* Auth Section */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="p-2 border-3 border-brutal-black bg-secondary/10 hover:bg-secondary/20 shadow-brutal-sm hover:shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all"
               aria-label={`Switch to ${resolvedTheme === 'light' ? 'dark' : 'light'} mode`}
             >
               {resolvedTheme === 'light' ? (
-                <Moon className="w-5 h-5" />
+                <Moon className="w-5 h-5 text-foreground" />
               ) : (
-                <Sun className="w-5 h-5" />
+                <Sun className="w-5 h-5 text-foreground" />
               )}
             </button>
 
             {status === "loading" ? (
-              <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+              <div className="w-10 h-10 border-3 border-brutal-black bg-muted animate-pulse" />
             ) : isLoggedIn ? (
               <>
                 {/* Notifications */}
@@ -147,44 +148,41 @@ export function Header({ transparent = false }: HeaderProps) {
                 
                 <Link
                   href={userRole === "CREATOR" ? "/dashboard/creator" : "/dashboard"}
-                  className="hidden sm:inline-flex text-muted-foreground hover:text-primary transition-colors px-3 py-2 text-sm font-medium"
+                  className="hidden sm:inline-flex"
                 >
-                  Dashboard
+                  <Button variant="brutal" size="sm" className="hidden xl:flex">
+                    Dashboard
+                  </Button>
                 </Link>
                 <Link
                   href={userRole === "CREATOR" ? "/dashboard/creator" : "/dashboard"}
-                  className="flex items-center gap-2"
+                  className="flex items-center gap-2 group"
                 >
-                  <Avatar
-                    src={session.user?.image}
-                    name={session.user?.name || "User"}
-                    size="sm"
-                  />
-                  <span className="hidden sm:inline text-sm font-medium text-foreground">
-                    {session.user?.name?.split(" ")[0]}
-                  </span>
+                  <div className="border-3 border-brutal-black rounded-full overflow-hidden shadow-brutal-sm group-hover:shadow-brutal transition-all">
+                    <Avatar
+                      src={session.user?.image}
+                      name={session.user?.name || "User"}
+                      size="sm"
+                    />
+                  </div>
                 </Link>
               </>
             ) : (
               <>
-                <Link
-                  href="/login"
-                  className="hidden sm:inline-flex text-muted-foreground hover:text-primary transition-colors px-4 py-2"
-                >
-                  Log In
+                <Link href="/login" className="hidden sm:inline-block">
+                  <Button variant="ghost" className="font-display font-bold">Log In</Button>
                 </Link>
-                <Link
-                  href="/signup"
-                  className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary-700 transition-colors"
-                >
-                  Get Started
+                <Link href="/signup">
+                  <Button variant="brutal-accent" size="md">
+                    Get Started
+                  </Button>
                 </Link>
               </>
             )}
 
             {/* Mobile menu button */}
             <button
-              className="md:hidden p-2 text-muted-foreground hover:text-foreground"
+              className="md:hidden p-2 border-3 border-brutal-black bg-background hover:bg-muted shadow-brutal-sm active:translate-y-[2px] active:shadow-none transition-all"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             >
               {mobileMenuOpen ? (
@@ -198,18 +196,18 @@ export function Header({ transparent = false }: HeaderProps) {
 
         {/* Mobile Menu */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-border">
-            <nav className="flex flex-col gap-2">
+          <div className="md:hidden py-6 border-t-3 border-brutal-black bg-card animate-in slide-in-from-top-4">
+            <nav className="flex flex-col gap-4 font-display font-bold text-xl px-2">
               <Link
                 href="/explore"
-                className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
+                className="px-4 py-3 hover:bg-primary/10 border-3 border-transparent hover:border-brutal-black hover:shadow-brutal-sm transition-all"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Explore Creators
               </Link>
               <Link
                 href="/how-it-works"
-                className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
+                className="px-4 py-3 hover:bg-primary/10 border-3 border-transparent hover:border-brutal-black hover:shadow-brutal-sm transition-all"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 How It Works
@@ -218,14 +216,14 @@ export function Header({ transparent = false }: HeaderProps) {
                 <>
                   <Link
                     href={userRole === "CREATOR" ? "/dashboard/creator" : "/dashboard"}
-                    className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
+                    className="px-4 py-3 hover:bg-primary/10 border-3 border-transparent hover:border-brutal-black hover:shadow-brutal-sm transition-all"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Dashboard
                   </Link>
                   <Link
                     href="/api/auth/signout"
-                    className="px-4 py-2 text-accent-red hover:bg-accent-red/10 rounded-lg"
+                    className="px-4 py-3 text-accent-red hover:bg-accent-red/10 border-3 border-transparent hover:border-brutal-black hover:shadow-brutal-sm transition-all"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Sign Out
@@ -235,14 +233,14 @@ export function Header({ transparent = false }: HeaderProps) {
                 <>
                   <Link
                     href="/login"
-                    className="px-4 py-2 text-muted-foreground hover:bg-muted rounded-lg"
+                    className="px-4 py-3 hover:bg-primary/10 border-3 border-transparent hover:border-brutal-black hover:shadow-brutal-sm transition-all"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Log In
                   </Link>
                   <Link
                     href="/signup"
-                    className="px-4 py-2 text-primary hover:bg-primary/10 rounded-lg font-medium"
+                    className="mx-4 mt-2 py-3 bg-primary text-white text-center border-3 border-brutal-black shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal-lg transition-all"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Get Started

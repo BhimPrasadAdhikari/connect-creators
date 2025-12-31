@@ -3,7 +3,7 @@ import { ButtonHTMLAttributes, forwardRef } from "react";
 import { Loader2 } from "lucide-react";
 
 export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger";
+  variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "brutal" | "brutal-accent";
   size?: "sm" | "md" | "lg";
   loading?: boolean;
   fullWidth?: boolean;
@@ -24,39 +24,55 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles = `
-      inline-flex items-center justify-center gap-2 font-medium rounded-lg
+      inline-flex items-center justify-center gap-2 font-medium
       transition-all duration-base
       focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-2
       disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none
-      active:scale-[0.98]
     `;
 
     const variants = {
       primary: `
-        bg-primary text-white 
+        bg-primary text-white rounded-lg
         hover:bg-primary-700 
-        active:bg-primary-800
+        active:bg-primary-800 active:scale-[0.98]
         shadow-sm hover:shadow-md
       `,
       secondary: `
-        bg-secondary text-white 
+        bg-secondary text-white rounded-lg
         hover:bg-secondary-600 
-        active:bg-secondary-700
+        active:bg-secondary-700 active:scale-[0.98]
         shadow-sm hover:shadow-md
       `,
       outline: `
-        border-2 border-primary text-primary bg-transparent 
+        border-2 border-primary text-primary bg-transparent rounded-lg
         hover:bg-primary/5 hover:border-primary-600
       `,
       ghost: `
-        text-muted-foreground bg-transparent
+        text-muted-foreground bg-transparent rounded-lg
         hover:text-foreground hover:bg-muted
       `,
       danger: `
-        bg-accent-red text-white
+        bg-accent-red text-white rounded-lg
         hover:bg-red-700
-        active:bg-red-800
+        active:bg-red-800 active:scale-[0.98]
         shadow-sm hover:shadow-md
+      `,
+      // Neubrutalist Variants
+      brutal: `
+        bg-card text-foreground rounded-none
+        border-3 border-brutal-black
+        shadow-brutal
+        hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal-lg
+        active:translate-x-[2px] active:translate-y-[2px] active:shadow-brutal-sm
+        transition-all duration-150 ease-brutal
+      `,
+      "brutal-accent": `
+        bg-primary text-white rounded-none
+        border-3 border-brutal-black
+        shadow-brutal
+        hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal-lg
+        active:translate-x-[2px] active:translate-y-[2px] active:shadow-brutal-sm
+        transition-all duration-150 ease-brutal
       `,
     };
 
@@ -98,3 +114,4 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 export { Button };
+

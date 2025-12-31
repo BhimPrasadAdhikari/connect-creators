@@ -11,6 +11,7 @@ import {
   Shield,
   Zap,
   ArrowRight,
+  HelpCircle,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -90,58 +91,72 @@ const benefits = [
 
 export default function HowItWorksPage() {
   return (
-    <main className="min-h-screen bg-background">
+    <main className="min-h-screen bg-background font-sans text-foreground">
       <Header />
 
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-primary to-primary-700 text-white py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h1 className="text-4xl sm:text-5xl font-bold mb-4">
-            How CreatorConnect Works
+      <section className="bg-primary text-white py-12 border-b-4 border-brutal-black relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-20" 
+             style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }}>
+        </div>
+        
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center relative z-10">
+          <div className="inline-block transform -rotate-2 mb-8">
+            <span className="bg-card text-foreground border-3 border-brutal-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] px-6 py-2 font-black uppercase tracking-widest text-sm sm:text-base">
+              Simple & Transparent
+            </span>
+          </div>
+          
+          <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black mb-6 font-display uppercase tracking-tighter text-white drop-shadow-[6px_6px_0px_rgba(0,0,0,1)]">
+            How It Works
           </h1>
-          <p className="text-xl text-primary-100 max-w-2xl mx-auto">
-            Whether you&apos;re a creator looking to monetize your content or a fan wanting to support your favorites, we make it simple.
-          </p>
+          
+          <div className="max-w-3xl mx-auto bg-brutal-black/20 p-6 sm:p-8 border-2 border-white/20 backdrop-blur-sm transform rotate-1">
+            <p className="text-xl sm:text-2xl font-bold font-mono text-white/90 leading-relaxed">
+              Whether you&apos;re a creator looking to monetize or a fan wanting to support, we make it simple.
+            </p>
+          </div>
         </div>
       </section>
 
       {/* For Creators Section */}
-      <section className="py-20">
+      <section className="py-24 bg-secondary/20 border-b-4 border-brutal-black">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1 bg-primary/10 text-primary rounded-full text-sm font-medium mb-4">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-2 bg-card text-foreground text-lg font-black uppercase tracking-widest mb-4 shadow-brutal border-2 border-white transform rotate-1">
               For Creators
             </span>
-            <h2 className="text-3xl font-bold text-foreground mb-4">
-              Start Earning in 4 Simple Steps
+            <h2 className="text-4xl sm:text-5xl font-black text-foreground mb-4 font-display uppercase">
+              Start Earning in 4 Steps
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg font-bold font-mono text-foreground/80 max-w-2xl mx-auto">
               Turn your passion into income. Set up once, earn monthly from your dedicated fanbase.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {creatorSteps.map((step, index) => (
-              <div key={step.title} className="relative">
+              <div key={step.title} className="relative group">
                 {/* Connector Line */}
                 {index < creatorSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-12 left-1/2 w-full h-0.5 bg-primary/20" />
+                  <div className="hidden lg:block absolute top-[60px] -right-4 w-8 h-1 bg-brutal-black z-0" />
                 )}
                 
-                <Card className="relative h-full">
-                  <CardContent className="pt-6">
+                <Card variant="brutal" className="relative h-full bg-card group-hover:bg-card group-hover:-translate-y-2 transition-transform duration-300">
+                  <CardContent className="pt-8 pb-8 px-6 text-center">
                     {/* Step Number */}
-                    <div className="absolute -top-4 left-6 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center text-sm font-bold">
+                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 w-10 h-10 bg-secondary text-white border-2 border-brutal-black flex items-center justify-center text-lg font-black shadow-brutal-sm z-10">
                       {index + 1}
                     </div>
                     
-                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center mb-4 mt-2">
-                      <step.icon className="w-6 h-6 text-primary" />
+                    <div className="w-16 h-16 bg-secondary border-2 border-brutal-black flex items-center justify-center mb-6 mx-auto shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                      <step.icon className="w-8 h-8 text-white" strokeWidth={2.5} />
                     </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                    <h3 className="text-xl font-black text-foreground mb-3 uppercase font-display leading-tight">
                       {step.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-foreground font-medium text-sm leading-relaxed border-t-2 border-brutal-black/10 pt-3">
                       {step.description}
                     </p>
                   </CardContent>
@@ -150,59 +165,44 @@ export default function HowItWorksPage() {
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-16">
             <Link href="/signup?role=creator">
-              <Button size="lg">
+              <Button size="lg" variant="brutal" className="bg-primary text-white text-xl px-10 py-8 hover:bg-white hover:text-primary border-3 border-brutal-black shadow-brutal hover:scale-105 active:scale-95 transition-all">
                 Start as Creator
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-6 h-6 ml-3" strokeWidth={3} />
               </Button>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* Divider */}
-      <div className="container mx-auto px-4">
-        <div className="h-px bg-border" />
-      </div>
-
       {/* For Fans Section */}
-      <section className="py-20">
+      <section className="py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <span className="inline-block px-4 py-1 bg-accent-green/10 text-accent-green rounded-full text-sm font-medium mb-4">
+          <div className="text-center mb-16">
+            <span className="inline-block px-4 py-2 bg-card text-foreground text-lg font-black uppercase tracking-widest mb-4 shadow-brutal border-2 border-brutal-black transform -rotate-1">
               For Fans
             </span>
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+            <h2 className="text-4xl sm:text-5xl font-black text-foreground mb-4 font-display uppercase">
               Support Creators You Love
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg font-bold font-mono text-muted-foreground max-w-2xl mx-auto">
               Get exclusive access to premium content and connect directly with your favorite creators.
             </p>
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
             {fanSteps.map((step, index) => (
-              <div key={step.title} className="relative">
-                {/* Connector Line */}
-                {index < fanSteps.length - 1 && (
-                  <div className="hidden lg:block absolute top-12 left-1/2 w-full h-0.5 bg-accent-green/20" />
-                )}
-                
-                <Card className="relative h-full">
-                  <CardContent className="pt-6">
-                    {/* Step Number */}
-                    <div className="absolute -top-4 left-6 w-8 h-8 bg-accent-green text-white rounded-full flex items-center justify-center text-sm font-bold">
-                      {index + 1}
+              <div key={step.title} className="relative group">
+                <Card variant="brutal" className="relative h-full bg-secondary/10 border-dashed hover:bg-secondary/20 transition-colors">
+                  <CardContent className="pt-8 pb-8 px-6 text-center">
+                     <div className="w-16 h-16 bg-secondary text-white border-2 border-brutal-black flex items-center justify-center mb-6 mx-auto shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] rounded-none">
+                      <step.icon className="w-8 h-8" strokeWidth={2.5} />
                     </div>
-                    
-                    <div className="w-12 h-12 bg-accent-green/10 rounded-lg flex items-center justify-center mb-4 mt-2">
-                      <step.icon className="w-6 h-6 text-accent-green" />
-                    </div>
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
+                    <h3 className="text-xl font-black text-foreground mb-3 uppercase font-display leading-tight">
                       {step.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm">
+                    <p className="text-muted-foreground font-bold font-mono text-xs leading-relaxed uppercase tracking-wide">
                       {step.description}
                     </p>
                   </CardContent>
@@ -211,11 +211,11 @@ export default function HowItWorksPage() {
             ))}
           </div>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-16">
             <Link href="/explore">
-              <Button size="lg" variant="secondary">
+              <Button size="lg" variant="brutal" className="bg-secondary text-white text-xl px-10 py-8 hover:bg-white hover:text-secondary border-3 border-brutal-black shadow-brutal hover:scale-105 active:scale-95 transition-all">
                 Explore Creators
-                <ArrowRight className="w-5 h-5 ml-2" />
+                <ArrowRight className="w-6 h-6 ml-3" strokeWidth={3} />
               </Button>
             </Link>
           </div>
@@ -223,46 +223,47 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="py-20 bg-muted">
+      <section className="py-24 bg-primary text-primary-foreground border-y-4 border-brutal-black">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground mb-4">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl sm:text-5xl font-black mb-4 font-display uppercase text-white">
               Why Choose CreatorConnect?
             </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-white/90 font-mono text-lg max-w-2xl mx-auto">
               We built this platform with creators and fans in mind.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {benefits.map((benefit) => (
-              <Card key={benefit.title} className="text-center">
-                <CardContent className="py-8">
-                  <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <benefit.icon className="w-8 h-8 text-primary" />
+              <div key={benefit.title} className="bg-card text-foreground p-8 border-4 border-accent-blue shadow-[8px_8px_0px_0px_#3b82f6] hover:translate-x-[-2px] hover:translate-y-[-2px] transition-transform">
+                  <div className="w-14 h-14 bg-primary text-white flex items-center justify-center mb-6 border-2 border-brutal-black">
+                    <benefit.icon className="w-7 h-7" />
                   </div>
-                  <h3 className="text-lg font-semibold text-foreground mb-2">
+                  <h3 className="text-2xl font-black mb-3 uppercase font-display">
                     {benefit.title}
                   </h3>
-                  <p className="text-muted-foreground text-sm">
+                  <p className="font-medium text-sm leading-relaxed">
                     {benefit.description}
                   </p>
-                </CardContent>
-              </Card>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
       {/* FAQ Preview Section */}
-      <section className="py-20">
+      <section className="py-24 bg-background">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mx-auto">
-            <h2 className="text-3xl font-bold text-foreground mb-8 text-center">
-              Frequently Asked Questions
-            </h2>
+          <div className="max-w-4xl mx-auto">
+              <div className="flex items-center justify-center gap-4 mb-12">
+                 <HelpCircle className="w-10 h-10 text-foreground" strokeWidth={3} />
+                 <h2 className="text-4xl font-black text-foreground text-center font-display uppercase">
+                   Frequently Asked Questions
+                 </h2>
+              </div>
             
-            <div className="space-y-4">
+            <div className="space-y-6">
               <FAQItem
                 question="How much does it cost to use CreatorConnect?"
                 answer="Signing up and creating a profile is completely free. We only take a 10% platform fee when you earn money from subscriptions. Fans pay the subscription price set by creators."
@@ -285,20 +286,22 @@ export default function HowItWorksPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-primary text-white">
+      <section className="py-24 bg-accent-blue border-t-4 border-brutal-black">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
-          <p className="text-primary-100 mb-8 max-w-xl mx-auto">
+          <h2 className="text-4xl sm:text-6xl font-black mb-6 text-white font-display uppercase drop-shadow-[4px_4px_0px_#000]">
+            Ready to Get Started?
+          </h2>
+          <p className="text-white font-bold font-mono text-lg mb-10 max-w-xl mx-auto bg-black/30 p-2">
             Join thousands of creators and fans already using CreatorConnect.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-6 justify-center">
             <Link href="/signup?role=creator">
-              <Button size="lg" className="bg-white text-primary hover:bg-primary-50">
+              <Button size="lg" variant="brutal" className="bg-primary text-white hover:bg-white hover:text-primary border-white text-xl px-12 py-8 w-full sm:w-auto shadow-brutal">
                 Start as Creator
               </Button>
             </Link>
             <Link href="/signup">
-              <Button size="lg" variant="outline" className="border-white text-white hover:bg-white/10">
+              <Button size="lg" variant="brutal" className="bg-secondary text-white hover:bg-white hover:text-secondary border-brutal-black text-xl px-12 py-8 w-full sm:w-auto shadow-brutal">
                 Sign Up as Fan
               </Button>
             </Link>
@@ -314,16 +317,16 @@ export default function HowItWorksPage() {
 
 function FAQItem({ question, answer }: { question: string; answer: string }) {
   return (
-    <details className="group bg-card rounded-lg border border-border">
-      <summary className="flex items-center justify-between p-4 cursor-pointer list-none">
-        <span className="font-medium text-foreground">{question}</span>
-        <span className="text-muted-foreground group-open:rotate-180 transition-transform">
-          <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+    <details className="group bg-card border-2 border-brutal-black shadow-brutal open:shadow-none open:translate-x-[4px] open:translate-y-[4px] transition-all">
+      <summary className="flex items-center justify-between p-6 cursor-pointer list-none bg-secondary/5 group-hover:bg-secondary/10 transition-colors">
+        <span className="font-bold text-lg text-foreground font-display uppercase">{question}</span>
+        <span className="text-foreground group-open:rotate-180 transition-transform duration-300 border-2 border-brutal-black p-1 bg-card shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M19 9l-7 7-7-7" />
           </svg>
         </span>
       </summary>
-      <div className="px-4 pb-4 text-muted-foreground">
+      <div className="px-6 pb-6 pt-2 text-foreground font-medium leading-relaxed border-t-2 border-brutal-black border-dashed">
         {answer}
       </div>
     </details>

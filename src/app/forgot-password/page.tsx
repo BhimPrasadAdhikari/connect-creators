@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Heart, Loader2, Mail, ArrowLeft, Check } from "lucide-react";
-import { Input, Button } from "@/components/ui";
+import { Heart, Loader2, Mail, ArrowLeft, Check, AlertTriangle } from "lucide-react";
+import { Input, Button, Card, CardContent } from "@/components/ui";
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
@@ -38,15 +38,15 @@ export default function ForgotPasswordPage() {
   };
 
   return (
-    <main className="min-h-screen bg-background flex flex-col">
+    <main className="min-h-screen bg-accent-yellow/5 flex flex-col">
       {/* Header */}
-      <header className="py-4 px-4 sm:px-6 lg:px-8">
+      <header className="py-6 px-4 sm:px-6 lg:px-8 border-b-4 border-brutal-black bg-card">
         <div className="container mx-auto">
-          <Link href="/" className="flex items-center gap-2 w-fit">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-              <Heart className="w-5 h-5 text-white" />
+          <Link href="/" className="flex items-center gap-3 w-fit group">
+            <div className="w-12 h-12 border-3 border-brutal-black bg-accent-purple shadow-brutal-sm flex items-center justify-center group-hover:translate-x-1 group-hover:translate-y-1 group-hover:shadow-none transition-all">
+              <Heart className="w-6 h-6 text-white stroke-[3] fill-current" />
             </div>
-            <span className="text-xl font-semibold text-foreground">
+            <span className="text-2xl font-display font-black uppercase text-foreground tracking-tight">
               CreatorConnect
             </span>
           </Link>
@@ -58,82 +58,96 @@ export default function ForgotPasswordPage() {
         <div className="w-full max-w-md">
           {success ? (
             // Success State
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-accent-green/20 flex items-center justify-center mx-auto mb-6">
-                <Check className="w-8 h-8 text-accent-green" />
-              </div>
-              <h1 className="text-2xl font-bold text-foreground mb-2">
-                Check your email
-              </h1>
-              <p className="text-muted-foreground mb-6">
-                If an account exists for <strong>{email}</strong>, we&apos;ve sent a password reset link.
-              </p>
-              <p className="text-sm text-muted-foreground mb-8">
-                The link will expire in 1 hour. Check your spam folder if you don&apos;t see it.
-              </p>
-              <Link
-                href="/login"
-                className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                Back to login
-              </Link>
-            </div>
+            <Card variant="brutal" className="bg-card border-4">
+              <CardContent className="p-8 text-center">
+                <div className="w-24 h-24 rounded-none border-4 border-brutal-black flex items-center justify-center mx-auto mb-8 bg-accent-green shadow-brutal">
+                  <Check className="w-12 h-12 text-foreground stroke-[3]" />
+                </div>
+                <h1 className="text-3xl font-display font-black text-foreground uppercase mb-4 tracking-tight">
+                  Check your email
+                </h1>
+                
+                <div className="bg-accent-green/20 p-4 border-2 border-brutal-black mb-8 transform -rotate-1">
+                  <p className="text-foreground font-medium text-lg">
+                    If an account exists for <span className="font-bold underline">{email}</span>, we&apos;ve sent a password reset link.
+                  </p>
+                </div>
+
+                <div className="bg-accent-yellow/20 p-3 border-2 border-brutal-black mb-8 text-sm font-bold uppercase tracking-wide">
+                  The link will expire in 1 hour.
+                </div>
+
+                <Link href="/login" className="block">
+                  <Button variant="brutal" className="w-full" size="lg">
+                    <ArrowLeft className="w-5 h-5 mr-2 stroke-[3]" />
+                    Back to login
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
           ) : (
             // Form State
-            <>
-              <div className="text-center mb-8">
-                <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-6">
-                  <Mail className="w-8 h-8 text-primary" />
+            <Card variant="brutal" className="bg-card border-4">
+              <CardContent className="p-8">
+                <div className="text-center mb-8">
+                  <div className="w-20 h-20 rounded-none border-4 border-brutal-black flex items-center justify-center mx-auto mb-6 bg-accent-blue shadow-brutal">
+                    <Mail className="w-10 h-10 text-white stroke-[2.5]" />
+                  </div>
+                  <h1 className="text-3xl font-display font-black text-foreground uppercase mb-4 tracking-tight leading-none">
+                    Forgot Password?
+                  </h1>
+                  <p className="text-muted-foreground font-medium text-lg leading-snug">
+                    Enter your email and we&apos;ll send you a link to reset your password.
+                  </p>
                 </div>
-                <h1 className="text-2xl font-bold text-foreground mb-2">
-                  Forgot your password?
-                </h1>
-                <p className="text-muted-foreground">
-                  Enter your email and we&apos;ll send you a link to reset your password.
-                </p>
-              </div>
 
-              <div className="bg-card rounded-xl border border-border shadow-sm p-6 sm:p-8">
                 {error && (
-                  <div className="mb-4 p-3 rounded-lg bg-accent-red/10 border border-accent-red/20 text-accent-red text-sm">
-                    {error}
+                  <div className="mb-6 p-4 bg-accent-red/10 border-3 border-brutal-black flex items-center gap-3 shadow-brutal-sm">
+                    <AlertTriangle className="w-6 h-6 text-accent-red stroke-[3]" />
+                    <p className="text-foreground font-bold uppercase text-sm">{error}</p>
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-6">
                   <Input
                     type="email"
-                    label="Email"
+                    label="Email Address"
+                    variant="brutal"
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
+                    containerClassName="space-y-2"
                   />
 
-                  <Button type="submit" className="w-full" size="lg" disabled={isLoading}>
+                  <Button 
+                    type="submit" 
+                    className="w-full text-lg py-6" 
+                    size="lg" 
+                    variant="brutal"
+                    disabled={isLoading}
+                  >
                     {isLoading ? (
                       <>
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                        Sending...
+                        <Loader2 className="w-6 h-6 animate-spin stroke-[3] mr-2" />
+                        Sending Link...
                       </>
                     ) : (
                       "Send Reset Link"
                     )}
                   </Button>
                 </form>
-              </div>
 
-              <p className="text-center text-muted-foreground mt-6">
-                <Link
-                  href="/login"
-                  className="inline-flex items-center gap-2 text-primary font-medium hover:underline"
-                >
-                  <ArrowLeft className="w-4 h-4" />
-                  Back to login
-                </Link>
-              </p>
-            </>
+                <div className="mt-8 pt-6 border-t-2 border-dashed border-brutal-black/30 text-center">
+                  <Link href="/login">
+                    <Button variant="ghost" className="hover:bg-accent-yellow/20 hover:text-foreground font-bold uppercase tracking-wide">
+                      <ArrowLeft className="w-4 h-4 mr-2 stroke-[3]" />
+                      Back to login
+                    </Button>
+                  </Link>
+                </div>
+              </CardContent>
+            </Card>
           )}
         </div>
       </div>

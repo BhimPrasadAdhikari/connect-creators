@@ -9,6 +9,12 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Neubrutalist High-Contrast Base - Dynamic CSS Variables
+        brutal: {
+          black: "rgb(var(--brutal-black) / <alpha-value>)", // Flips: Black -> White
+          white: "rgb(var(--brutal-white) / <alpha-value>)", // Flips: White -> Black
+          cream: "rgb(var(--brutal-cream) / <alpha-value>)", // Flips: Cream -> Dark Grey
+        },
         // Primary Palette - Trust & Community
         primary: {
           DEFAULT: "#2563EB",
@@ -22,6 +28,7 @@ const config: Config = {
           700: "#1D4ED8",
           800: "#1E40AF",
           900: "#1E3A8A",
+          foreground: "#FFFFFF",
         },
         // Secondary - Success/Positive
         secondary: {
@@ -34,10 +41,17 @@ const config: Config = {
           500: "#22C55E",
           600: "#16A34A",
           700: "#15803D",
+          foreground: "#FFFFFF",
         },
-        // Accent - Warm Highlight
+        // Accent - Vibrant Neubrutalist Colors
         accent: {
           DEFAULT: "#F59E0B",
+          yellow: "#FACC15",
+          orange: "#FB923C",
+          pink: "#F472B6",
+          purple: "#A855F7",
+          cyan: "#22D3EE",
+          lime: "#A3E635",
           50: "#FFFBEB",
           100: "#FEF3C7",
           200: "#FDE68A",
@@ -47,22 +61,34 @@ const config: Config = {
           600: "#D97706",
           700: "#B45309",
         },
-        // Neutrals
-        background: "#F9FAFB",
-        card: "#FFFFFF",
-        border: "#E5E7EB",
+        // Neutrals - Dynamic CSS Variables
+        background: "rgb(var(--background) / <alpha-value>)",
+        card: "rgb(var(--card) / <alpha-value>)",
+        "card-foreground": "rgb(var(--card-foreground) / <alpha-value>)",
+        foreground: "rgb(var(--foreground) / <alpha-value>)",
+        muted: "rgb(var(--muted) / <alpha-value>)",
+        "muted-foreground": "rgb(var(--muted-foreground) / <alpha-value>)",
+        border: "rgb(var(--border) / <alpha-value>)",
+        input: "rgb(var(--input) / <alpha-value>)",
+        ring: "rgb(var(--ring) / <alpha-value>)",
+        
+        // Legacy Text Map (Mapping to foregrounds)
         text: {
-          primary: "#111827",
-          secondary: "#6B7280",
-          tertiary: "#9CA3AF",
+          primary: "rgb(var(--foreground) / <alpha-value>)",
+          secondary: "rgb(var(--muted-foreground) / <alpha-value>)",
+          tertiary: "rgb(var(--foreground-secondary) / <alpha-value>)",
         },
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        display: ["var(--font-display)", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
-      // Improved Typography Scale
+      // Neubrutalist Typography Scale
       fontSize: {
-        // Display sizes for hero/landing
+        // Display sizes - Oversized experimental headings
+        "display-2xl": ["5rem", { lineHeight: "1", fontWeight: "700", letterSpacing: "-0.03em" }],    // 80px
+        "display-xl": ["4rem", { lineHeight: "1.05", fontWeight: "700", letterSpacing: "-0.03em" }], // 64px
         "display-lg": ["3.5rem", { lineHeight: "1.1", fontWeight: "700", letterSpacing: "-0.02em" }], // 56px
         "display": ["3rem", { lineHeight: "1.15", fontWeight: "700", letterSpacing: "-0.02em" }],      // 48px
         "display-sm": ["2.5rem", { lineHeight: "1.2", fontWeight: "700", letterSpacing: "-0.01em" }],  // 40px
@@ -91,9 +117,9 @@ const config: Config = {
         "1.5": "0.375rem",  // 6px
         "2": "0.5rem",      // 8px
         "3": "0.75rem",     // 12px
-        "4": "1rem",        // 16px
+        "4": "1rem",        // 16px - Bento Grid gutter
         "5": "1.25rem",     // 20px
-        "6": "1.5rem",      // 24px
+        "6": "1.5rem",      // 24px - Bento Grid gutter (large)
         "7": "1.75rem",     // 28px
         "8": "2rem",        // 32px
         "10": "2.5rem",     // 40px
@@ -115,8 +141,19 @@ const config: Config = {
         "3xl": "1.5rem",    // 24px
         "full": "9999px",
       },
+      // Neubrutalist Border Widths
+      borderWidth: {
+        "DEFAULT": "1px",
+        "0": "0px",
+        "1": "1px",
+        "2": "2px",
+        "3": "3px",        // Neubrutalist thick border
+        "4": "4px",        // Neubrutalist extra thick border
+        "6": "6px",
+        "8": "8px",
+      },
       boxShadow: {
-        // Elevation System
+        // Standard Elevation System
         "xs": "0 1px 2px 0 rgb(0 0 0 / 0.05)",
         "sm": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
         "DEFAULT": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
@@ -125,6 +162,17 @@ const config: Config = {
         "xl": "0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)",
         "2xl": "0 25px 50px -12px rgb(0 0 0 / 0.25)",
         "inner": "inset 0 2px 4px 0 rgb(0 0 0 / 0.05)",
+        
+        // Neubrutalist Sharp Shadows (no blur, hard offset)
+        "brutal-sm": "2px 2px 0 0 #060606",
+        "brutal": "4px 4px 0 0 #060606",
+        "brutal-lg": "5px 5px 0 0 #060606",
+        "brutal-xl": "8px 8px 0 0 #060606",
+        
+        // Brutal Shadow with Colors
+        "brutal-primary": "4px 4px 0 0 #2563EB",
+        "brutal-accent": "4px 4px 0 0 #F59E0B",
+        "brutal-secondary": "4px 4px 0 0 #22C55E",
         
         // Semantic shadows
         "card": "0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
@@ -142,6 +190,7 @@ const config: Config = {
       transitionTimingFunction: {
         "bounce-in": "cubic-bezier(0.68, -0.55, 0.265, 1.55)",
         "smooth": "cubic-bezier(0.4, 0, 0.2, 1)",
+        "brutal": "cubic-bezier(0.2, 0, 0, 1)",
       },
       // Z-index scale
       zIndex: {
@@ -166,9 +215,37 @@ const config: Config = {
       minWidth: {
         "touch": "44px",
       },
+      // Keyframes for micro-animations
+      keyframes: {
+        "brutal-shake": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "25%": { transform: "translateX(-2px)" },
+          "75%": { transform: "translateX(2px)" },
+        },
+        "brutal-pop": {
+          "0%": { transform: "scale(0.95)" },
+          "50%": { transform: "scale(1.02)" },
+          "100%": { transform: "scale(1)" },
+        },
+        "slide-up": {
+          "0%": { transform: "translateY(10px)", opacity: "0" },
+          "100%": { transform: "translateY(0)", opacity: "1" },
+        },
+        "fade-in": {
+          "0%": { opacity: "0" },
+          "100%": { opacity: "1" },
+        },
+      },
+      animation: {
+        "brutal-shake": "brutal-shake 0.3s ease-in-out",
+        "brutal-pop": "brutal-pop 0.2s ease-out",
+        "slide-up": "slide-up 0.3s ease-out",
+        "fade-in": "fade-in 0.2s ease-out",
+      },
     },
   },
   plugins: [],
 };
 
 export default config;
+

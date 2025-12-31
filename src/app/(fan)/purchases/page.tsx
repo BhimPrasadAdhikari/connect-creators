@@ -56,16 +56,16 @@ function formatDate(dateString: string): string {
 
 function PurchaseSkeleton() {
   return (
-    <Card>
+    <Card variant="brutal" className="mb-4">
       <CardContent className="p-6">
         <div className="flex gap-4">
-          <Skeleton className="w-16 h-16 rounded-xl flex-shrink-0" />
+          <Skeleton className="w-16 h-16 rounded-none border-2 border-brutal-black flex-shrink-0" />
           <div className="flex-1 space-y-3">
             <Skeleton className="h-5 w-3/4" />
             <Skeleton className="h-4 w-1/2" />
             <div className="flex gap-2">
-              <Skeleton className="h-6 w-16 rounded-full" />
-              <Skeleton className="h-6 w-20" />
+              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-8 w-20" />
             </div>
           </div>
           <Skeleton className="h-10 w-28" />
@@ -165,21 +165,23 @@ export default function PurchasesPage() {
 
   return (
     <>
-      <div className="p-6 lg:p-8">
+      <div className="p-6 lg:p-8 font-sans">
         {/* Page Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <ShoppingBag className="w-8 h-8 text-purple-500" />
+        <div className="mb-8 border-b-4 border-brutal-black pb-6">
+          <h1 className="text-3xl lg:text-5xl font-black text-foreground flex items-center gap-3 font-display uppercase tracking-tight">
+             <div className="w-12 h-12 bg-accent-purple border-3 border-brutal-black flex items-center justify-center shadow-brutal-sm">
+                <ShoppingBag className="w-6 h-6 text-brutal-black" strokeWidth={2.5}/>
+             </div>
             My Purchases
           </h1>
-          <p className="text-gray-500 mt-1">
+          <p className="text-muted-foreground mt-2 font-mono font-bold text-lg">
             Your purchased digital products
           </p>
         </div>
 
         {/* Loading State */}
         {loading && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <PurchaseSkeleton />
             <PurchaseSkeleton />
             <PurchaseSkeleton />
@@ -188,12 +190,12 @@ export default function PurchasesPage() {
 
         {/* Error State */}
         {error && (
-          <Card>
+          <Card variant="brutal" className="bg-accent-red/10 border-accent-red">
             <CardContent className="py-12 text-center">
-              <p className="text-red-600">{error}</p>
+              <p className="text-accent-red font-bold font-mono text-lg mb-4">{error}</p>
               <Button
-                variant="outline"
-                className="mt-4"
+                variant="brutal"
+                className="bg-card text-brutal-black"
                 onClick={() => window.location.reload()}
               >
                 Try Again
@@ -204,20 +206,20 @@ export default function PurchasesPage() {
 
         {/* Empty State */}
         {!loading && !error && purchases.length === 0 && (
-          <Card>
-            <CardContent className="py-16 text-center">
-              <div className="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center mx-auto mb-4">
-                <ShoppingBag className="w-10 h-10 text-purple-500" />
+          <Card variant="brutal" className="bg-card">
+            <CardContent className="py-20 text-center">
+              <div className="w-24 h-24 bg-accent-purple border-4 border-brutal-black flex items-center justify-center mx-auto mb-6 shadow-brutal">
+                <ShoppingBag className="w-12 h-12 text-brutal-black" strokeWidth={2.5} />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              <h2 className="text-3xl font-black text-foreground mb-3 font-display uppercase">
                 No purchases yet
               </h2>
-              <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+              <p className="text-muted-foreground mb-8 max-w-sm mx-auto font-medium text-lg">
                 Explore creator products and make your first purchase to see them here!
               </p>
               <Link href="/explore">
-                <Button variant="primary">
-                  <Compass className="w-4 h-4 mr-2" />
+                <Button variant="brutal" className="text-lg px-8 py-6">
+                  <Compass className="w-5 h-5 mr-3" />
                   Explore Creators
                 </Button>
               </Link>
@@ -227,21 +229,21 @@ export default function PurchasesPage() {
 
         {/* Purchases List */}
         {!loading && !error && purchases.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             {purchases.map((purchase) => (
-              <Card key={purchase.id} className="hover:shadow-md transition-shadow">
+              <Card key={purchase.id} variant="brutal" className="hover:translate-x-[-4px] hover:translate-y-[-4px] transition-transform">
                 <CardContent className="p-6">
-                  <div className="flex flex-col sm:flex-row gap-4">
+                  <div className="flex flex-col sm:flex-row gap-6">
                     {/* Product Icon */}
-                    <div className="w-16 h-16 rounded-xl bg-purple-100 flex items-center justify-center flex-shrink-0">
+                    <div className="w-24 h-24 bg-secondary/20 border-3 border-brutal-black flex items-center justify-center flex-shrink-0 shadow-brutal-sm">
                       {purchase.product.thumbnailUrl ? (
                         <img
                           src={purchase.product.thumbnailUrl}
                           alt={purchase.product.title}
-                          className="w-full h-full object-cover rounded-xl"
+                          className="w-full h-full object-cover"
                         />
                       ) : (
-                        <Package className="w-8 h-8 text-purple-600" />
+                        <Package className="w-10 h-10 text-brutal-black" strokeWidth={1.5} />
                       )}
                     </div>
 
@@ -249,54 +251,59 @@ export default function PurchasesPage() {
                     <div className="flex-1 min-w-0">
                       <Link
                         href={`/products/${purchase.product.id}`}
-                        className="text-lg font-semibold text-gray-900 hover:text-purple-600 transition-colors"
+                        className="text-2xl font-black text-foreground hover:underline decoration-4 underline-offset-4 decoration-accent-purple font-display uppercase"
                       >
                         {purchase.product.title}
                       </Link>
                       
                       <Link
                         href={`/creator/${purchase.product.creator.username}`}
-                        className="flex items-center gap-2 mt-1 text-sm text-gray-500 hover:text-gray-700"
+                        className="flex items-center gap-2 mt-2 group w-fit"
                       >
-                        <Avatar
-                          src={purchase.product.creator.avatar}
-                          name={purchase.product.creator.displayName || purchase.product.creator.username}
-                          size="sm"
-                        />
-                        <span>{purchase.product.creator.displayName || purchase.product.creator.username}</span>
+                         <div className="border-2 border-brutal-black rounded-full overflow-hidden w-6 h-6">
+                            <Avatar
+                            src={purchase.product.creator.avatar}
+                            name={purchase.product.creator.displayName || purchase.product.creator.username}
+                            size="sm"
+                            />
+                         </div>
+                        <span className="font-bold font-mono text-sm group-hover:bg-brutal-black group-hover:text-brutal-white px-1 transition-colors">
+                            @{purchase.product.creator.displayName || purchase.product.creator.username}
+                        </span>
                       </Link>
 
-                      <div className="flex flex-wrap items-center gap-2 mt-3">
+                      <div className="flex flex-wrap items-center gap-3 mt-4">
                         {purchase.product.fileType && (
-                          <Badge variant="accent">
+                          <span className="inline-block bg-accent-blue text-brutal-black border-2 border-brutal-black px-2 py-0.5 text-xs font-black uppercase shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                             {purchase.product.fileType.toUpperCase()}
-                          </Badge>
+                          </span>
                         )}
-                        <span className="text-sm text-gray-500">
+                        <span className="text-sm font-bold bg-secondary/10 px-2 py-0.5 border border-brutal-black/20">
                           Purchased {formatDate(purchase.purchasedAt)}
                         </span>
-                        <span className="text-sm font-medium text-gray-700">
+                        <span className="text-sm font-black text-foreground bg-accent-green px-2 py-0.5 border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
                           {formatPrice(purchase.amount, purchase.currency)}
                         </span>
                       </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex-shrink-0 flex sm:flex-col items-center gap-2">
+                    <div className="flex-shrink-0 flex sm:flex-col items-center gap-3 mt-4 sm:mt-0">
                       <a
                         href={purchase.product.fileUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 px-5 py-2.5 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors shadow-sm w-full sm:w-auto justify-center"
+                        className="w-full sm:w-auto"
                       >
-                        <Download className="w-5 h-5" />
-                        Download
+                        <Button variant="brutal" className="w-full bg-brutal-black text-brutal-white hover:bg-card hover:text-brutal-black">
+                            <Download className="w-4 h-4 mr-2" /> Download
+                        </Button>
                       </a>
                       
                       {isRefundable(purchase.purchasedAt) && (
                         <Button 
                           variant="ghost" 
-                          className="text-gray-500 hover:text-red-600 w-full sm:w-auto"
+                          className="text-muted-foreground hover:text-accent-red hover:bg-accent-red/10 border-2 border-transparent hover:border-accent-red w-full sm:w-auto font-bold"
                           onClick={() => handleOpenRefund(purchase)}
                         >
                           <RotateCcw className="w-4 h-4 mr-2" />
@@ -314,60 +321,63 @@ export default function PurchasesPage() {
 
       {/* Refund Modal */}
       <Modal
+        variant="brutal"
         isOpen={refundModalOpen}
         onClose={() => setRefundModalOpen(false)}
         title="Request Refund"
       >
-        <div className="space-y-4">
-          <div className="bg-yellow-50 p-4 rounded-lg flex gap-3 text-sm text-yellow-800">
-            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+        <div className="space-y-6">
+          <div className="bg-accent-yellow/20 p-4 border-l-4 border-accent-yellow flex gap-3 text-sm font-bold text-foreground">
+            <AlertCircle className="w-5 h-5 flex-shrink-0 text-brutal-black" />
             <p>
-              Refund requests are reviewed manually. Please allow up to 48 hours for a response.
-              Refunds are generally only approved for technical issues or accidental purchases within 7 days.
+              Refund requests are reviewed manually. Please allow up to 48 hours.
+              Generally only approved for technical issues within 7 days.
             </p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-black uppercase tracking-wider text-foreground mb-2">
               Product
             </label>
-            <div className="p-3 bg-gray-50 rounded-lg text-sm font-medium text-gray-900">
+            <div className="p-4 bg-secondary/10 border-2 border-brutal-black font-bold text-foreground shadow-brutal-sm">
               {selectedPurchase?.product.title}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-black uppercase tracking-wider text-foreground mb-2">
               Reason for Refund
             </label>
             <Textarea
+              variant="brutal"
               placeholder="Please explain why you are requesting a refund..."
               value={refundReason}
               onChange={(e) => setRefundReason(e.target.value)}
               className="min-h-[100px]"
             />
-            <p className="text-xs text-gray-500 mt-1">
-              Minimum 10 characters required.
+            <p className="text-xs font-bold font-mono text-muted-foreground mt-2 uppercase">
+              Min 10 characters required.
             </p>
           </div>
 
           {refundError && (
-            <div className="text-sm text-red-600">
+            <div className="p-3 bg-accent-red/20 border-2 border-accent-red text-accent-red font-bold text-sm">
               {refundError}
             </div>
           )}
 
-          <div className="flex gap-3 justify-end pt-2">
+          <div className="flex gap-4 justify-end pt-2">
             <Button
               variant="outline"
+              className="border-2 border-brutal-black font-bold hover:bg-secondary/20"
               onClick={() => setRefundModalOpen(false)}
               disabled={refundLoading}
             >
               Cancel
             </Button>
             <Button
-              variant="primary"
-              className="bg-red-600 hover:bg-red-700 text-white"
+              variant="brutal"
+              className="bg-accent-red text-white hover:bg-white hover:text-accent-red"
               onClick={handleSubmitRefund}
               disabled={refundLoading || refundReason.trim().length < 10}
             >

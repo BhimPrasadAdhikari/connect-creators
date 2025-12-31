@@ -72,7 +72,7 @@ const navSections: NavSection[] = [
       { href: "/dashboard/creator/earnings", label: "Earnings", icon: DollarSign },
       { href: "/dashboard/creator/payouts", label: "Payouts", icon: Wallet },
       { href: "/dashboard/creator/tiers", label: "Tiers", icon: TrendingUp },
-      { href: "/messages", label: "Messages", icon: MessageCircle },
+      { href: "/dashboard/creator/messages", label: "Messages", icon: MessageCircle },
       { href: "/dashboard/creator/settings", label: "Settings", icon: Settings },
     ],
   },
@@ -126,13 +126,13 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
   const NavigationContent = ({ mobile = false }: { mobile?: boolean }) => (
     <>
       {navSections.map((section, sectionIdx) => (
-        <div key={sectionIdx} className={sectionIdx > 0 ? "mt-6" : ""}>
+        <div key={sectionIdx} className={sectionIdx > 0 ? "mt-8" : ""}>
           {section.title && (!isCollapsed || mobile) && (
-            <div className="px-4 pb-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+            <div className="px-4 pb-2 mb-2 text-xs font-black text-foreground font-mono uppercase tracking-wider border-b-2 border-brutal-black/20 mx-2">
               {section.title}
             </div>
           )}
-          <div className="space-y-1">
+          <div className="space-y-2">
             {section.items.map((item) => {
               const active = isActive(item.href);
               return (
@@ -141,16 +141,16 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
                   href={item.href}
                   onClick={mobile ? closeMobile : undefined}
                   className={cn(
-                    "flex items-center gap-3 rounded-2xl font-medium transition-all",
-                    !mobile && isCollapsed ? "justify-center p-3" : "px-4 py-3",
+                    "flex items-center gap-3 font-bold transition-all group relative",
+                    !mobile && isCollapsed ? "justify-center p-3" : "px-4 py-3 mx-2",
                     active
-                      ? "bg-foreground text-background shadow-md"
-                      : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      ? "bg-primary text-primary-foreground border-2 border-brutal-black shadow-brutal-sm translate-x-[-2px] translate-y-[-2px]"
+                      : "text-foreground hover:bg-accent-yellow hover:text-brutal-black hover:border-2 hover:border-brutal-black hover:shadow-brutal-sm hover:translate-x-[-2px] hover:translate-y-[-2px] border-2 border-transparent"
                   )}
                   title={!mobile && isCollapsed ? item.label : undefined}
                 >
-                  <item.icon className="w-5 h-5 flex-shrink-0" />
-                  {(mobile || !isCollapsed) && <span>{item.label}</span>}
+                  <item.icon className={cn("w-5 h-5 flex-shrink-0 transition-transform stroke-2", active ? "scale-110" : "group-hover:scale-110")} />
+                  {(mobile || !isCollapsed) && <span className="font-display tracking-tight text-sm uppercase">{item.label}</span>}
                 </Link>
               );
             })}
@@ -165,27 +165,31 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
     <>
       {(!mobile && isCollapsed) ? (
         <div className="flex flex-col items-center gap-2">
-          <Avatar src={user.image} name={user.name || ""} size="sm" />
+          <div className="border-2 border-brutal-black rounded-none p-0.5 bg-background shadow-brutal-sm">
+            <Avatar src={user.image} name={user.name || ""} size="sm" className="rounded-none" />
+          </div>
           <Link
             href="/api/auth/signout"
-            className="p-2 rounded-lg text-muted-foreground hover:text-accent-red hover:bg-accent-red/10 transition-colors"
+            className="p-2 border-2 border-transparent hover:border-brutal-black hover:bg-accent-red hover:text-white hover:shadow-brutal-sm transition-all"
             title="Sign out"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-4 h-4 stroke-2" />
           </Link>
         </div>
       ) : (
         <>
-          <div className="flex items-center gap-3 mb-3">
-            <Avatar src={user.image} name={user.name || ""} size="sm" />
+          <div className="flex items-center gap-3 mb-4 p-3 bg-card border-2 border-brutal-black shadow-brutal-sm">
+            <div className="border-2 border-brutal-black rounded-none shrink-0">
+              <Avatar src={user.image} name={user.name || ""} size="sm" className="rounded-none" />
+            </div>
             <div className="flex-1 min-w-0">
-              <p className="font-semibold text-sm text-foreground truncate">
+              <p className="font-display font-black text-sm text-foreground truncate uppercase">
                 {creatorProfile.displayName || user.name}
               </p>
               <Link
                 href={`/creator/${creatorProfile.username}`}
                 onClick={mobile ? closeMobile : undefined}
-                className="text-xs text-primary hover:text-primary-700 font-medium"
+                className="text-xs text-primary hover:text-accent-purple hover:underline font-mono font-bold uppercase"
               >
                 View Profile ↗
               </Link>
@@ -193,10 +197,10 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
           </div>
           <Link
             href="/api/auth/signout"
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-accent-red transition-colors"
+            className="flex items-center justify-center gap-2 text-sm font-black uppercase text-foreground border-2 border-dashed border-brutal-black p-2 hover:bg-accent-red hover:text-white hover:border-solid hover:shadow-brutal-sm active:translate-y-[2px] active:shadow-none transition-all"
           >
-            <LogOut className="w-4 h-4" />
-            Sign out
+            <LogOut className="w-4 h-4 stroke-2" />
+            Sign Out
           </Link>
         </>
       )}
@@ -215,7 +219,7 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
         {/* Mobile Sidebar Overlay */}
         {isMobileOpen && (
           <div
-            className="fixed inset-0 bg-overlay/50 z-40 lg:hidden transition-opacity"
+            className="fixed inset-0 bg-brutal-black/50 backdrop-blur-sm z-40 lg:hidden transition-opacity"
             onClick={closeMobile}
             aria-hidden="true"
           />
@@ -224,55 +228,58 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
         {/* Mobile Sidebar Drawer */}
         <aside
           className={cn(
-            "fixed left-0 top-0 h-full w-72 bg-card flex flex-col z-50 lg:hidden transition-transform duration-300 ease-in-out border-r border-border",
+            "fixed left-0 top-0 h-full w-80 bg-background flex flex-col z-50 lg:hidden transition-transform duration-300 ease-in-out border-r-4 border-brutal-black",
             isMobileOpen ? "translate-x-0" : "-translate-x-full"
           )}
         >
           {/* Mobile Header */}
-          <div className="flex items-center justify-between h-16 px-4 border-b border-border">
-            <Link href="/" className="flex items-center gap-3" onClick={closeMobile}>
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-                <Heart className="w-5 h-5 text-white" />
+          <div className="flex items-center justify-between h-20 px-6 border-b-4 border-brutal-black bg-primary text-white">
+            <Link href="/" className="flex items-center gap-3 group" onClick={closeMobile}>
+              <div className="w-10 h-10 border-3 border-white bg-card flex items-center justify-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.5)] group-hover:rotate-3 transition-transform">
+                <Heart className="w-5 h-5 text-primary fill-current" />
               </div>
-              <span className="text-xl font-bold text-foreground tracking-tight">
+              <span className="font-display text-xl font-bold tracking-tight">
                 CreatorConnect
               </span>
             </Link>
             <button
               onClick={closeMobile}
-              className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="p-2 border-2 border-white bg-card/10 hover:bg-card/20 text-white transition-all shadow-sm active:translate-y-0.5"
               aria-label="Close menu"
             >
-              <X className="w-5 h-5" />
+              <X className="w-6 h-6 stroke-2" />
             </button>
           </div>
 
           {/* Mobile Navigation */}
-          <nav className="flex-1 py-4 px-4 overflow-y-auto">
+          <nav className="flex-1 py-6 px-2 overflow-y-auto bg-card">
             <NavigationContent mobile />
           </nav>
 
           {/* Mobile User Profile */}
-          <div className="border-t border-border p-4">
+          <div className="border-t-4 border-brutal-black p-6 bg-muted">
             <UserProfileContent mobile />
           </div>
         </aside>
 
-        {/* Desktop Sidebar - stays mounted, never re-renders on navigation */}
+        {/* Desktop Sidebar */}
         <aside
           className={cn(
-            "fixed left-0 top-0 h-full bg-card hidden lg:flex flex-col z-40 transition-all duration-300 border-r border-border",
-            isCollapsed ? "w-20" : "w-72"
+            "fixed left-0 top-0 h-full bg-card hidden lg:flex flex-col z-40 transition-all duration-300 border-r-4 border-brutal-black shadow-brutal",
+            isCollapsed ? "w-24" : "w-72"
           )}
         >
           {/* Desktop Header */}
-          <div className={cn("flex items-center h-16 px-4", isCollapsed ? "justify-center" : "justify-between")}>
-            <Link href="/" className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20 flex-shrink-0">
-                <Heart className="w-5 h-5 text-white" />
+          <div className={cn("flex items-center h-20 border-b-4 border-brutal-black bg-primary text-white", isCollapsed ? "justify-center px-0" : "justify-between px-6")}>
+            <Link href="/" className={cn("flex items-center gap-3 transition-all", isCollapsed ? "" : "group")}>
+              <div className={cn(
+                "border-3 border-white bg-card flex items-center justify-center shadow-[3px_3px_0px_0px_rgba(0,0,0,0.3)] group-hover:rotate-3 transition-transform",
+                isCollapsed ? "w-10 h-10" : "w-10 h-10"
+              )}>
+                <Heart className="w-5 h-5 text-primary fill-current" />
               </div>
               {!isCollapsed && (
-                <span className="text-xl font-bold text-foreground tracking-tight">
+                <span className="font-display text-xl font-bold tracking-tight">
                   CreatorConnect
                 </span>
               )}
@@ -280,10 +287,10 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
             {!isCollapsed && (
               <button
                 onClick={() => setIsCollapsed(true)}
-                className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="p-1.5 border-2 border-transparent hover:border-white hover:bg-card/10 rounded-md transition-all"
                 aria-label="Collapse sidebar"
               >
-                <ChevronLeft className="w-5 h-5" />
+                <ChevronLeft className="w-5 h-5 stroke-2" />
               </button>
             )}
           </div>
@@ -292,44 +299,46 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
           {isCollapsed && (
             <button
               onClick={() => setIsCollapsed(false)}
-              className="mx-auto mt-2 p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="mx-auto mt-4 p-2 border-2 border-brutal-black bg-card hover:bg-secondary transition-all shadow-brutal-sm hover:shadow-brutal hover:translate-x-[-2px] hover:translate-y-[-2px]"
               aria-label="Expand sidebar"
             >
-              <ChevronRight className="w-5 h-5" />
+              <ChevronRight className="w-5 h-5 text-brutal-black stroke-2" />
             </button>
           )}
 
           {/* Desktop Navigation */}
-          <nav className={cn("flex-1 py-4 overflow-y-auto", isCollapsed ? "px-2" : "px-4")}>
+          <nav className={cn("flex-1 py-6 overflow-y-auto scrollbar-hide", isCollapsed ? "px-2" : "px-2")}>
             <NavigationContent />
           </nav>
 
           {/* Desktop User Profile */}
-          <div className={cn("border-t border-border", isCollapsed ? "p-2" : "p-4")}>
+          <div className={cn("border-t-4 border-brutal-black bg-muted", isCollapsed ? "p-4" : "p-6")}>
             <UserProfileContent />
           </div>
         </aside>
 
         {/* Mobile Header */}
-        <header className="lg:hidden sticky top-0 bg-card/80 backdrop-blur-md border-b border-border z-30 px-4 py-3 safe-area-top">
+        <header className="lg:hidden sticky top-0 bg-card border-b-4 border-brutal-black z-30 px-4 py-3 safe-area-top shadow-brutal-sm">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setIsMobileOpen(true)}
-                className="p-2 -ml-2 rounded-lg text-muted-foreground hover:bg-muted transition-colors"
+                className="p-2 -ml-2 border-2 border-brutal-black bg-card shadow-brutal-sm active:translate-y-[2px] active:shadow-none transition-all"
                 aria-label="Open menu"
               >
-                <Menu className="w-6 h-6" />
+                <Menu className="w-5 h-5 stroke-2" />
               </button>
-              <Link href="/" className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
-                  <Heart className="w-4 h-4 text-white" />
+              <Link href="/" className="flex items-center gap-2 group">
+                <div className="w-8 h-8 border-2 border-brutal-black bg-primary flex items-center justify-center shadow-brutal-sm group-hover:rotate-6 transition-transform">
+                  <Heart className="w-4 h-4 text-white fill-current" />
                 </div>
-                <span className="font-bold text-foreground text-sm">CreatorConnect</span>
+                <span className="font-display font-bold text-foreground text-lg">CreatorConnect</span>
               </Link>
             </div>
             <Link href={`/creator/${creatorProfile.username}`}>
-              <Avatar src={user.image} name={user.name || ""} size="sm" />
+               <div className="border-2 border-brutal-black rounded-none p-0.5 bg-background shadow-brutal-sm">
+                <Avatar src={user.image} name={user.name || ""} size="sm" className="rounded-none" />
+              </div>
             </Link>
           </div>
         </header>
@@ -338,7 +347,7 @@ export function CreatorDashboardShell({ children, user, creatorProfile }: Creato
         <main
           className={cn(
             "min-h-screen transition-all duration-300 pb-safe",
-            isCollapsed ? "lg:ml-20" : "lg:ml-72"
+             isCollapsed ? "lg:ml-24" : "lg:ml-72"
           )}
         >
           {children}

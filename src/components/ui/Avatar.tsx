@@ -41,7 +41,7 @@ export function Avatar({ src, name = "User", size = "md", className }: AvatarPro
   return (
     <div
       className={cn(
-        "flex items-center justify-center rounded-full bg-primary/10 text-primary font-medium",
+        "flex items-center justify-center rounded-full bg-primary text-white font-bold",
         sizeClasses[size],
         className
       )}

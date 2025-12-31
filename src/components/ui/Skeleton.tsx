@@ -289,7 +289,7 @@ export function TiersPageSkeleton() {
         </div>
         <Skeleton height={40} width={100} />
       </div>
-      <div className="p-4 bg-primary/10 rounded-xl border border-primary/20">
+      <div className="p-4 bg-primary/20 rounded-xl border border-primary/20">
         <Skeleton height={80} width="100%" />
       </div>
       <div className="space-y-4">

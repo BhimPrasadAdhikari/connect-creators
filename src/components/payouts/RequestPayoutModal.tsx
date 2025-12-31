@@ -1,103 +1,121 @@
-import { useState } from 'react';
-import { Modal, Button, Input } from "@/components/ui";
+"use client";
+
+import { useState } from "react";
+import { Loader2, DollarSign } from "lucide-react";
+import { Button, Input, Modal, Select, useToastActions } from "@/components/ui";
 
 interface RequestPayoutModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
-  maxAmount: number; // in paise
+  maxAmount: number;
   methods: any[];
 }
 
 export function RequestPayoutModal({ isOpen, onClose, onSuccess, maxAmount, methods }: RequestPayoutModalProps) {
-  const [amount, setAmount] = useState<string>("");
-  const [methodId, setMethodId] = useState<string>(methods[0]?.id || "");
   const [loading, setLoading] = useState(false);
+  const [amount, setAmount] = useState("");
+  const [methodId, setMethodId] = useState(methods[0]?.id || "");
+  const toast = useToastActions();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!methodId) {
-        alert("Please select a payout method");
-        return;
-    }
-    
-    const amountPaise = parseFloat(amount) * 100;
-    if (amountPaise > maxAmount) {
-        alert("Amount exceeds available balance");
-        return;
-    }
-
     setLoading(true);
+
     try {
-        const res = await fetch("/api/payouts/request", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                amount: amountPaise,
-                payoutMethodId: methodId,
-            }),
-        });
-        
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error);
-        
+      const res = await fetch("/api/payouts/request", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ 
+            amount: Math.round(parseFloat(amount) * 100), 
+            methodId 
+        }),
+      });
+
+      if (res.ok) {
+        toast.success("Request Submitted", "Your payout request has been received.");
         onSuccess();
         onClose();
         setAmount("");
-    } catch (error: any) {
-        alert(error.message);
+      } else {
+        const data = await res.json();
+        toast.error("Request Failed", data.error || "Please try again.");
+      }
+    } catch (e) {
+      toast.error("Error", "An unexpected error occurred.");
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
+  const formatCurrency = (val: number) => {
+      return new Intl.NumberFormat("en-IN", {
+          style: "currency",
+          currency: "INR",
+          maximumFractionDigits: 0
+      }).format(val / 100);
+  };
+
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Request Payout">
-        <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="bg-gray-50 p-4 rounded-xl text-center mb-4">
-                <p className="text-sm text-gray-500">Available Balance</p>
-                <p className="text-2xl font-bold text-gray-900">
-                    {new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR" }).format(maxAmount / 100)}
+    <Modal isOpen={isOpen} onClose={onClose} title="Request Payout" variant="brutal">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="p-4 bg-secondary/10 border-2 border-brutal-black border-dashed mb-6">
+            <div className="flex justify-between items-center text-sm font-bold font-mono">
+                <span className="text-muted-foreground uppercase">Available Balance</span>
+                <span className="text-foreground">{formatCurrency(maxAmount)}</span>
+            </div>
+        </div>
+
+        <div className="space-y-4">
+            <div>
+                <label className="block text-sm font-bold text-foreground mb-1.5 uppercase tracking-wide font-display">
+                    Amount (INR)
+                </label>
+                <div className="flex items-center">
+                    <span className="px-4 py-3 bg-secondary/20 text-foreground border-2 border-r-0 border-brutal-black font-display font-bold text-xl">
+                        ₹
+                    </span>
+                    <Input
+                        type="number"
+                        variant="brutal"
+                        placeholder="0"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        required
+                        max={maxAmount / 100}
+                        min={500}
+                        className="rounded-none border-l-0 text-xl font-bold"
+                        containerClassName="mb-0 w-full"
+                    />
+                </div>
+                <p className="font-mono text-xs font-bold text-muted-foreground mt-2">
+                    Minimum payout amount is ₹500
                 </p>
             </div>
 
-            <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Withdrawal Amount (₹)</label>
-                <Input 
-                    type="number"
-                    required
-                    min="1"
-                    max={maxAmount / 100}
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    placeholder="Enter amount"
-                />
-            </div>
-            
-             <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Select Method</label>
-                <select 
-                    className="w-full rounded-lg border border-gray-300 p-2"
-                    value={methodId}
-                    onChange={(e) => setMethodId(e.target.value)}
-                    required
-                >
-                    <option value="" disabled>Select a method</option>
-                    {methods.map(m => (
-                        <option key={m.id} value={m.id}>
-                            {m.type === 'UPI' ? `UPI - ${m.details.vpa}` : `Bank - ••${m.details.accountNumber?.slice(-4)}`}
-                        </option>
-                    ))}
-                </select>
-            </div>
+            <Select 
+                variant="brutal"
+                label="Select Payout Method"
+                value={methodId}
+                onChange={(e) => setMethodId(e.target.value)}
+                options={methods.map(m => ({
+                    value: m.id,
+                    label: m.type === 'bank' ? `${m.details.bankName} (****${m.details.accountNumber?.slice(-4)})` : 
+                           m.type === 'upi' ? `UPI (${m.details.upiId})` : `PayPal (${m.details.email})`
+                }))}
+            />
+        </div>
 
-            <div className="flex justify-end gap-3 mt-6">
-                <Button type="button" variant="ghost" onClick={onClose}>Cancel</Button>
-                <Button type="submit" loading={loading} disabled={methods.length === 0 || maxAmount <= 0}>
-                    Request Withdrawal
-                </Button>
-            </div>
-        </form>
+        <div className="pt-4 flex gap-3">
+          <Button type="button" variant="ghost" onClick={onClose} className="flex-1 border-2 border-transparent hover:border-brutal-black">
+            Cancel
+          </Button>
+          <Button type="submit" variant="brutal" className="flex-1" disabled={loading || !amount || parseFloat(amount) < 500}>
+            {loading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <DollarSign className="w-4 h-4 mr-2" />}
+            Request Payout
+          </Button>
+        </div>
+      </form>
     </Modal>
   );
 }
