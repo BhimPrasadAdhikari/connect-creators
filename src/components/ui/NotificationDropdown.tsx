@@ -30,7 +30,7 @@ export function NotificationBadge({ count, className }: NotificationBadgeProps) 
       className={cn(
         "absolute -top-2 -right-2 flex items-center justify-center",
         "min-w-[20px] h-[20px] px-1 text-xs font-bold font-mono",
-        "bg-accent-red text-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-10",
+        "bg-red-500 text-white border-2 border-brutal-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] z-10",
         className
       )}
     >
@@ -160,7 +160,7 @@ export function NotificationDropdown({
       <button
         onClick={() => setIsOpen(!isOpen)}
         className={cn(
-          "relative w-10 h-10 flex items-center justify-center border-3 border-brutal-black transition-all bg-card shadow-brutal-sm",
+          "relative w-10 h-10 flex items-center justify-center border-3 border-brutal-black transition-all bg-yellow-400 shadow-brutal-sm",
           isOpen ? "translate-x-[2px] translate-y-[2px] shadow-none bg-secondary/10" : "hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-brutal hover:bg-secondary/10"
         )}
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ""}`}

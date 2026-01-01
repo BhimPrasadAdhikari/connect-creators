@@ -46,6 +46,10 @@ const config: Config = {
         // Accent - Vibrant Neubrutalist Colors
         accent: {
           DEFAULT: "#F59E0B",
+          // Added missing colors based on usage in NotificationDropdown (mapped to CSS vars for dark mode support)
+          blue: "rgb(var(--accent-blue) / <alpha-value>)",
+          red: "rgb(var(--accent-red) / <alpha-value>)",
+          green: "rgb(var(--accent-green) / <alpha-value>)",
           yellow: "#FACC15",
           orange: "#FB923C",
           pink: "#F472B6",

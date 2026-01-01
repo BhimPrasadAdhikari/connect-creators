@@ -52,8 +52,8 @@ export function BalanceCard({
             </div>
             
             <Button 
-              variant="brutal" 
-              className="bg-card text-primary border-4 border-black shadow-[4px_4px_0px_0px_#000000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] w-full md:w-auto text-lg py-6"
+              variant="secondary"
+              className=" border-4 border-black shadow-[4px_4px_0px_0px_#000000] hover:shadow-none hover:translate-x-[4px] hover:translate-y-[4px] w-full md:w-auto text-lg py-6"
               onClick={onRequestPayout}
               disabled={balance < 50000} // 500 INR
             >

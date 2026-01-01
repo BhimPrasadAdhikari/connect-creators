@@ -373,7 +373,7 @@ export default async function CreatorDashboardPage() {
             <Link href="/dashboard/creator/tiers">
               <Button 
                 variant="brutal" 
-                className="w-full bg-card text-primary hover:bg-brutal-cream"
+                className="w-full bg-accent-yellow text-primary hover:bg-brutal-cream"
               >
                 Manage Tiers
               </Button>
@@ -389,25 +389,25 @@ export default async function CreatorDashboardPage() {
           <BentoContent>
             <div className="grid grid-cols-2 gap-3">
               <Link href="/dashboard/creator/earnings">
-                <Button variant="brutal" size="sm" fullWidth className="justify-start">
+                <Button variant="secondary" size="sm" fullWidth className="justify-start">
                   <DollarSign className="w-4 h-4 mr-2" />
                   Earnings
                 </Button>
               </Link>
               <Link href="/dashboard/creator/settings">
-                <Button variant="brutal" size="sm" fullWidth className="justify-start">
+                <Button variant="secondary" size="sm" fullWidth className="justify-start">
                   <Users className="w-4 h-4 mr-2" />
                   Settings
                 </Button>
               </Link>
               <Link href="/dashboard/creator/products">
-                <Button variant="brutal" size="sm" fullWidth className="justify-start">
+                <Button variant="secondary" size="sm" fullWidth className="justify-start">
                   <FileText className="w-4 h-4 mr-2" />
                   Products
                 </Button>
               </Link>
               <Link href="/dashboard/creator/payouts">
-                <Button variant="brutal" size="sm" fullWidth className="justify-start">
+                <Button variant="secondary" size="sm" fullWidth className="justify-start">
                   <TrendingUp className="w-4 h-4 mr-2" />
                   Payouts
                 </Button>

@@ -22,7 +22,7 @@ export function CTASection() {
               <Button 
                 variant="brutal" 
                 size="lg" 
-                className="gap-2 w-full sm:w-auto bg-card text-primary hover:bg-brutal-cream"
+                className="gap-2  w-full sm:w-auto bg-accent-yellow text-primary"
               >
                 Explore Creators
                 <ArrowRight className="w-5 h-5" />

@@ -150,7 +150,7 @@ export function Header({ transparent = false }: HeaderProps) {
                   href={userRole === "CREATOR" ? "/dashboard/creator" : "/dashboard"}
                   className="hidden sm:inline-flex"
                 >
-                  <Button variant="brutal" size="sm" className="hidden xl:flex">
+                  <Button variant="brutal-accent" size="sm" className="hidden xl:flex">
                     Dashboard
                   </Button>
                 </Link>
